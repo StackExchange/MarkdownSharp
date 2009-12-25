@@ -1,0 +1,10 @@
+C:\Users\Jeff\Documents\Visual Studio 2008\Projects\MarkdownSharp\MarkdownSharp\bin\Release\MarkdownSharp.pdb
+C:\Users\Jeff\Documents\Visual Studio 2008\Projects\MarkdownSharp\MarkdownSharp\obj\Release\ResolveAssemblyReference.cache
+C:\Users\Jeff\Documents\Visual Studio 2008\Projects\MarkdownSharp\MarkdownSharp\obj\Release\MarkdownSharp.pdb
+C:\Users\Jeff\Documents\Visual Studio 2008\Projects\MarkdownSharp\MarkdownSharp\bin\Release\MarkdownSharp.dll
+C:\Users\Jeff\Documents\Visual Studio 2008\Projects\MarkdownSharp\MarkdownSharp\obj\Release\MarkdownSharp.dll
+C:\svn3\MarkdownSharp\MarkdownSharp\bin\Release\MarkdownSharp.dll
+C:\svn3\MarkdownSharp\MarkdownSharp\bin\Release\MarkdownSharp.pdb
+C:\svn3\MarkdownSharp\MarkdownSharp\obj\Release\ResolveAssemblyReference.cache
+C:\svn3\MarkdownSharp\MarkdownSharp\obj\Release\MarkdownSharp.dll
+C:\svn3\MarkdownSharp\MarkdownSharp\obj\Release\MarkdownSharp.pdb

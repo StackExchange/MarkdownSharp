@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="C:\Users\Jeff\Documents\Visual Studio 2008\Projects\MarkdownSharp\MarkdownSharpTests\bin\Debug\MarkdownSharpTests.exe" total="1" failures="1" not-run="0" date="2009-12-24" time="15:58:39">
+  <environment nunit-version="2.4.7.0" clr-version="2.0.50727.4927" os-version="Microsoft Windows NT 6.1.7600.0" platform="Win32NT" cwd="C:\Users\Jeff\Documents\Visual Studio 2008\Projects\MarkdownSharp\MarkdownSharpTests\bin\Debug" machine-name="WUMPUS-HOME-X64" user="Jeff" user-domain="wumpus-home-x64" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite name="C:\Users\Jeff\Documents\Visual Studio 2008\Projects\MarkdownSharp\MarkdownSharpTests\bin\Debug\MarkdownSharpTests.exe" success="False" time="0.637" asserts="0">
+    <results>
+      <test-suite name="MarkdownSharpTests" success="False" time="0.633" asserts="0">
+        <results>
+          <test-suite name="CoreTests" success="False" time="0.620" asserts="0">
+            <results>
+              <test-case name="MarkdownSharpTests.CoreTests.HelloWorld" executed="True" success="False" time="0.451" asserts="1">
+                <failure>
+                  <message><![CDATA[  Expected string length 28 but was 29. Strings differ at index 28.
+  Expected: "<p>Hello <em>World!</em></p>"
+  But was:  "<p>Hello <em>World!</em></p>\n"
+  ---------------------------------------^
+]]></message>
+                  <stack-trace><![CDATA[at MarkdownSharpTests.CoreTests.HelloWorld() in C:\Users\Jeff\Documents\Visual Studio 2008\Projects\MarkdownSharp\MarkdownSharpTests\CoreTests.cs:line 19
+]]></stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
