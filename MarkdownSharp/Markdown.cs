@@ -98,7 +98,7 @@ namespace MarkdownSharp
         /// enter ">" here for HTML output
         /// enter "/>" here for XHTML output
         /// </summary>
-        private const string _emptyElementSuffix = ">";
+        private const string _emptyElementSuffix = "/>";
         /// <summary>
         /// when this is true, RETURN becomes a literal newline. 
         /// Beware: this is a major deviation from the Markdown spec!
@@ -436,7 +436,10 @@ namespace MarkdownSharp
             text = DoItalicsAndBold(text);
 
             // do hard breaks
-            text = Regex.Replace(text, @" {2,}\n", string.Format("<br{0}\n", _emptyElementSuffix));
+            if (_autoNewlines)
+                text = Regex.Replace(text, @"\n", string.Format("<br{0}\n", _emptyElementSuffix));
+            else
+                text = Regex.Replace(text, @" {2,}\n", string.Format("<br{0}\n", _emptyElementSuffix));
 
             return text;
         }
@@ -985,6 +988,7 @@ namespace MarkdownSharp
         }
 
         private static Regex _codeSpan = new Regex(@"
+                    (?<!\\)		# Character before opening ` can't be a backslash
                     (`+)		# $1 = Opening run of `
 			        (.+?)		# $2 = The code block
 			        (?<!`)
@@ -1025,6 +1029,7 @@ namespace MarkdownSharp
         private string CodeSpanEvaluator(Match match)
         {
             string s = match.Groups[2].Value;
+            // remove leading and trailing whitespace
             s = s.Replace(@"^[ \t]*", "").Replace(@"[ \t]*$", "");
             s = EncodeCode(s);
 

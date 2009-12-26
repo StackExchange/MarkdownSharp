@@ -131,5 +131,13 @@ namespace MarkdownSharpTests
             Assert.AreEqual("<div>\nHello World!\n</div>\n", s);
         }
 
+        [Test]
+        public void Escaping()
+        {
+            var m = new MarkdownSharp.Markdown();
+            string s = m.Transform(@"\`foo\`");
+            Assert.AreEqual("<p>`foo`</p>\n", s);
+        }
+
     }
 }
