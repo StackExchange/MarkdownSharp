@@ -1030,7 +1030,8 @@ namespace MarkdownSharp
         {
             string s = match.Groups[2].Value;
             // remove leading and trailing whitespace
-            s = s.Replace(@"^[ \t]*", "").Replace(@"[ \t]*$", "");
+            s = Regex.Replace(s, @"^[ \t]*", "");
+            s = Regex.Replace(s, @"[ \t]*$", "");
             s = EncodeCode(s);
 
             return string.Concat("<code>", s, "</code>");
