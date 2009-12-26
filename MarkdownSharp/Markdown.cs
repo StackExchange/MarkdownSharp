@@ -96,9 +96,9 @@ namespace MarkdownSharp
 
         /// <summary>
         /// enter ">" here for HTML output
-        /// enter "/>" here for XHTML output
+        /// enter " />" here for XHTML output
         /// </summary>
-        private const string _emptyElementSuffix = "/>";
+        private const string _emptyElementSuffix = " />";
         /// <summary>
         /// when this is true, RETURN becomes a literal newline. 
         /// Beware: this is a major deviation from the Markdown spec!
