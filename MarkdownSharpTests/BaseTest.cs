@@ -35,11 +35,10 @@ namespace MarkdownSharpTests
 
         public string LoadFile(string filename)
         {
+            string path;
             //string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string path = @"c:\svn3\MarkdownSharp\MarkdownSharpTests\";
-            //path = path.Replace(@"\bin\Release", "");
-            //path = path.Replace(@"\bin\Debug", "");
-            //path = path.Replace("MarkdownSharpTests.exe", "");
+            throw new Exception("you must edit the path variable in LoadFile() before running tests");
+            //path = @"c:\svn3\MarkdownSharpTests\";
             string file = Path.Combine(path, filename);
             return File.ReadAllText(file);
         }

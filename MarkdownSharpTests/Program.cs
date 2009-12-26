@@ -20,7 +20,20 @@ namespace MarkdownSharpTests
             log4net.Config.XmlConfigurator.Configure();
             RunTests();
 
+            //AdHocTest();
+            //RealityCheck();
+
             Console.ReadKey();
+        }
+
+        /// <summary>
+        /// quick and dirty test for one-liner Markdown bug repros
+        /// </summary>
+        private static void AdHocTest()
+        {
+            var m = new MarkdownSharp.Markdown();
+            string s = m.Transform(@"Backtick: `` \` ``");
+            var x = s;
         }
 
         private static void RealityCheck()
@@ -34,7 +47,7 @@ namespace MarkdownSharpTests
             if (s != expected)
                 throw new Exception("reality check failed!");
             else
-                Console.WriteLine("pass");
+                Console.WriteLine("reality check passed. phew.");
 
         }
 
