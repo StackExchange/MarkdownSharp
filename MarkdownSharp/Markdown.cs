@@ -81,6 +81,7 @@ software, even if advised of the possibility of such damage.
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -124,12 +125,12 @@ namespace MarkdownSharp
         private static string _nestedBracketsPattern;
         private static string _markerAnyPattern;
                 
-        private static readonly Hashtable _escapeTable;
-        private static readonly Hashtable _backslashEscapeTable;
+        private static readonly Dictionary<string, string> _escapeTable;
+        private static readonly Dictionary<string, string> _backslashEscapeTable;
 
-        private Hashtable _urls;
-        private Hashtable _titles;
-        private Hashtable _htmlBlocks;
+        private Dictionary<string, string> _urls;
+        private Dictionary<string, string> _titles;
+        private Dictionary<string, string> _htmlBlocks;
 
         private int _listLevel = 0;
 
@@ -142,35 +143,35 @@ namespace MarkdownSharp
         static Markdown()
         {
             // Table of hash values for escaped characters:
-            _escapeTable = new Hashtable();
-            _escapeTable[@"\"] = @"\".GetHashCode();
-            _escapeTable["`"] = "`".GetHashCode();
-            _escapeTable["*"] = "*".GetHashCode();
-            _escapeTable["_"] = "_".GetHashCode();
-            _escapeTable["{"] = "{".GetHashCode();
-            _escapeTable["}"] = "}".GetHashCode();
-            _escapeTable["["] = "[".GetHashCode();
-            _escapeTable["]"] = "]".GetHashCode();
-            _escapeTable["("] = "(".GetHashCode();
-            _escapeTable[")"] = ")".GetHashCode();
-            _escapeTable[">"] = ">".GetHashCode();
-            _escapeTable["#"] = "#".GetHashCode();
-            _escapeTable["+"] = "+".GetHashCode();
-            _escapeTable["-"] = "-".GetHashCode();
-            _escapeTable["."] = ".".GetHashCode();
-            _escapeTable["!"] = "!".GetHashCode();
+            _escapeTable = new Dictionary<string, string>();
+            _escapeTable[@"\"] = @"\".GetHashCode().ToString();
+            _escapeTable["`"] = "`".GetHashCode().ToString();
+            _escapeTable["*"] = "*".GetHashCode().ToString();
+            _escapeTable["_"] = "_".GetHashCode().ToString();
+            _escapeTable["{"] = "{".GetHashCode().ToString();
+            _escapeTable["}"] = "}".GetHashCode().ToString();
+            _escapeTable["["] = "[".GetHashCode().ToString();
+            _escapeTable["]"] = "]".GetHashCode().ToString();
+            _escapeTable["("] = "(".GetHashCode().ToString();
+            _escapeTable[")"] = ")".GetHashCode().ToString();
+            _escapeTable[">"] = ">".GetHashCode().ToString();
+            _escapeTable["#"] = "#".GetHashCode().ToString();
+            _escapeTable["+"] = "+".GetHashCode().ToString();
+            _escapeTable["-"] = "-".GetHashCode().ToString();
+            _escapeTable["."] = ".".GetHashCode().ToString();
+            _escapeTable["!"] = "!".GetHashCode().ToString();
 
             // Create an identical table but for escaped characters.
-            _backslashEscapeTable = new Hashtable();
+            _backslashEscapeTable = new Dictionary<string, string>();
             foreach (string key in _escapeTable.Keys)
                 _backslashEscapeTable[@"\" + key] = _escapeTable[key];
         }
 
         public Markdown()
         {
-            _urls = new Hashtable();
-            _titles = new Hashtable();
-            _htmlBlocks = new Hashtable();
+            _urls = new Dictionary<string, string>();
+            _titles = new Dictionary<string, string>();
+            _htmlBlocks = new Dictionary<string, string>();
         }
 
         public static string GetNestedBracketsPattern()
@@ -256,7 +257,7 @@ namespace MarkdownSharp
 
         private string LinkEvaluator(Match match)
         {
-            string linkID = match.Groups[1].Value.ToLower();
+            string linkID = match.Groups[1].Value.ToLowerInvariant();
             _urls[linkID] = EncodeAmpsAndAngles(match.Groups[2].Value);
 
             if (match.Groups[3] != null && match.Groups[3].Length > 0)
@@ -520,10 +521,10 @@ namespace MarkdownSharp
 
                 if (token.First == "tag")
                 {
-                    value = value.Replace(@"\", _escapeTable[@"\"].ToString());
-                    value = Regex.Replace(value, "(?<=.)</?code>(?=.)", _escapeTable[@"\"].ToString());
-                    value = value.Replace("*", _escapeTable["*"].ToString());
-                    value = value.Replace("_", _escapeTable["_"].ToString());
+                    value = value.Replace(@"\", _escapeTable[@"\"]);
+                    value = Regex.Replace(value, "(?<=.)</?code>(?=.)", _escapeTable[@"\"]);
+                    value = value.Replace("*", _escapeTable["*"]);
+                    value = value.Replace("_", _escapeTable["_"]);
                 }                    
 
                 sb.Append(value);
@@ -584,7 +585,7 @@ namespace MarkdownSharp
         {
             string wholeMatch = match.Groups[1].Value;
             string linkText = match.Groups[2].Value;
-            string linkID = match.Groups[3].Value.ToLower();
+            string linkID = match.Groups[3].Value.ToLowerInvariant();
             string url;            
             string title;
 
@@ -592,19 +593,19 @@ namespace MarkdownSharp
 
             // for shortcut links like [this][].
             if (linkID == "")
-                linkID = linkText.ToLower();
+                linkID = linkText.ToLowerInvariant();
 
-            if (_urls[linkID] != null)
+            if (_urls.ContainsKey(linkID))
             {
-                url = _urls[linkID].ToString();
+                url = _urls[linkID];
                 url = EncodeProblemUrlChars(url);
                 output = "<a href=\"" + url + "\"";
 
-                if (_titles[linkID] != null)
+                if (_titles.ContainsKey(linkID))
                 {
-                    title = _titles[linkID].ToString();
-                    title = title.Replace("*", _escapeTable["*"].ToString());
-                    title = title.Replace("_", _escapeTable["_"].ToString());
+                    title = _titles[linkID];
+                    title = title.Replace("*", _escapeTable["*"]);
+                    title = title.Replace("_", _escapeTable["_"]);
                     output += " title=\"" + title + "\"";
                 }
 
@@ -652,8 +653,8 @@ namespace MarkdownSharp
             if (!String.IsNullOrEmpty(title))
             {
                 title = title.Replace("\"", "&quot;");
-                title = title.Replace("*", _escapeTable["*"].ToString());
-                title = title.Replace("_", _escapeTable["_"].ToString());
+                title = title.Replace("*", _escapeTable["*"]);
+                title = title.Replace("_", _escapeTable["_"]);
                 output += string.Format(" title=\"{0}\"", title);
             }
 
@@ -714,30 +715,29 @@ namespace MarkdownSharp
         {
             string wholeMatch = match.Groups[1].Value;
             string altText = match.Groups[2].Value;
-            string linkID = match.Groups[3].Value.ToLower();
+            string linkID = match.Groups[3].Value.ToLowerInvariant();
             string url;
             string output;
             string title;
 
             // for shortcut links like ![this][].
             if (linkID == "")
-                linkID = altText.ToLower();
+                linkID = altText.ToLowerInvariant();
 
             altText = altText.Replace("\"", "&quot;");
 
-            if (_urls[linkID] != null)
+            if (_urls.ContainsKey(linkID))
             {
-                url = _urls[linkID].ToString();
-
+                url = _urls[linkID];
                 url = EncodeProblemUrlChars(url);
 
                 output = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, altText);
 
-                if (_titles[linkID] != null)
+                if (_titles.ContainsKey(linkID))
                 {
-                    title = _titles[linkID].ToString();
-                    title = title.Replace("*", _escapeTable["*"].ToString());
-                    title = title.Replace("_", _escapeTable["_"].ToString());
+                    title = _titles[linkID];
+                    title = title.Replace("*", _escapeTable["*"]);
+                    title = title.Replace("_", _escapeTable["_"]);
 
                     output += string.Format(" title=\"{0}\"", title);
                 }
@@ -769,8 +769,8 @@ namespace MarkdownSharp
 
             if (!String.IsNullOrEmpty(title))
             {
-                title = title.Replace("*", _escapeTable["*"].ToString());
-                title = title.Replace("_", _escapeTable["_"].ToString());
+                title = title.Replace("*", _escapeTable["*"]);
+                title = title.Replace("_", _escapeTable["_"]);
                 output += string.Format(" title=\"{0}\"", title);
             }
 
@@ -1074,13 +1074,13 @@ namespace MarkdownSharp
             code = code.Replace(">", "&gt;");
 
             // Now, escape characters that are magic in Markdown
-            code = code.Replace("*", _escapeTable["*"].ToString());
-            code = code.Replace("_", _escapeTable["_"].ToString());
-            code = code.Replace("{", _escapeTable["{"].ToString());
-            code = code.Replace("}", _escapeTable["}"].ToString());
-            code = code.Replace("[", _escapeTable["["].ToString());
-            code = code.Replace("]", _escapeTable["]"].ToString());
-            code = code.Replace(@"\", _escapeTable[@"\"].ToString());
+            code = code.Replace("*", _escapeTable["*"]);
+            code = code.Replace("_", _escapeTable["_"]);
+            code = code.Replace("{", _escapeTable["{"]);
+            code = code.Replace("}", _escapeTable["}"]);
+            code = code.Replace("[", _escapeTable["["]);
+            code = code.Replace("]", _escapeTable["]"]);
+            code = code.Replace(@"\", _escapeTable[@"\"]);
 
             return code;
         }
@@ -1161,7 +1161,7 @@ namespace MarkdownSharp
             // Wrap <p> tags.
             for (int i = 0; i < paragraphs.Length; i++)
             {
-                if (_htmlBlocks[paragraphs[i]] == null)
+                if (!_htmlBlocks.ContainsKey(paragraphs[i]))
                 {
                     string block = paragraphs[i];
 
@@ -1176,10 +1176,8 @@ namespace MarkdownSharp
             // Unhashify HTML blocks
             for (int i = 0; i < paragraphs.Length; i++)
             {
-                string block = (string)_htmlBlocks[paragraphs[i]];
-
-                if (block != null)
-                    paragraphs[i] = block;
+                if (_htmlBlocks.ContainsKey(paragraphs[i]))
+                    paragraphs[i] = _htmlBlocks[paragraphs[i]];
             }
 
             return string.Join("\n\n", paragraphs);
@@ -1305,7 +1303,7 @@ namespace MarkdownSharp
         {
             // Must process escaped backslashes first.
             foreach (string key in _backslashEscapeTable.Keys)
-                value = value.Replace(key, _backslashEscapeTable[key].ToString());
+                value = value.Replace(key, _backslashEscapeTable[key]);
 
             return value;
         }
@@ -1316,7 +1314,7 @@ namespace MarkdownSharp
         private string UnescapeSpecialChars(string text)
         {
             foreach (string key in _escapeTable.Keys)
-                text = text.Replace(_escapeTable[key].ToString(), key);
+                text = text.Replace(_escapeTable[key], key);
 
             return text;
         }
@@ -1326,7 +1324,7 @@ namespace MarkdownSharp
         /// </summary>
         private string Outdent(string block)
         {
-            return Regex.Replace(block, @"^(\t|[ ]{1," + _tabWidth.ToString() + @"})", "", RegexOptions.Multiline);
+            return Regex.Replace(block, @"^(\t|[ ]{1," + _tabWidth + @"})", "", RegexOptions.Multiline);
         }
 
         // profiler says this one is expensive
