@@ -64,7 +64,7 @@ namespace MarkdownSharpTests
         {
             var m = new MarkdownSharp.Markdown();
             string s = m.Transform("An image goes here: ![alt text][1]\n\n  [1]: http://www.google.com/intl/en_ALL/images/logo.gif");
-            Assert.AreEqual("<p>An image goes here: <img src=\"http://www.google.com/intl/en%5FALL/images/logo.gif\" alt=\"alt text\"></p>\n", s);
+            Assert.AreEqual("<p>An image goes here: <img src=\"http://www.google.com/intl/en%5FALL/images/logo.gif\" alt=\"alt text\" /></p>\n", s);
         }
 
         [Test]
@@ -137,6 +137,14 @@ namespace MarkdownSharpTests
             var m = new MarkdownSharp.Markdown();
             string s = m.Transform(@"\`foo\`");
             Assert.AreEqual("<p>`foo`</p>\n", s);
+        }
+
+        [Test]
+        public void HorizontalRule()
+        {
+            var m = new MarkdownSharp.Markdown();
+            string s = m.Transform("* * *\n\n***\n\n*****\n\n- - -\n\n---------------------------------------\n\n");
+            Assert.AreEqual("<hr />\n\n<hr />\n\n<hr />\n\n<hr />\n\n<hr />\n", s);
         }
 
     }
