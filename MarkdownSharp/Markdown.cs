@@ -118,6 +118,10 @@ namespace MarkdownSharp
         /// when true, email addresses will be auto-linked if present
         /// </summary>
         private const bool _linkEmails = false;
+        /// <summary>
+        /// when true, bold and italic require non-word characters on either side
+        /// </summary>
+        private const bool _strictBoldItalic = false;
 
         private const string _markerUL = @"[*+-]";
         private const string _markerOL = @"\d+[.]";
@@ -187,6 +191,37 @@ namespace MarkdownSharp
                 _markerAnyPattern = string.Format("(?:{0}|{1})", _markerUL, _markerOL);
             return _markerAnyPattern;
         }
+
+        public static string GetBoldPattern()
+        {
+            if (_strictBoldItalic)
+                return @"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)";
+            else
+                return @"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1";
+        }
+        public static string GetBoldReplace()
+        {
+            if (_strictBoldItalic)
+                return "$1<strong>$3</strong>$4";
+            else
+                return "<strong>$2</strong>";
+        }
+
+        public static string GetItalicPattern()
+        {
+            if (_strictBoldItalic)
+                return @"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)";
+            else
+                return @"(\*|_) (?=\S) (.+?) (?<=\S) \1";
+        }
+        public static string GetItalicReplace()
+        {
+            if (_strictBoldItalic)
+                return "$1<em>$3</em>$4";
+            else
+                return "<em>$2</em>";
+        }
+
 
         /// <summary>
         /// Main function. The order in which other subs are called here is
@@ -1093,22 +1128,19 @@ namespace MarkdownSharp
         }
 
 
-        // WARNING: we deviate from the markdown spec here, and are more strict with italic and bold 
-        // this should probably be a configuration option
-
         // profiler says this one is expensive
-        private static Regex _strong = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
+        private static Regex _strong = new Regex(GetBoldPattern(),
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
         // profiler says this one is expensive
-        private static Regex _italics = new Regex(@"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
+        private static Regex _italics = new Regex(GetItalicPattern(),
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         private string DoItalicsAndBold(string text)
         {
             // <strong> must go first:
-            text = _strong.Replace(text, "$1<strong>$3</strong>$4");
+            text = _strong.Replace(text, GetBoldReplace());
             // Then <em>:
-            text = _italics.Replace(text, "$1<em>$3</em>$4");
+            text = _italics.Replace(text, GetItalicReplace());
 
             return text;
         }
