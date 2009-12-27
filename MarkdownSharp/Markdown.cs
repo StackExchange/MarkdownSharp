@@ -1367,19 +1367,23 @@ namespace MarkdownSharp
         }
 
         // profiler says this one is expensive
-        private static Regex _deTab = new Regex(@"(.*?)\t", RegexOptions.Multiline | RegexOptions.Compiled);
+        private static Regex _deTab = new Regex(@"^(.*?)(\t+)", RegexOptions.Multiline | RegexOptions.Compiled);
 
         private string Detab(string text)
         {
             // Inspired from a post by Bart Lateur: 
             // http://www.nntp.perl.org/group/perl.macperl.anyperl/154
+            //
+            // without a beginning of line anchor, the above has HIDEOUS performance
+            // so I added a line anchor and we count the # of tabs beyond that.
             return _deTab.Replace(text, new MatchEvaluator(TabEvaluator));
         }
 
         private string TabEvaluator(Match match)
         {
             string leading = match.Groups[1].Value;
-            return string.Concat(leading, RepeatString(" ", _tabWidth - leading.Length % _tabWidth));
+            int tabCount = match.Groups[2].Value.Length;
+            return new String(' ', (_tabWidth - leading.Length % _tabWidth) + ((tabCount - 1) * _tabWidth));
         }
 
 
