@@ -726,7 +726,7 @@ namespace MarkdownSharp
                 \s?             # one optional whitespace character
 		        \(			    # literal paren
 			        [ \t]*
-			        <?(\S+?)>?	# href = $3
+			        <?(\S*?)>?	# href = $3
 			        [ \t]*
 			        (			# $4
 			        (['\x22])	# quote char = $5
