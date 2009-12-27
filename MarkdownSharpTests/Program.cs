@@ -24,7 +24,6 @@ namespace MarkdownSharpTests
             //Benchmark();
 
             //AdHocTest();
-            //RealityCheck();
             
             Console.ReadKey();
         }
@@ -36,7 +35,7 @@ namespace MarkdownSharpTests
         {
             var m = new MarkdownSharp.Markdown();
 
-            string input = @"---";
+            string input = "    line1\n    \tline2\n    \t\tline3\n    \t\t\tline4\n";
             string output = m.Transform(input);
 
             Console.WriteLine("input:");
@@ -79,6 +78,9 @@ namespace MarkdownSharpTests
                 input = FileContents(file);
                 expected = FileContents(file.Replace(".text", ".html"));
                 output = m.Transform(input);
+
+                // clear any existing actual results, first
+                File.Delete(file.Replace(".text", ".actual.html"));
 
                 total++;
 
