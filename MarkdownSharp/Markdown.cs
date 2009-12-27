@@ -1004,8 +1004,9 @@ namespace MarkdownSharp
         private string CodeBlockEvaluator(Match match)
         {
             string codeBlock = match.Groups[1].Value;
+
             codeBlock = EncodeCode(Outdent(codeBlock));
-            
+            codeBlock = Detab(codeBlock);            
             codeBlock = Regex.Replace(codeBlock, @"^\n+", ""); // trim leading newlines
             codeBlock = Regex.Replace(codeBlock, @"\n+\z", ""); // trim trailing newlines
 
