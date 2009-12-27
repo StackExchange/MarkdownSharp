@@ -563,7 +563,7 @@ namespace MarkdownSharp
                 if (token.First == "tag")
                 {
                     value = value.Replace(@"\", _escapeTable[@"\"]);
-                    value = Regex.Replace(value, "(?<=.)</?code>(?=.)", _escapeTable[@"\"]);
+                    value = Regex.Replace(value, "(?<=.)</?code>(?=.)", _escapeTable[@"`"]);
                     value = value.Replace("*", _escapeTable["*"]);
                     value = value.Replace("_", _escapeTable["_"]);
                 }                    
