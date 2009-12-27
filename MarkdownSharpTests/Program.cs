@@ -35,7 +35,7 @@ namespace MarkdownSharpTests
         {
             var m = new MarkdownSharp.Markdown();
 
-            string input = @"![`<b>`Testing something](http://stackoverflow.com/content/img/so/logo.png)";
+            string input = @"---";
             string output = m.Transform(input);
 
             Console.WriteLine("input:");
@@ -53,8 +53,8 @@ namespace MarkdownSharpTests
             //var m = new MarkdownSharp.MarkdownOld();
             var m = new MarkdownSharp.Markdown();
 
-            string input = m.Transform(FileContents("TestFiles/reality-check.txt"));
-            string output = FileContents("TestFiles/reality-check.html");
+            string input = m.Transform(FileContents("test-input/reality-check.txt"));
+            string output = FileContents("test-input/reality-check.html");
 
             if (input != output)
                 throw new Exception("reality check failed!");
@@ -74,7 +74,7 @@ namespace MarkdownSharpTests
         /// </remarks>
         static void GenerateMDTestOutput()
         {
-            string testfolder = @"MDTest1.1\";
+            string testfolder = @"mdtest-1.1\";
 
             string path = Path.Combine(ExecutingAssemblyPath, testfolder);
             string input;
@@ -121,8 +121,9 @@ namespace MarkdownSharpTests
             if (err > 0)            
             {
                 Console.WriteLine();
-                Console.WriteLine("for each mismatch, an appropriately named .output.html file was generated");
-                Console.WriteLine("to troubleshoot mismatches, use a diff tool on .html and .output.html");
+                Console.WriteLine("for each mismatch, a *.output.html file was generated in");
+                Console.WriteLine(path);
+                Console.WriteLine("to troubleshoot mismatches, use a diff tool on *.html and *.output.html");
             }
 
         }
@@ -172,9 +173,9 @@ namespace MarkdownSharpTests
         /// </summary>
         static void Benchmark()
         {
-            Benchmark(FileContents("BenchmarkFiles/markdown-example-short-1.txt"), 1000);
-            Benchmark(FileContents("BenchmarkFiles/markdown-example-medium-1.txt"), 500);
-            Benchmark(FileContents("BenchmarkFiles/markdown-example-long-2.txt"), 100);
+            Benchmark(FileContents("benchmark/markdown-example-short-1.txt"), 1000);
+            Benchmark(FileContents("benchmark/markdown-example-medium-1.txt"), 500);
+            Benchmark(FileContents("benchmark/markdown-example-long-2.txt"), 100);
         }
 
         /// <summary>

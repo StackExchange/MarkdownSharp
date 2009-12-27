@@ -13,7 +13,7 @@ namespace MarkdownSharpTests
     public class MDTestTests : BaseTest
     {
 
-        const string folder = @"MDTest1.1\";
+        const string folder = @"mdtest-1.1\";
 
         private string LoadInput(string filename)
         {
