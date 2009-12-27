@@ -1383,7 +1383,7 @@ namespace MarkdownSharp
         {
             string leading = match.Groups[1].Value;
             int tabCount = match.Groups[2].Value.Length;
-            return new String(' ', (_tabWidth - leading.Length % _tabWidth) + ((tabCount - 1) * _tabWidth));
+            return String.Concat(leading, new String(' ', (_tabWidth - leading.Length % _tabWidth) + ((tabCount - 1) * _tabWidth)));
         }
 
 
