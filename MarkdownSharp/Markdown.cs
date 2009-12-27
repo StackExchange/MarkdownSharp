@@ -1090,10 +1090,10 @@ namespace MarkdownSharp
         // this should probably be a configuration option
 
         // profiler says this one is expensive
-        private static Regex _strong = new Regex(@"(\s|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 (\W|$)",
+        private static Regex _strong = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
         // profiler says this one is expensive
-        private static Regex _italics = new Regex(@"(\s|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 (\W|$)",
+        private static Regex _italics = new Regex(@"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         private string DoItalicsAndBold(string text)
