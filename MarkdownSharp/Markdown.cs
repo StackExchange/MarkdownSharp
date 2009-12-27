@@ -191,11 +191,19 @@ namespace MarkdownSharp
         /// <summary>
         /// Main function. The order in which other subs are called here is
         /// essential. Link and image substitutions need to happen before
-        /// EscapeSpecialChars(), so that any *'s or _'s in the <a>
-        /// and <img> tags get encoded.
+        /// EscapeSpecialChars(), so that any *'s or _'s in the &lt;a&gt;
+        /// and &lt;img&gt; tags get encoded.
         /// </summary>
         public string Transform(string text)
         {
+            // Clear the global hashes. If we don't clear these, you get conflicts
+	        // from other articles when generating a page which contains more than
+	        // one article (e.g. an index page that shows the N most recent
+	        // articles):
+            _urls.Clear();
+            _titles.Clear();
+            _htmlBlocks.Clear();
+
             // Standardize line endings             
             text = text.Replace("\r\n", "\n");    // DOS to Unix
             text = text.Replace("\r", "\n");      // Mac to Unix
@@ -299,7 +307,7 @@ namespace MarkdownSharp
 					\A\n?			    # the beginning of the doc
 				)
 				(						# save in $1
-					[ ]{{0, {0}}}
+					[ ]{{0,{0}}}
 					<(hr)				# start tag = $2
 					\b					# word break
 					([^<>])*?			#
@@ -326,18 +334,15 @@ namespace MarkdownSharp
 				)", _tabWidth - 1), RegexOptions.IgnorePatternWhitespace);
 
         /// <summary>
-        /// Hashify HTML blocks
+        /// Hashify HTML blocks:
+        /// We only want to do this for block-level HTML tags, such as headers,
+        /// lists, and tables. That's because we still want to wrap &lt;p&gt;s around
+        /// "paragraphs" that are wrapped in non-block-level tags, such as anchors,
+        /// phrase emphasis, and spans. The list of tags we're looking for is
+        /// hard-coded.        
         /// </summary>
         private string HashHTMLBlocks(string text)
         {
-            /*
-             We only want to do this for block-level HTML tags, such as headers,
-             lists, and tables. That's because we still want to wrap <p>s around
-             "paragraphs" that are wrapped in non-block-level tags, such as anchors,
-             phrase emphasis, and spans. The list of tags we're looking for is
-             hard-coded.
-            */
-
             /*
              First, look for nested blocks, e.g.:
             <div>
@@ -388,6 +393,7 @@ namespace MarkdownSharp
         {
             text = DoHeaders(text);
 
+            // Do Horizontal Rules:
             text = _block1.Replace(text, "<hr" + _emptyElementSuffix + "\n");
             text = _block2.Replace(text, "<hr" + _emptyElementSuffix + "\n");
             text = _block3.Replace(text, "<hr" + _emptyElementSuffix + "\n");
