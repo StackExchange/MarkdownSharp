@@ -1335,7 +1335,7 @@ namespace MarkdownSharp
         }
 
         // profiler says this one is expensive
-        private static Regex _deTab = new Regex(@"^(.*?)\t", RegexOptions.Multiline | RegexOptions.Compiled);
+        private static Regex _deTab = new Regex(@"(.*?)\t", RegexOptions.Multiline | RegexOptions.Compiled);
 
         private string Detab(string text)
         {
