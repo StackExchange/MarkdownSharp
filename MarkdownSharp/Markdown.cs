@@ -633,7 +633,7 @@ namespace MarkdownSharp
             url = url.Replace("_", "%5F");
             if (url.Length > 7 && url.Substring(7).Contains(":"))
             {
-                // replace any colons NOT followed by 2 or more numbers
+                // replace any colons in the body of the URL that are NOT followed by 2 or more numbers
                 url = url.Substring(0, 7) + Regex.Replace(url.Substring(7), @":(?!\d{2,})", "%3A");
             }
             return url;
