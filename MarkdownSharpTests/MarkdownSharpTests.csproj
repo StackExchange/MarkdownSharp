@@ -131,7 +131,7 @@
     <Content Include="nunit-console\nunit.core.interfaces.dll" />
     <Content Include="nunit-console\nunit.util.dll" />
     <Content Include="test-input\reality-check.html" />
-    <Content Include="test-input\reality-check.txt" />
+    <None Include="test-input\reality-check.text" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

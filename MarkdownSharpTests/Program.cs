@@ -16,9 +16,10 @@ namespace MarkdownSharpTests
 
             UnitTests();
 
-            //GenerateMDTestOutput();
+            //GenerateTestOutput(@"mdtest-1.1\");
 
-            //RealityCheck();
+            // quick and dirty "Hello World" type test
+            //GenerateTestOutput(@"test-input\");
 
             //Benchmark();
 
@@ -50,16 +51,7 @@ namespace MarkdownSharpTests
         /// </summary>
         private static void RealityCheck()
         {
-            //var m = new MarkdownSharp.MarkdownOld();
-            var m = new MarkdownSharp.Markdown();
-
-            string input = m.Transform(FileContents("test-input/reality-check.txt"));
-            string output = FileContents("test-input/reality-check.html");
-
-            if (input != output)
-                throw new Exception("reality check failed!");
-            else
-                Console.WriteLine("reality check passed. phew.");
+            
         }
 
         /// <summary>
@@ -72,9 +64,12 @@ namespace MarkdownSharpTests
         /// test_name.html         -- output (expected cooked html output from reference markdown engine)
         /// test_name.actual.html  -- actual output (actual cooked html output from our markdown c# engine)
         /// </remarks>
-        static void GenerateMDTestOutput()
+        static void GenerateTestOutput(string testfolder)
         {
-            string testfolder = @"mdtest-1.1\";
+
+            Console.WriteLine();
+            Console.WriteLine(@"Markdown test run on \" + testfolder);
+            Console.WriteLine();
 
             string path = Path.Combine(ExecutingAssemblyPath, testfolder);
             string input;
