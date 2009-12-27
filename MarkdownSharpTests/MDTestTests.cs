@@ -17,12 +17,12 @@ namespace MarkdownSharpTests
 
         private string LoadInput(string filename)
         {
-            return LoadFile(folder + @"\" + filename + ".text");
+            return FileContents(folder + @"\" + filename + ".text");
         }
 
         private string LoadExpected(string filename)
         {
-            return LoadFile(folder + @"\" + filename + ".html");
+            return FileContents(folder + @"\" + filename + ".html");
         }
 
         [Test]

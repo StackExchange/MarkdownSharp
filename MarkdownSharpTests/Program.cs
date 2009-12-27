@@ -46,15 +46,6 @@ namespace MarkdownSharpTests
         }
 
         /// <summary>
-        /// quick and dirty "hello world" reality check to make sure Markdown is still working  
-        /// consider this a very fast / cheap / inaccurate version of the full set of unit tests 
-        /// </summary>
-        private static void RealityCheck()
-        {
-            
-        }
-
-        /// <summary>
         /// iterates through all the /MDTest1.1 files and generates file-based output 
         /// this is essentially the same as running the unit tests, but with diff-able results
         /// </summary>
@@ -112,8 +103,7 @@ namespace MarkdownSharpTests
             Console.WriteLine("Passed   : " + ok);
             Console.WriteLine("Mismatch : " + err);
 
-
-            if (err > 0)            
+            if (err > 0)
             {
                 Console.WriteLine();
                 Console.WriteLine("for each mismatch, a *.output.html file was generated in");
@@ -126,8 +116,6 @@ namespace MarkdownSharpTests
         /// <summary>
         /// given a full path string return just the filename
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
         private static string GetFileName(string path)
         {
             return Regex.Match(path, @"\\[^\\]+?$").Value.Replace(@"\", "");

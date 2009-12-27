@@ -33,7 +33,7 @@ namespace MarkdownSharpTests
             log.InfoFormat("{0} - Tests complete", GetType().Name);
         }
 
-        public string LoadFile(string filename)
+        public string FileContents(string filename)
         {
             string path;
             //string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
