@@ -89,7 +89,7 @@ namespace MarkdownSharp
 {
     public class Markdown
     {
-        public struct Pair
+        private struct Pair
         {
             public string First;
             public string Second;
@@ -178,28 +178,28 @@ namespace MarkdownSharp
             _htmlBlocks = new Dictionary<string, string>();
         }
 
-        public static string GetNestedBracketsPattern()
+        private static string GetNestedBracketsPattern()
         {
             if (_nestedBracketsPattern == null)
                 _nestedBracketsPattern = RepeatString(@"(?>[^\[\]]+|\[", _nestedBracketDepth) + RepeatString(@"\])*", _nestedBracketDepth);
             return _nestedBracketsPattern;
         }
 
-        public static string GetMarkerAnyPattern()
+        private static string GetMarkerAnyPattern()
         {
             if (_markerAnyPattern == null)
                 _markerAnyPattern = string.Format("(?:{0}|{1})", _markerUL, _markerOL);
             return _markerAnyPattern;
         }
 
-        public static string GetBoldPattern()
+        private static string GetBoldPattern()
         {
             if (_strictBoldItalic)
                 return @"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)";
             else
                 return @"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1";
         }
-        public static string GetBoldReplace()
+        private static string GetBoldReplace()
         {
             if (_strictBoldItalic)
                 return "$1<strong>$3</strong>$4";
@@ -207,14 +207,14 @@ namespace MarkdownSharp
                 return "<strong>$2</strong>";
         }
 
-        public static string GetItalicPattern()
+        private static string GetItalicPattern()
         {
             if (_strictBoldItalic)
                 return @"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)";
             else
                 return @"(\*|_) (?=\S) (.+?) (?<=\S) \1";
         }
-        public static string GetItalicReplace()
+        private static string GetItalicReplace()
         {
             if (_strictBoldItalic)
                 return "$1<em>$3</em>$4";
