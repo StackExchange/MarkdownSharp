@@ -14,14 +14,21 @@ namespace MarkdownSharpTests
         static void Main(string[] args)
         {
 
-            UnitTests();
+            //UnitTests();
 
-            //GenerateTestOutput(@"mdtest-1.1\");
+            //
+            // this is the closest thing to a set of Markdown reference tests I could find
+            //
+            // see http://six.pairlist.net/pipermail/markdown-discuss/2009-February/001526.html
+            // and http://michelf.com/docs/projets/mdtest-1.1.zip
+            // and http://git.michelf.com/mdtest/
+            //
+            GenerateTestOutput(@"mdtest-1.1");
 
             // quick and dirty "Hello World" type test
-            //GenerateTestOutput(@"test-input\");
+            GenerateTestOutput(@"test-input");
 
-            //Benchmark();
+            Benchmark();
 
             //AdHocTest();
             
@@ -29,7 +36,8 @@ namespace MarkdownSharpTests
         }
 
         /// <summary>
-        /// quick and dirty test for one-liner Markdown bug repros
+        /// mini test harness for one-liner Markdown bug repros 
+        /// for anything larger, I recommend using the folder based approach and GenerateTestOutput()
         /// </summary>
         private static void AdHocTest()
         {
@@ -45,17 +53,21 @@ namespace MarkdownSharpTests
         }
 
         /// <summary>
-        /// iterates through all the /MDTest1.1 files and generates file-based output 
+        /// iterates through all the test files in a given folder and generates file-based output 
         /// this is essentially the same as running the unit tests, but with diff-able results
         /// </summary>
         /// <remarks>
-        /// three files are present:
+        /// two files should be present for each test:
         /// test_name.text         -- input (raw markdown)
         /// test_name.html         -- output (expected cooked html output from reference markdown engine)
+        /// 
+        /// this file will be generated if, and ONLY IF, the expected output does not match the actual output
         /// test_name.actual.html  -- actual output (actual cooked html output from our markdown c# engine)
         /// </remarks>
         static void GenerateTestOutput(string testfolder)
         {
+
+            testfolder += @"\";
 
             Console.WriteLine();
             Console.WriteLine(@"Markdown test run on \" + testfolder);
@@ -158,6 +170,10 @@ namespace MarkdownSharpTests
         /// </summary>
         static void Benchmark()
         {
+            Console.WriteLine();
+            Console.WriteLine("running standard benchmark, please wait..");
+            Console.WriteLine();
+
             Benchmark(FileContents("benchmark/markdown-example-short-1.txt"), 1000);
             Benchmark(FileContents("benchmark/markdown-example-medium-1.txt"), 500);
             Benchmark(FileContents("benchmark/markdown-example-long-2.txt"), 100);
