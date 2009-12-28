@@ -58,11 +58,15 @@ namespace MarkdownSharpTests
         /// </summary>
         /// <remarks>
         /// two files should be present for each test:
+        /// 
         /// test_name.text         -- input (raw markdown)
         /// test_name.html         -- output (expected cooked html output from reference markdown engine)
         /// 
-        /// this file will be generated if, and ONLY IF, the expected output does not match the actual output
-        /// test_name.actual.html  -- actual output (actual cooked html output from our markdown c# engine)
+        /// this file will be generated if, and ONLY IF, the expected output does not match the actual output:
+        /// 
+        /// test_name.xxxx.actual.html  -- actual output (actual cooked html output from our markdown c# engine)
+        ///                             -- xxxx is the 16-bit CRC checksum of the file contents; this is included
+        ///                                so you can tell if the contents of a failing test have changed
         /// </remarks>
         static void GenerateTestOutput(string testfolder)
         {
@@ -74,25 +78,23 @@ namespace MarkdownSharpTests
             Console.WriteLine();
 
             string path = Path.Combine(ExecutingAssemblyPath, testfolder);
-            string input;
             string output;
             string expected;
             string filename;
+            string actual;
 
             int ok = 0;
             int err = 0;
+            int errnew = 0;
             int total = 0;
 
             var m = new MarkdownSharp.Markdown();
 
             foreach (var file in Directory.GetFiles(path, "*.text"))
             {
-                input = FileContents(file);
-                expected = FileContents(file.Replace(".text", ".html"));
-                output = m.Transform(input);
-
-                // clear any existing actual results, first
-                File.Delete(file.Replace(".text", ".actual.html"));
+                expected = FileContents(file.Replace(".text", ".html"));                
+                output = m.Transform(FileContents(file));
+                actual = file.Replace(".text", "." + GetCrc16(output) + ".actual.html");
 
                 total++;
 
@@ -107,24 +109,43 @@ namespace MarkdownSharpTests
                 else
                 {
                     err++;
-                    Console.WriteLine("Mismatch");
-                    File.WriteAllText(file.Replace(".text", ".actual.html"), output);
+                    if (File.Exists(actual))
+                    {
+                        Console.WriteLine("Mismatch");
+                    }
+                    else
+                    {
+                        errnew++;
+                        Console.WriteLine("Mismatch *NEW*");
+                        File.WriteAllText(actual, output);
+                    }
                 }
             }
 
             Console.WriteLine();
-            Console.WriteLine("Tests    : " + (ok + err));
-            Console.WriteLine("Passed   : " + ok);
-            Console.WriteLine("Mismatch : " + err);
+            Console.WriteLine("Tests        : " + total);
+            Console.WriteLine("OK           : " + ok);
+            Console.Write("Mismatch     : " + err);
+            if (errnew > 0)
+                Console.Write(" (" + errnew + " *NEW*)");
+            else
+                Console.WriteLine();
 
-            if (err > 0)
+            if (errnew > 0)
             {
                 Console.WriteLine();
-                Console.WriteLine("for each mismatch, a *.output.html file was generated in");
+                Console.WriteLine("for each mismatch, an *.actual.html file was generated in");
                 Console.WriteLine(path);
-                Console.WriteLine("to troubleshoot mismatches, use a diff tool on *.html and *.output.html");
+                Console.WriteLine("to troubleshoot mismatches, use a diff tool on *.html and *.actual.html");
             }
 
+        }
+
+        private static string GetCrc16(string s)
+        {            
+            if (String.IsNullOrEmpty(s)) return "";
+            byte[] b = new Crc16().ComputeChecksumBytes(Encoding.UTF8.GetBytes(s));
+            return b[0].ToString("x2") + b[1].ToString("x2");
         }
 
         /// <summary>
@@ -171,11 +192,11 @@ namespace MarkdownSharpTests
         static void Benchmark()
         {
             Console.WriteLine();
-            Console.WriteLine("running standard benchmark, please wait..");
+            Console.WriteLine("running standard benchmark, takes 10 - 30 seconds...");
             Console.WriteLine();
 
-            Benchmark(FileContents("benchmark/markdown-example-short-1.txt"), 1000);
-            Benchmark(FileContents("benchmark/markdown-example-medium-1.txt"), 500);
+            Benchmark(FileContents("benchmark/markdown-example-short-1.txt"), 4000);
+            Benchmark(FileContents("benchmark/markdown-example-medium-1.txt"), 1000);
             Benchmark(FileContents("benchmark/markdown-example-long-2.txt"), 100);
         }
 

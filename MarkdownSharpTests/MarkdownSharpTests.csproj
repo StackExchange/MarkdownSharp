@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseTest.cs" />
+    <Compile Include="helpers\crc16.cs" />
     <Compile Include="MDTestTests.cs" />
     <Compile Include="SimpleTests.cs" />
     <Compile Include="Program.cs" />
