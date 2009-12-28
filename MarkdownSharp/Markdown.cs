@@ -7,12 +7,16 @@
  * Copyright (c) 2004 John Gruber
  * http://daringfireball.net/projects/markdown/
  * 
- * Markdown.NET Copyright (c) 2004-2009 Milan Negovan
+ * Markdown.NET
+ * Copyright (c) 2004-2009 Milan Negovan
  * http://www.aspnetresources.com
+ * http://aspnetresources.com/blog/markdown_announced.aspx
  * 
- * MarkdownSharp Copyright (c) 2009 Jeff Atwood
+ * MarkdownSharp
+ * Copyright (c) 2009 Jeff Atwood
  * http://stackoverflow.com
  * http://www.codinghorror.com/blog/
+ * http://code.google.com/p/markdownsharp/
  * 
  * History: Milan ported the Markdown processor to C#. He granted license to me so I can open source it
  * and let the community contribute to and improve MarkdownSharp.
@@ -378,19 +382,18 @@ namespace MarkdownSharp
         /// </summary>
         private string HashHTMLBlocks(string text)
         {
-            /*
-             First, look for nested blocks, e.g.:
-            <div>
-                <div>
-                tags for inner block must be indented.
-                </div>
-            </div>
+            //
+            // First, look for nested blocks, e.g.:
+            // <div>
+            //    <div>
+            //    tags for inner block must be indented.
+            //    </div>
+            // </div>
 	        
-             The outermost tags must start at the left margin for this to match, and
-             the inner nested divs must be indented.
-             We need to do this before the next, more liberal match, because the next
-             match will start at the first `<div>` and stop at the first `</div>`.
-            */
+            // The outermost tags must start at the left margin for this to match, and
+            // the inner nested divs must be indented.
+            // We need to do this before the next, more liberal match, because the next
+            // match will start at the first `<div>` and stop at the first `</div>`.
             text = _blocksNested.Replace(text, new MatchEvaluator(HtmlEvaluator));
 
             // Now match more liberally, simply from `\n<tag>` to `</tag>\n`
@@ -1004,7 +1007,6 @@ namespace MarkdownSharp
             string item = match.Groups[4].Value;
             string leadingLine = match.Groups[1].Value;
 
-
             if ((leadingLine != null && leadingLine != "") || Regex.IsMatch(item, @"\n{2,}"))
                 item = RunBlockGamut(Outdent(item));
             else
@@ -1058,33 +1060,31 @@ namespace MarkdownSharp
 
         private string DoCodeSpans(string text)
         {
-            /*
-                *	Backtick quotes are used for <code></code> spans.
-                *	You can use multiple backticks as the delimiters if you want to
-                    include literal backticks in the code span. So, this input:
+            //
+            //    *	Backtick quotes are used for <code></code> spans.
+            //    *	You can use multiple backticks as the delimiters if you want to
+            //        include literal backticks in the code span. So, this input:
+            //
+            //        Just type ``foo `bar` baz`` at the prompt.
+            //
+            //        Will translate to:
+            //
+            //          <p>Just type <code>foo `bar` baz</code> at the prompt.</p>
+            //
+            //        There's no arbitrary limit to the number of backticks you
+            //        can use as delimters. If you need three consecutive backticks
+            //        in your code, use four for delimiters, etc.
+            //
+            //    *	You can use spaces to get literal backticks at the edges:
+            //
+            //          ... type `` `bar` `` ...
+            //
+            //        Turns to:
+            //
+            //          ... type <code>`bar`</code> ...	        
+            //
 
-                    Just type ``foo `bar` baz`` at the prompt.
-        
-                    Will translate to:
-        
-                      <p>Just type <code>foo `bar` baz</code> at the prompt.</p>
-        
-                    There's no arbitrary limit to the number of backticks you
-                    can use as delimters. If you need three consecutive backticks
-                    in your code, use four for delimiters, etc.
-        
-                *	You can use spaces to get literal backticks at the edges:
-        
-                      ... type `` `bar` `` ...
-        
-                    Turns to:
-        
-                      ... type <code>`bar`</code> ...	        
-            */
-
-            text = _codeSpan.Replace(text, new MatchEvaluator(CodeSpanEvaluator));
-
-            return text;
+            return _codeSpan.Replace(text, new MatchEvaluator(CodeSpanEvaluator));
         }
 
         private string CodeSpanEvaluator(Match match)
@@ -1178,10 +1178,7 @@ namespace MarkdownSharp
 
         private string BlockQuoteEvaluator2(Match match)
         {
-            string pre = match.Groups[1].Value;
-            pre = Regex.Replace(pre, @"^  ", "", RegexOptions.Multiline);
-
-            return pre;
+            return Regex.Replace(match.Groups[1].Value, @"^  ", "", RegexOptions.Multiline);
         }
 
         private static Regex _newlinesLeading = new Regex(@"^\n+", RegexOptions.Compiled);
@@ -1276,21 +1273,20 @@ namespace MarkdownSharp
         {
             string email = UnescapeSpecialChars(match.Groups[1].Value);
 
-            /*
-                Input: an email address, e.g. "foo@example.com"
-            
-                Output: the email address as a mailto link, with each character
-                        of the address encoded as either a decimal or hex entity, in
-                        the hopes of foiling most address harvesting spam bots. E.g.:
-            
-                  <a href="&#x6D;&#97;&#105;&#108;&#x74;&#111;:&#102;&#111;&#111;&#64;&#101;
-                    x&#x61;&#109;&#x70;&#108;&#x65;&#x2E;&#99;&#111;&#109;">&#102;&#111;&#111;
-                    &#64;&#101;x&#x61;&#109;&#x70;&#108;&#x65;&#x2E;&#99;&#111;&#109;</a>
-            
-                Based by a filter by Matthew Wickline, posted to the BBEdit-Talk
-                mailing list: <http://tinyurl.com/yu7ue>
-            
-             */
+            //
+            //    Input: an email address, e.g. "foo@example.com"
+            //
+            //    Output: the email address as a mailto link, with each character
+            //            of the address encoded as either a decimal or hex entity, in
+            //            the hopes of foiling most address harvesting spam bots. E.g.:
+            //
+            //      <a href="&#x6D;&#97;&#105;&#108;&#x74;&#111;:&#102;&#111;&#111;&#64;&#101;
+            //        x&#x61;&#109;&#x70;&#108;&#x65;&#x2E;&#99;&#111;&#109;">&#102;&#111;&#111;
+            //        &#64;&#101;x&#x61;&#109;&#x70;&#108;&#x65;&#x2E;&#99;&#111;&#109;</a>
+            //
+            //    Based by a filter by Matthew Wickline, posted to the BBEdit-Talk
+            //    mailing list: <http://tinyurl.com/yu7ue>
+            //
             email = "mailto:" + email;
 
             // leave ':' alone (to spot mailto: later) 
@@ -1358,12 +1354,14 @@ namespace MarkdownSharp
             return text;
         }
 
+        private static Regex _outDent = new Regex(@"^(\t|[ ]{1," + _tabWidth + @"})", RegexOptions.Multiline | RegexOptions.Compiled);
+
         /// <summary>
         /// Remove one level of line-leading tabs or spaces
         /// </summary>
         private string Outdent(string block)
         {
-            return Regex.Replace(block, @"^(\t|[ ]{1," + _tabWidth + @"})", "", RegexOptions.Multiline);
+            return _outDent.Replace(block, "");
         }
 
         // profiler says this one is expensive
@@ -1385,7 +1383,6 @@ namespace MarkdownSharp
             int tabCount = match.Groups[2].Value.Length;
             return String.Concat(leading, new String(' ', (_tabWidth - leading.Length % _tabWidth) + ((tabCount - 1) * _tabWidth)));
         }
-
 
         /// <summary>
         /// this is to emulate what's evailable in PHP
