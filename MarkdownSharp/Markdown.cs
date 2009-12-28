@@ -285,7 +285,7 @@ namespace MarkdownSharp
 							[\x22)]
 							[ \t]*
 						)?	# title is optional
-						(?:\n+|\Z)", _tabWidth - 1), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
+						(?:\n+|\Z)", _tabWidth - 1), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// Strips link definitions from text, stores the URLs and titles in hash references.
@@ -333,7 +333,7 @@ namespace MarkdownSharp
 					.*</\2>				# the matching end tag
 					[ \t]*				# trailing spaces/tabs
 					(?=\n+|\Z)	        # followed by a newline or end of document
-				)", _blockTags2), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
+				)", _blockTags2), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _blocksHr = new Regex(string.Format(@"
                 (?:
@@ -349,7 +349,7 @@ namespace MarkdownSharp
 					/?>					# the matching end tag
 					[ \t]*
 					(?=\n{{2,}}|\Z)		# followed by a blank line or end of document
-				)", _tabWidth - 1), RegexOptions.IgnorePatternWhitespace);
+				)", _tabWidth - 1), RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _blocksHtmlComments = new Regex(string.Format(@"
 				(?:
@@ -366,7 +366,7 @@ namespace MarkdownSharp
 					)
 					[ \t]*
 					(?=\n{{2,}}|\Z)		# followed by a blank line or end of document
-				)", _tabWidth - 1), RegexOptions.IgnorePatternWhitespace);
+				)", _tabWidth - 1), RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// Hashify HTML blocks:
@@ -416,9 +416,9 @@ namespace MarkdownSharp
             return string.Concat("\n\n", key, "\n\n");
         }
 
-        private static Regex _block1 = new Regex(@"^[ ]{0,2}([ ]?\*[ ]?){3,}[ \t]*$", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
-        private static Regex _block2 = new Regex(@"^[ ]{0,2}([ ]? -[ ]?){3,}[ \t]*$", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
-        private static Regex _block3 = new Regex(@"^[ ]{0,2}([ ]? _[ ]?){3,}[ \t]*$", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
+        private static Regex _block1 = new Regex(@"^[ ]{0,2}([ ]?\*[ ]?){3,}[ \t]*$", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+        private static Regex _block2 = new Regex(@"^[ ]{0,2}([ ]? -[ ]?){3,}[ \t]*$", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+        private static Regex _block3 = new Regex(@"^[ ]{0,2}([ ]? _[ ]?){3,}[ \t]*$", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// These are all the transformations that form block-level 
@@ -488,7 +488,7 @@ namespace MarkdownSharp
             @"(?s:<!(?:--.*?--\s*)+>)|(?s:<\?.*?\?>)|" + 
             RepeatString(@"(?:<[a-z\/!$](?:[^<>]|", _nestedBracketDepth) + 
             RepeatString(@")*>)", _nestedBracketDepth), 
-            RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
 
         /// <summary>
         /// 
@@ -587,7 +587,7 @@ namespace MarkdownSharp
 		        \[
 			        (.*?)                   # id = $3
 		        \]
-		    )", GetNestedBracketsPattern()), RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace);
+		    )", GetNestedBracketsPattern()), RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _anchorInline = new Regex(string.Format(@"
                 (                          # wrap whole match in $1
@@ -605,7 +605,7 @@ namespace MarkdownSharp
                         [ \t]*             # ignore any spaces/tabs between closing quote and )
 			            )?                 # title is optional
 		            \)
-        		)", GetNestedBracketsPattern()), RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace);
+        		)", GetNestedBracketsPattern()), RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
 
         /// <summary>
@@ -716,7 +716,7 @@ namespace MarkdownSharp
 			            (.*?)       # id = $3
 		            \]
 
-		            )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline);
+		            )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static Regex _imagesInline = new Regex(@"
                 (				# wrap whole match in $1
@@ -735,7 +735,7 @@ namespace MarkdownSharp
 			        [ \t]*
 			        )?			# title is optional
 		        \)
-		        )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline);
+		        )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown image shortcuts into <img> tags. 
@@ -835,7 +835,7 @@ namespace MarkdownSharp
 			    [ \t]*
 			    \#*			# optional closing #'s (not counted)
 			    \n+",
-            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
+            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private string DoHeaders(string text)
         {
@@ -905,7 +905,7 @@ namespace MarkdownSharp
 			)", GetMarkerAnyPattern(), _tabWidth - 1);
 
         private static Regex _listNested = new Regex(@"^" + _wholeList,
-            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
+            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         // profiler says this one is expensive
         private static Regex _listTopLevel = new Regex(@"(?:(?<=\n\n)|\A\n?)" + _wholeList,
@@ -1028,7 +1028,7 @@ namespace MarkdownSharp
 			        )+
 			        )
 			        ((?=^[ ]{{0,{0}}}\S)|\Z) # Lookahead for non-space at line-start, or end of doc",
-                                            _tabWidth), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
+                                            _tabWidth), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private string DoCodeBlocks(string text)
         {
@@ -1054,7 +1054,7 @@ namespace MarkdownSharp
 			        (.+?)		# $2 = The code block
 			        (?<!`)
 			        \1
-			        (?!`)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline);
+			        (?!`)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         private string DoCodeSpans(string text)
         {
@@ -1153,7 +1153,7 @@ namespace MarkdownSharp
 			    (.+\n)*					# subsequent consecutive lines
 			    \n*						# blanks
 			    )+
-		    )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline);
+		    )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
         private string DoBlockQuotes(string text)
         {
@@ -1184,10 +1184,10 @@ namespace MarkdownSharp
             return pre;
         }
 
-        private static Regex _newlinesLeading = new Regex(@"^\n+");
-        private static Regex _newlinesTrailing = new Regex(@"\n+\z");
-        private static Regex _newlinesMultiple = new Regex(@"\n{2,}");
-        private static Regex _tabsLeading = new Regex(@"^([ \t]*)", RegexOptions.ExplicitCapture);
+        private static Regex _newlinesLeading = new Regex(@"^\n+", RegexOptions.Compiled);
+        private static Regex _newlinesTrailing = new Regex(@"\n+\z" , RegexOptions.Compiled);
+        private static Regex _newlinesMultiple = new Regex(@"\n{2,}", RegexOptions.Compiled);
+        private static Regex _tabsLeading = new Regex(@"^([ \t]*)", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
         private string FormParagraphs(string text)
         {
@@ -1320,8 +1320,8 @@ namespace MarkdownSharp
         }
 
 
-        private static Regex _amps = new Regex(@"&(?!#?[xX]?([0-9a-fA-F]+|\w+);)", RegexOptions.ExplicitCapture);
-        private static Regex _angles = new Regex(@"<(?![A-Za-z/?\$!])", RegexOptions.ExplicitCapture);
+        private static Regex _amps = new Regex(@"&(?!#?[xX]?([0-9a-fA-F]+|\w+);)", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
+        private static Regex _angles = new Regex(@"<(?![A-Za-z/?\$!])", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
         /// <summary>
         /// Smart processing for ampersands and angle brackets that need to be encoded.
