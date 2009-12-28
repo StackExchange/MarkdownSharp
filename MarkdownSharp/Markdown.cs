@@ -93,24 +93,13 @@ namespace MarkdownSharp
 {
     public class Markdown
     {
-        private struct Pair
-        {
-            public string First;
-            public string Second;
-        }
 
         /// <summary>
-        /// enter ">" here for HTML output
-        /// enter " />" here for XHTML output
+        /// use ">" for HTML output, or " />" for XHTML output
         /// </summary>
         private const string _emptyElementSuffix = " />";
         /// <summary>
-        /// when this is true, RETURN becomes a literal newline. 
-        /// Beware: this is a major deviation from the Markdown spec!
-        /// </summary>
-        private const bool _autoNewlines = false;
-        /// <summary>
-        /// Tabs are automatically converted to spaces as part of the transform 
+        /// Tabs are automatically converted to spaces as part of the transform  
         /// this variable determines how "wide" those tabs become in spaces
         /// </summary>
         private const int _tabWidth = 4;
@@ -119,13 +108,26 @@ namespace MarkdownSharp
         /// </summary>
         private const int _nestedBracketDepth = 6;
         /// <summary>
-        /// when true, email addresses will be auto-linked if present
+        /// when false, email addresses will never be auto-linked  
+        /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        private const bool _linkEmails = false;
+        private const bool _linkEmails = true;
         /// <summary>
-        /// when true, bold and italic require non-word characters on either side
+        /// when true, bold and italic require non-word characters on either side  
+        /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
         private const bool _strictBoldItalic = false;
+        /// <summary>
+        /// when true, RETURN becomes a literal newline  
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        private const bool _autoNewlines = false;
+
+        private struct Pair
+        {
+            public string First;
+            public string Second;
+        }
 
         private const string _markerUL = @"[*+-]";
         private const string _markerOL = @"\d+[.]";
