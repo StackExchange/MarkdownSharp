@@ -184,6 +184,15 @@ namespace MarkdownSharp
             _htmlBlocks = new Dictionary<string, string>();
         }
 
+        /// <summary>
+        /// current version of MarkdownSharp  
+        /// see http://code.google.com/p/markdownsharp/ for latest or to contribute
+        /// </summary>
+        public string Version
+        {
+            get { return "1.004"; }
+        }
+
         private static string GetNestedBracketsPattern()
         {
             if (_nestedBracketsPattern == null)

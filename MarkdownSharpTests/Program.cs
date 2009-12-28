@@ -70,10 +70,12 @@ namespace MarkdownSharpTests
         /// </remarks>
         static void GenerateTestOutput(string testfolder)
         {
-
             testfolder += @"\";
 
+            var m = new MarkdownSharp.Markdown();
+
             Console.WriteLine();
+            WriteVersion();
             Console.WriteLine(@"Markdown test run on \" + testfolder);
             Console.WriteLine();
 
@@ -86,9 +88,7 @@ namespace MarkdownSharpTests
             int ok = 0;
             int err = 0;
             int errnew = 0;
-            int total = 0;
-
-            var m = new MarkdownSharp.Markdown();
+            int total = 0;            
 
             foreach (var file in Directory.GetFiles(path, "*.text"))
             {
@@ -192,6 +192,7 @@ namespace MarkdownSharpTests
         static void Benchmark()
         {
             Console.WriteLine();
+            WriteVersion();            
             Console.WriteLine("running standard benchmark, takes 10 - 30 seconds...");
             Console.WriteLine();
 
@@ -218,6 +219,11 @@ namespace MarkdownSharpTests
             Console.WriteLine("input string length: " + text.Length);
             Console.Write("performed " + iterations + " iterations in " + sw.ElapsedMilliseconds);
             Console.WriteLine(" (" + Convert.ToDouble(sw.ElapsedMilliseconds) / Convert.ToDouble(iterations) + " ms per iteration)");
+        }
+
+        static void WriteVersion()
+        {
+            Console.WriteLine(@"MarkdownSharp V" + new MarkdownSharp.Markdown().Version);
         }
 
         /// <summary>
