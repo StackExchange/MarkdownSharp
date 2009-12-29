@@ -122,6 +122,12 @@ namespace MarkdownSharp
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
         private const bool _autoNewlines = false;
+        /// <summary>
+        /// when true, (most) bare plain URLs are auto-hyperlinked  
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        private const bool _autoHyperlink = false;
+
 
         private struct Pair
         {
@@ -853,26 +859,23 @@ namespace MarkdownSharp
 
         private string DoHeaders(string text)
         {
-            /*
-            Setext-style headers:
-            
-            Header 1
-            ========
-	          
-            Header 2
-            --------
-            */
+            // Setext-style headers:
+            //
+            // Header 1
+            // ========
+	        //  
+            // Header 2
+            // --------
+            //
             text = _header1.Replace(text, new MatchEvaluator(SetextHeader1Evaluator));
             text = _header2.Replace(text, new MatchEvaluator(SetextHeader2Evaluator));
 
-            /*
-             atx-style headers:
-                # Header 1
-                ## Header 2
-                ## Header 2 with closing hashes ##
-                ...
-                ###### Header 6
-            */
+            // atx-style headers:
+            //    # Header 1
+            //    ## Header 2
+            //    ## Header 2 with closing hashes ##
+            //    ...
+            //    ###### Header 6
             text = _header3.Replace(text, new MatchEvaluator(AtxHeaderEvaluator));
 
             return text;
@@ -971,28 +974,26 @@ namespace MarkdownSharp
         /// </summary>
         private string ProcessListItems(string list, string marker)
         {
-            /*
-	            The listLevel global keeps track of when we're inside a list.
-	            Each time we enter a list, we increment it; when we leave a list,
-	            we decrement. If it's zero, we're not in a list anymore.
-	        
-	            We do this because when we're not inside a list, we want to treat
-	            something like this:
-	        
-	            	I recommend upgrading to version
-	            	8. Oops, now this line is treated
-	            	as a sub-list.
-	        
-	            As a single paragraph, despite the fact that the second line starts
-	            with a digit-period-space sequence.
-	        
-	            Whereas when we're inside a list (or sub-list), that line will be
-	            treated as the start of a sub-list. What a kludge, huh? This is
-	            an aspect of Markdown's syntax that's hard to parse perfectly
-	            without resorting to mind-reading. Perhaps the solution is to
-	            change the syntax rules such that sub-lists must start with a
-	            starting cardinal number; e.g. "1." or "a.".
-            */
+            // The listLevel global keeps track of when we're inside a list.
+            // Each time we enter a list, we increment it; when we leave a list,
+            // we decrement. If it's zero, we're not in a list anymore.
+
+            // We do this because when we're not inside a list, we want to treat
+            // something like this:
+
+            //    I recommend upgrading to version
+            //    8. Oops, now this line is treated
+            //    as a sub-list.
+
+            // As a single paragraph, despite the fact that the second line starts
+            // with a digit-period-space sequence.
+
+            // Whereas when we're inside a list (or sub-list), that line will be
+            // treated as the start of a sub-list. What a kludge, huh? This is
+            // an aspect of Markdown's syntax that's hard to parse perfectly
+            // without resorting to mind-reading. Perhaps the solution is to
+            // change the syntax rules such that sub-lists must start with a
+            // starting cardinal number; e.g. "1." or "a.".
 
             _listLevel++;
 
@@ -1237,10 +1238,13 @@ namespace MarkdownSharp
         private string DoAutoLinks(string text)
         {
 
-            // fixup arbitrary URLs by adding Markdown < > so they get linked as well
-            // note that at this point, all other URL in the text are already hyperlinked as <a href=""></a>
-            // *except* for the <http://www.foo.com> case
-            text = _autolinkBare.Replace(text, @"$1<$2$3>$4");
+            if (_autoHyperlink)
+            {
+                // fixup arbitrary URLs by adding Markdown < > so they get linked as well
+                // note that at this point, all other URL in the text are already hyperlinked as <a href=""></a>
+                // *except* for the <http://www.foo.com> case
+                text = _autolinkBare.Replace(text, @"$1<$2$3>$4");
+            }
 
             if (Regex.IsMatch(text, @"<(https?|ftp)://[^>]+>"))
             {
