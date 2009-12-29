@@ -578,10 +578,10 @@ namespace MarkdownSharp
 
 
         /// <summary>
-        /// Within tags -- meaning between &lt; and &gt; -- encode [\ ` * _] so they
-        /// don't conflict with their use in Markdown for code, italics and strong.
-        /// We're replacing each such character with its corresponding MD5 checksum
-        /// value; this is likely overkill, but it should prevent us from colliding
+        /// Within tags -- meaning between &lt; and &gt; -- encode [\ ` * _] so they 
+        /// don't conflict with their use in Markdown for code, italics and strong. 
+        /// We're replacing each such character with its corresponding hash 
+        /// value; this is likely overkill, but it should prevent us from colliding 
         /// with the escape values by accident.
         /// </summary>
         private string EscapeSpecialCharsWithinTagAttributes(string text)
