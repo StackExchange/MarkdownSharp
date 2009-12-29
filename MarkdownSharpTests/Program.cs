@@ -25,6 +25,16 @@ namespace MarkdownSharpTests
             //
             GenerateTestOutput(@"mdtest-1.1");
 
+            //
+            // same as mdtest-1.1, but:
+            //
+            // * remove any non-significant whitespace or extra paragraph differences
+            //   (there are only two as I recall; not sure why, but frankly who cares)
+            // * comment out any edge conditions we aren't dealing with yet; search for
+            //   the string "omitted:" to see what those are
+            //
+            GenerateTestOutput(@"mdtest-1.1-alt");
+
             // quick and dirty "Hello World" type test
             GenerateTestOutput(@"test-input");
 
@@ -43,7 +53,7 @@ namespace MarkdownSharpTests
         {
             var m = new MarkdownSharp.Markdown();
 
-            string input = "    line1\n    \tline2\n    \t\tline3\n    \t\t\tline4\n";
+            string input = "Here's another where the [link \nbreaks] across lines, but with a line-ending space.\n\n\n[link breaks]: /url/";
             string output = m.Transform(input);
 
             Console.WriteLine("input:");
@@ -75,8 +85,7 @@ namespace MarkdownSharpTests
             var m = new MarkdownSharp.Markdown();
 
             Console.WriteLine();
-            WriteVersion();
-            Console.WriteLine(@"Markdown test run on \" + testfolder);
+            Console.WriteLine(@"MarkdownSharp v" + m.Version + @" test run on \" + testfolder);
             Console.WriteLine();
 
             string path = Path.Combine(ExecutingAssemblyPath, testfolder);
@@ -158,12 +167,11 @@ namespace MarkdownSharpTests
 
         /// <summary>
         /// returns the contents of the specified file as a string  
-        /// assumes the files are relative to the root of the project
+        /// assumes the file is relative to the root of the project
         /// </summary>
         static string FileContents(string filename)
         {
-            string file = Path.Combine(ExecutingAssemblyPath, filename);
-            return File.ReadAllText(file);
+            return File.ReadAllText(Path.Combine(ExecutingAssemblyPath, filename));
         }
 
         /// <summary>
@@ -192,8 +200,8 @@ namespace MarkdownSharpTests
         static void Benchmark()
         {
             Console.WriteLine();
-            WriteVersion();            
-            Console.WriteLine("running standard benchmark, takes 10 - 30 seconds...");
+            Console.WriteLine();
+            Console.WriteLine(@"MarkdownSharp v" + new MarkdownSharp.Markdown().Version + " benchmark, takes 10 ~ 30 seconds...");
             Console.WriteLine();
 
             Benchmark(FileContents("benchmark/markdown-example-short-1.txt"), 4000);
@@ -221,10 +229,6 @@ namespace MarkdownSharpTests
             Console.WriteLine(" (" + Convert.ToDouble(sw.ElapsedMilliseconds) / Convert.ToDouble(iterations) + " ms per iteration)");
         }
 
-        static void WriteVersion()
-        {
-            Console.WriteLine(@"MarkdownSharp V" + new MarkdownSharp.Markdown().Version);
-        }
 
         /// <summary>
         /// executes nunit-console.exe to run all the tests in this assembly
