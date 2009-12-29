@@ -268,9 +268,9 @@ namespace MarkdownSharp
         public string Transform(string text)
         {
             // Clear the global hashes. If we don't clear these, you get conflicts
-	        // from other articles when generating a page which contains more than
-	        // one article (e.g. an index page that shows the N most recent
-	        // articles):
+            // from other articles when generating a page which contains more than
+            // one article (e.g. an index page that shows the N most recent
+            // articles):
             _urls.Clear();
             _titles.Clear();
             _htmlBlocks.Clear();
@@ -306,22 +306,22 @@ namespace MarkdownSharp
 
 
         private static Regex _linkDef = new Regex(string.Format(@"
-						^[ ]{{0,{0}}}\[(.+)\]:	# id = $1
-						  [ \t]*
-						  \n?				# maybe *one* newline
-						  [ \t]*
-						<?(\S+?)>?			# url = $2
-						  [ \t]*
-						  \n?				# maybe one newline
-						  [ \t]*
-						(?:
-							(?<=\s)			# lookbehind for whitespace
-							[\x22(]
-							(.+?)			# title = $3
-							[\x22)]
-							[ \t]*
-						)?	# title is optional
-						(?:\n+|\Z)", _tabWidth - 1), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                        ^[ ]{{0,{0}}}\[(.+)\]:	# id = $1
+                          [ \t]*
+                          \n?				# maybe *one* newline
+                          [ \t]*
+                        <?(\S+?)>?			# url = $2
+                          [ \t]*
+                          \n?				# maybe one newline
+                          [ \t]*
+                        (?:
+                            (?<=\s)			# lookbehind for whitespace
+                            [\x22(]
+                            (.+?)			# title = $3
+                            [\x22)]
+                            [ \t]*
+                        )?	# title is optional
+                        (?:\n+|\Z)", _tabWidth - 1), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// Strips link definitions from text, stores the URLs and titles in hash references.
@@ -350,59 +350,59 @@ namespace MarkdownSharp
         private static string _blockTags1 = "p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|ins|del";
         private static Regex _blocksNested = new Regex(string.Format(@"
                 (						# save in $1
-					^					# start of line  (with /m)
-					<({0})	            # start tag = $2
-					\b					# word break
-					(.*\n)*?			# any number of lines, minimally matching
-					</\2>				# the matching end tag
-					[ \t]*				# trailing spaces/tabs
-					(?=\n+|\Z)	        # followed by a newline or end of document
-				)", _blockTags1), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                    ^					# start of line  (with /m)
+                    <({0})	            # start tag = $2
+                    \b					# word break
+                    (.*\n)*?			# any number of lines, minimally matching
+                    </\2>				# the matching end tag
+                    [ \t]*				# trailing spaces/tabs
+                    (?=\n+|\Z)	        # followed by a newline or end of document
+                )", _blockTags1), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static string _blockTags2 = "p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math";
         private static Regex _blocksNestedLiberal = new Regex(string.Format(@"
                (						# save in $1
-					^					# start of line  (with /m)
-					<({0})	            # start tag = $2
-					\b					# word break
-					(.*\n)*?			# any number of lines, minimally matching
-					.*</\2>				# the matching end tag
-					[ \t]*				# trailing spaces/tabs
-					(?=\n+|\Z)	        # followed by a newline or end of document
-				)", _blockTags2), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                    ^					# start of line  (with /m)
+                    <({0})	            # start tag = $2
+                    \b					# word break
+                    (.*\n)*?			# any number of lines, minimally matching
+                    .*</\2>				# the matching end tag
+                    [ \t]*				# trailing spaces/tabs
+                    (?=\n+|\Z)	        # followed by a newline or end of document
+                )", _blockTags2), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _blocksHr = new Regex(string.Format(@"
                 (?:
-					(?<=\n\n)		    # Starting after a blank line
-					|				    # or
-					\A\n?			    # the beginning of the doc
-				)
-				(						# save in $1
-					[ ]{{0,{0}}}
-					<(hr)				# start tag = $2
-					\b					# word break
-					([^<>])*?			#
-					/?>					# the matching end tag
-					[ \t]*
-					(?=\n{{2,}}|\Z)		# followed by a blank line or end of document
-				)", _tabWidth - 1), RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                    (?<=\n\n)		    # Starting after a blank line
+                    |				    # or
+                    \A\n?			    # the beginning of the doc
+                )
+                (						# save in $1
+                    [ ]{{0,{0}}}
+                    <(hr)				# start tag = $2
+                    \b					# word break
+                    ([^<>])*?			#
+                    /?>					# the matching end tag
+                    [ \t]*
+                    (?=\n{{2,}}|\Z)		# followed by a blank line or end of document
+                )", _tabWidth - 1), RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _blocksHtmlComments = new Regex(string.Format(@"
-				(?:
-					(?<=\n\n)		# Starting after a blank line
-					|				# or
-					\A\n?			# the beginning of the doc
-				)
-				(						# save in $1
-					[ ]{{0,{0}}}
-					(?s:
-						<!
-						(--.*?--\s*)+
-						>
-					)
-					[ \t]*
-					(?=\n{{2,}}|\Z)		# followed by a blank line or end of document
-				)", _tabWidth - 1), RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                (?:
+                    (?<=\n\n)		# Starting after a blank line
+                    |				# or
+                    \A\n?			# the beginning of the doc
+                )
+                (						# save in $1
+                    [ ]{{0,{0}}}
+                    (?s:
+                        <!
+                        (--.*?--\s*)+
+                        >
+                    )
+                    [ \t]*
+                    (?=\n{{2,}}|\Z)		# followed by a blank line or end of document
+                )", _tabWidth - 1), RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// Hashify HTML blocks:
@@ -421,7 +421,7 @@ namespace MarkdownSharp
             //    tags for inner block must be indented.
             //    </div>
             // </div>
-	        
+            
             // The outermost tags must start at the left margin for this to match, and
             // the inner nested divs must be indented.
             // We need to do this before the next, more liberal match, because the next
@@ -612,42 +612,42 @@ namespace MarkdownSharp
 
         private static Regex _anchorRef = new Regex(string.Format(@"
             (                               # wrap whole match in $1
-		        \[
-			        ({0})                   # link text = $2
-		        \]
+                \[
+                    ({0})                   # link text = $2
+                \]
 
-		        [ ]?                        # one optional space
-		        (?:\n[ ]*)?                 # one optional newline followed by spaces
+                [ ]?                        # one optional space
+                (?:\n[ ]*)?                 # one optional newline followed by spaces
 
-		        \[
-			        (.*?)                   # id = $3
-		        \]
-		    )", GetNestedBracketsPattern()), RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                \[
+                    (.*?)                   # id = $3
+                \]
+            )", GetNestedBracketsPattern()), RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _anchorInline = new Regex(string.Format(@"
                 (                          # wrap whole match in $1
-		            \[
-			            ({0})              # link text = $2
-		            \]
-		            \(                     # literal paren
-			            [ \t]*
-			            <?(.*?)>?          # href = $3
-			            [ \t]*
-			            (                  # $4
-			            (['\x22])          # quote char = $5
-			            (.*?)              # Title = $6
-			            \5                 # matching quote
+                    \[
+                        ({0})              # link text = $2
+                    \]
+                    \(                     # literal paren
+                        [ \t]*
+                        <?(.*?)>?          # href = $3
+                        [ \t]*
+                        (                  # $4
+                        (['\x22])          # quote char = $5
+                        (.*?)              # Title = $6
+                        \5                 # matching quote
                         [ \t]*             # ignore any spaces/tabs between closing quote and )
-			            )?                 # title is optional
-		            \)
-        		)", GetNestedBracketsPattern()), RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                        )?                 # title is optional
+                    \)
+                )", GetNestedBracketsPattern()), RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _anchorRefShortcut = new Regex(@"
             (					# wrap whole match in $1
-		      \[
-		         ([^\[\]]+)		# link text = $2; can't contain '[' or ']'
-		      \]
-		    )", RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+              \[
+                 ([^\[\]]+)		# link text = $2; can't contain '[' or ']'
+              \]
+            )", RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown link shortcuts [link text](url "title") or [link text][id] into HTML anchor tags. 
@@ -661,8 +661,8 @@ namespace MarkdownSharp
             text = _anchorInline.Replace(text, new MatchEvaluator(AnchorInlineEvaluator));
 
             //	Last, handle reference-style shortcuts: [link text]
-	        //  These must come last in case you've also got [link test][1]
-	        //  or [link test](/foo)
+            //  These must come last in case you've also got [link test][1]
+            //  or [link test](/foo)
             text = _anchorRefShortcut.Replace(text, new MatchEvaluator(AnchorRefShortcutEvaluator));
             return text;
         }
@@ -784,37 +784,37 @@ namespace MarkdownSharp
 
         private static Regex _imagesRef = new Regex(@"
                     (               # wrap whole match in $1
-		            !\[
-			            (.*?)	    # alt text = $2
-		            \]
+                    !\[
+                        (.*?)	    # alt text = $2
+                    \]
 
-		            [ ]?            # one optional space
-		            (?:\n[ ]*)?		# one optional newline followed by spaces
+                    [ ]?            # one optional space
+                    (?:\n[ ]*)?		# one optional newline followed by spaces
 
-		            \[
-			            (.*?)       # id = $3
-		            \]
+                    \[
+                        (.*?)       # id = $3
+                    \]
 
-		            )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+                    )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static Regex _imagesInline = new Regex(@"
                 (				# wrap whole match in $1
-		        !\[
-			        (.*?)		# alt text = $2
-		        \]
+                !\[
+                    (.*?)		# alt text = $2
+                \]
                 \s?             # one optional whitespace character
-		        \(			    # literal paren
-			        [ \t]*
-			        <?(\S*?)>?	# href = $3
-			        [ \t]*
-			        (			# $4
-			        (['\x22])	# quote char = $5
-			        (.*?)		# title = $6
-			        \5		    # matching quote
-			        [ \t]*
-			        )?			# title is optional
-		        \)
-		        )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+                \(			    # literal paren
+                    [ \t]*
+                    <?(\S*?)>?	# href = $3
+                    [ \t]*
+                    (			# $4
+                    (['\x22])	# quote char = $5
+                    (.*?)		# title = $6
+                    \5		    # matching quote
+                    [ \t]*
+                    )?			# title is optional
+                \)
+                )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown image shortcuts into <img> tags. 
@@ -909,11 +909,11 @@ namespace MarkdownSharp
 
         private static Regex _header3 = new Regex(@"
                 ^(\#{1,6})	# $1 = string of #'s
-			    [ \t]*
-			    (.+?)		# $2 = Header text
-			    [ \t]*
-			    \#*			# optional closing #'s (not counted)
-			    \n+",
+                [ \t]*
+                (.+?)		# $2 = Header text
+                [ \t]*
+                \#*			# optional closing #'s (not counted)
+                \n+",
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private string DoHeaders(string text)
@@ -922,7 +922,7 @@ namespace MarkdownSharp
             //
             // Header 1
             // ========
-	        //  
+            //  
             // Header 2
             // --------
             //
@@ -961,24 +961,24 @@ namespace MarkdownSharp
         }
 
         private static string _wholeList = string.Format(@"
-			(                               # $1 = whole list
-			  (                             # $2
-				[ ]{{0,{1}}}
-			    ({0})                       # $3 = first list item marker
-				[ \t]+
-			  )
-			  (?s:.+?)
-			  (                             # $4
-				  \z
-				|
-				  \n{{2,}}
-				  (?=\S)
-				  (?!                       # Negative lookahead for another list item marker
-				  	[ \t]*
-				  	{0}[ \t]+
-				  )
-			  )
-			)", GetMarkerAnyPattern(), _tabWidth - 1);
+            (                               # $1 = whole list
+              (                             # $2
+                [ ]{{0,{1}}}
+                ({0})                       # $3 = first list item marker
+                [ \t]+
+              )
+              (?s:.+?)
+              (                             # $4
+                  \z
+                |
+                  \n{{2,}}
+                  (?=\S)
+                  (?!                       # Negative lookahead for another list item marker
+                    [ \t]*
+                    {0}[ \t]+
+                  )
+              )
+            )", GetMarkerAnyPattern(), _tabWidth - 1);
 
         private static Regex _listNested = new Regex(@"^" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
@@ -1015,9 +1015,9 @@ namespace MarkdownSharp
             // from Markdown 1.0.2b8 -- not doing this for now
             //
             // Trim any trailing whitespace, to put the closing `</$list_type>`
-			// up on the preceding line, to get it past the current stupid
-			// HTML block parser. This is a hack to work around the terrible
-			// hack that is the HTML block parser.
+            // up on the preceding line, to get it past the current stupid
+            // HTML block parser. This is a hack to work around the terrible
+            // hack that is the HTML block parser.
             //
             //output = Regex.Replace(output, @"\s+$", "");
             //output = string.Format("<{0}>{1}</{0}>\n", listType, output);
@@ -1063,9 +1063,9 @@ namespace MarkdownSharp
               @"(\n)?                      # leading line = $1
                 (^[ \t]*)                  # leading whitespace = $2
                 ({0}) [ \t]+               # list marker = $3
-		        ((?s:.+?)                  # list item text = $4
+                ((?s:.+?)                  # list item text = $4
                 (\n{{1,2}}))      
-		        (?= \n* (\z | \2 ({0}) [ \t]+))", marker);
+                (?= \n* (\z | \2 ({0}) [ \t]+))", marker);
 
             list = Regex.Replace(list, pattern, new MatchEvaluator(ListEvaluator2),
                                   RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline);
@@ -1094,13 +1094,13 @@ namespace MarkdownSharp
 
         private static Regex _codeBlock = new Regex(string.Format(@"
                     (?:\n\n|\A)
-			        (	                     # $1 = the code block -- one or more lines, starting with a space/tab
-			        (?:
-				        (?:[ ]{{{0}}} | \t)  # Lines must start with a tab or a tab-width of spaces
-				        .*\n+
-			        )+
-			        )
-			        ((?=^[ ]{{0,{0}}}\S)|\Z) # Lookahead for non-space at line-start, or end of doc",
+                    (	                     # $1 = the code block -- one or more lines, starting with a space/tab
+                    (?:
+                        (?:[ ]{{{0}}} | \t)  # Lines must start with a tab or a tab-width of spaces
+                        .*\n+
+                    )+
+                    )
+                    ((?=^[ ]{{0,{0}}}\S)|\Z) # Lookahead for non-space at line-start, or end of doc",
                                             _tabWidth), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private string DoCodeBlocks(string text)
@@ -1124,10 +1124,10 @@ namespace MarkdownSharp
         private static Regex _codeSpan = new Regex(@"
                     (?<!\\)		# Character before opening ` can't be a backslash
                     (`+)		# $1 = Opening run of `
-			        (.+?)		# $2 = The code block
-			        (?<!`)
-			        \1
-			        (?!`)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+                    (.+?)		# $2 = The code block
+                    (?<!`)
+                    \1
+                    (?!`)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         private string DoCodeSpans(string text)
         {
@@ -1179,7 +1179,7 @@ namespace MarkdownSharp
         private string EncodeCode(string code)
         {
             // Encode all ampersands; HTML entities are not
-	        // entities within a Markdown code span.
+            // entities within a Markdown code span.
             code = code.Replace("&", "&amp;");
 
             // Do the angle bracket song and dance
@@ -1218,13 +1218,13 @@ namespace MarkdownSharp
 
         private static Regex _blockquote = new Regex(@"
             (                           # Wrap whole match in $1
-			    (
-			    ^[ \t]*>[ \t]?			# '>' at the start of a line
-				    .+\n				# rest of the first line
-			    (.+\n)*					# subsequent consecutive lines
-			    \n*						# blanks
-			    )+
-		    )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+                (
+                ^[ \t]*>[ \t]?			# '>' at the start of a line
+                    .+\n				# rest of the first line
+                (.+\n)*					# subsequent consecutive lines
+                \n*						# blanks
+                )+
+            )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
         private string DoBlockQuotes(string text)
         {
@@ -1326,11 +1326,11 @@ namespace MarkdownSharp
                     @"<
                       (?:mailto:)?
                       (
-    			        [-.\w]+
-    			        \@
-    			        [-a-z0-9]+(\.[-a-z0-9]+)*\.[a-z]+
+                        [-.\w]+
+                        \@
+                        [-a-z0-9]+(\.[-a-z0-9]+)*\.[a-z]+
                       )
-    		          >";
+                      >";
                 text = Regex.Replace(text, pattern, new MatchEvaluator(EmailEvaluator), RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
             }
 
