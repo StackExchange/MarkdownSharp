@@ -642,6 +642,12 @@ namespace MarkdownSharp
 		            \)
         		)", GetNestedBracketsPattern()), RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
+        private static Regex _anchorRefShortcut = new Regex(@"
+            (					# wrap whole match in $1
+		      \[
+		         ([^\[\]]+)		# link text = $2; can't contain '[' or ']'
+		      \]
+		    )", RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown link shortcuts [link text](url "title") or [link text][id] into HTML anchor tags. 
@@ -649,15 +655,19 @@ namespace MarkdownSharp
         private string DoAnchors(string text)
         {
             // First, handle reference-style links: [link text] [id]
-            text = _anchorRef.Replace(text, new MatchEvaluator(AnchorReferenceEvaluator));
+            text = _anchorRef.Replace(text, new MatchEvaluator(AnchorRefEvaluator));
 
             // Next, inline-style links: [link text](url "optional title") or [link text](url "optional title")
             text = _anchorInline.Replace(text, new MatchEvaluator(AnchorInlineEvaluator));
 
+            //	Last, handle reference-style shortcuts: [link text]
+	        //  These must come last in case you've also got [link test][1]
+	        //  or [link test](/foo)
+            text = _anchorRefShortcut.Replace(text, new MatchEvaluator(AnchorRefShortcutEvaluator));
             return text;
         }
 
-        private string AnchorReferenceEvaluator(Match match)
+        private string AnchorRefEvaluator(Match match)
         {
             string wholeMatch = match.Groups[1].Value;
             string linkText = match.Groups[2].Value;
@@ -693,6 +703,39 @@ namespace MarkdownSharp
             return output;
         }
 
+        private string AnchorRefShortcutEvaluator(Match match)
+        {
+            string wholeMatch = match.Groups[1].Value;
+            string linkText = match.Groups[2].Value;
+            string linkID = Regex.Replace(linkText.ToLowerInvariant(), @"[ ]*\n[ ]*", " ");  // lower case and remove newlines
+            string url;
+            string title;
+
+            string output;
+
+            if (_urls.ContainsKey(linkID))
+            {
+                url = _urls[linkID];
+                url = EncodeProblemUrlChars(url);
+                output = "<a href=\"" + url + "\"";
+
+                if (_titles.ContainsKey(linkID))
+                {
+                    title = _titles[linkID];
+                    title = title.Replace("*", _escapeTable["*"]);
+                    title = title.Replace("_", _escapeTable["_"]);
+                    output += " title=\"" + title + "\"";
+                }
+
+                output += ">" + linkText + "</a>";
+            }
+            else
+                output = wholeMatch;
+
+            return output;
+        }
+
+
         /// <summary>
         /// encodes problem characters in URLs, such as 
         /// ' () [] * _ :
@@ -700,6 +743,7 @@ namespace MarkdownSharp
         /// </summary>
         private string EncodeProblemUrlChars(string url)
         {
+            // TODO: should just be bold/italic unless we're in strict mode
             url = url.Replace("'", "%27");
             url = url.Replace("(", "%28");
             url = url.Replace(")", "%29");
