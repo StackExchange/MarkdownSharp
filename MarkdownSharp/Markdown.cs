@@ -199,10 +199,25 @@ namespace MarkdownSharp
             get { return "1.004"; }
         }
 
+        /// <summary>
+        /// Regex to match balanced [brackets]. See Friedl's
+        /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
+        /// </summary>
         private static string GetNestedBracketsPattern()
         {
+            // in other words [this] and [this[also]] and [this[also[too]]]
+            // up to _nestedBracketDepth
             if (_nestedBracketsPattern == null)
-                _nestedBracketsPattern = RepeatString(@"(?>[^\[\]]+|\[", _nestedBracketDepth) + RepeatString(@"\])*", _nestedBracketDepth);
+                _nestedBracketsPattern = 
+                    RepeatString(@"
+                    (?>              # Atomic matching
+                       [^\[\]]+      # Anything other than brackets
+                     |
+                       \[
+                           ", _nestedBracketDepth) + RepeatString(
+                    @" \]
+                    )*"
+                    , _nestedBracketDepth);
             return _nestedBracketsPattern;
         }
 
