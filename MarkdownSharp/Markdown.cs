@@ -106,6 +106,9 @@ namespace MarkdownSharp
         /// maximum nested bracket depth supported by the transform
         /// </summary>
         private const int _nestedBracketDepth = 6;
+
+
+
         /// <summary>
         /// when false, email addresses will never be auto-linked  
         /// WARNING: this is a significant deviation from the markdown spec
@@ -133,11 +136,7 @@ namespace MarkdownSharp
         private const bool _encodeProblemUrlCharacters = false;
 
 
-        private enum TokenType
-        {
-            Text,
-            Tag
-        }
+        private enum TokenType { Text, Tag }
 
         private struct Token
         {
@@ -672,10 +671,8 @@ namespace MarkdownSharp
             string wholeMatch = match.Groups[1].Value;
             string linkText = match.Groups[2].Value;
             string linkID = match.Groups[3].Value.ToLowerInvariant();
-            string url;            
-            string title;
 
-            string output;
+            string result;
 
             // for shortcut links like [this][].
             if (linkID == "")
@@ -683,56 +680,54 @@ namespace MarkdownSharp
 
             if (_urls.ContainsKey(linkID))
             {
-                url = _urls[linkID];
+                string url = _urls[linkID];
                 url = EncodeProblemUrlChars(url);
-                output = "<a href=\"" + url + "\"";
+                result = "<a href=\"" + url + "\"";
 
                 if (_titles.ContainsKey(linkID))
                 {
-                    title = _titles[linkID];
+                    string title = _titles[linkID];
                     title = title.Replace("*", _escapeTable["*"]);
                     title = title.Replace("_", _escapeTable["_"]);
-                    output += " title=\"" + title + "\"";
+                    result += " title=\"" + title + "\"";
                 }
 
-                output += ">" + linkText + "</a>";
+                result += ">" + linkText + "</a>";
             }
             else
-                output = wholeMatch;
+                result = wholeMatch;
 
-            return output;
+            return result;
         }
 
         private string AnchorRefShortcutEvaluator(Match match)
         {
             string wholeMatch = match.Groups[1].Value;
             string linkText = match.Groups[2].Value;
-            string linkID = Regex.Replace(linkText.ToLowerInvariant(), @"[ ]*\n[ ]*", " ");  // lower case and remove newlines
-            string url;
-            string title;
+            string linkID = Regex.Replace(linkText.ToLowerInvariant(), @"[ ]*\n[ ]*", " ");  // lower case and remove newlines / extra spaces
 
-            string output;
+            string result;
 
             if (_urls.ContainsKey(linkID))
             {
-                url = _urls[linkID];
+                string url = _urls[linkID];
                 url = EncodeProblemUrlChars(url);
-                output = "<a href=\"" + url + "\"";
+                result = "<a href=\"" + url + "\"";
 
                 if (_titles.ContainsKey(linkID))
                 {
-                    title = _titles[linkID];
+                    string title = _titles[linkID];
                     title = title.Replace("*", _escapeTable["*"]);
                     title = title.Replace("_", _escapeTable["_"]);
-                    output += " title=\"" + title + "\"";
+                    result += " title=\"" + title + "\"";
                 }
 
-                output += ">" + linkText + "</a>";
+                result += ">" + linkText + "</a>";
             }
             else
-                output = wholeMatch;
+                result = wholeMatch;
 
-            return output;
+            return result;
         }
 
 
@@ -768,22 +763,22 @@ namespace MarkdownSharp
             string linkText = match.Groups[2].Value;
             string url = match.Groups[3].Value;
             string title = match.Groups[6].Value;
-            string output;
+            string result;
 
             url = EncodeProblemUrlChars(url);
 
-            output = string.Format("<a href=\"{0}\"", url);
+            result = string.Format("<a href=\"{0}\"", url);
 
             if (!String.IsNullOrEmpty(title))
             {
                 title = title.Replace("\"", "&quot;");
                 title = title.Replace("*", _escapeTable["*"]);
                 title = title.Replace("_", _escapeTable["_"]);
-                output += string.Format(" title=\"{0}\"", title);
+                result += string.Format(" title=\"{0}\"", title);
             }
 
-            output += string.Format(">{0}</a>", linkText);
-            return output;
+            result += string.Format(">{0}</a>", linkText);
+            return result;
         }
 
         private static Regex _imagesRef = new Regex(@"
@@ -840,9 +835,7 @@ namespace MarkdownSharp
             string wholeMatch = match.Groups[1].Value;
             string altText = match.Groups[2].Value;
             string linkID = match.Groups[3].Value.ToLowerInvariant();
-            string url;
-            string output;
-            string title;
+            string result;
 
             // for shortcut links like ![this][].
             if (linkID == "")
@@ -852,29 +845,29 @@ namespace MarkdownSharp
 
             if (_urls.ContainsKey(linkID))
             {
-                url = _urls[linkID];
+                string url = _urls[linkID];
                 url = EncodeProblemUrlChars(url);
 
-                output = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, altText);
+                result = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, altText);
 
                 if (_titles.ContainsKey(linkID))
                 {
-                    title = _titles[linkID];
+                    string title = _titles[linkID];
                     title = title.Replace("*", _escapeTable["*"]);
                     title = title.Replace("_", _escapeTable["_"]);
 
-                    output += string.Format(" title=\"{0}\"", title);
+                    result += string.Format(" title=\"{0}\"", title);
                 }
 
-                output += _emptyElementSuffix;
+                result += _emptyElementSuffix;
             }
             else
             {
                 // If there's no such link ID, leave intact:
-                output = wholeMatch;
+                result = wholeMatch;
             }
 
-            return output;
+            return result;
         }
 
         private string ImageInlineEvaluator(Match match)
@@ -882,25 +875,25 @@ namespace MarkdownSharp
             string alt = match.Groups[2].Value;
             string url = match.Groups[3].Value;
             string title = match.Groups[6].Value;
-            string output;
+            string result;
 
             alt = alt.Replace("\"", "&quot;");
             title = title.Replace("\"", "&quot;");
             url = EncodeProblemUrlChars(url);
             url = Regex.Replace(url, @"^<(.*)>$", "$1");            // remove <>'s surrounding URL, if present
 
-            output = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, alt);
+            result = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, alt);
 
             if (!String.IsNullOrEmpty(title))
             {
                 title = title.Replace("*", _escapeTable["*"]);
                 title = title.Replace("_", _escapeTable["_"]);
-                output += string.Format(" title=\"{0}\"", title);
+                result += string.Format(" title=\"{0}\"", title);
             }
 
-            output += _emptyElementSuffix;
+            result += _emptyElementSuffix;
 
-            return output;
+            return result;
         }
 
         private static Regex _header1 = new Regex(@"^(.+?)[ \t]*\n=+[ \t]*\n+",
@@ -1006,12 +999,12 @@ namespace MarkdownSharp
         {
             string list = match.Groups[1].Value;
             string listType = Regex.IsMatch(match.Groups[3].Value, _markerUL) ? "ul" : "ol";
-            string output;
+            string result;
 
             // Turn double returns into triple returns, so that we can make a
             // paragraph for the last item in a list, if necessary:
             list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
-            output = ProcessListItems(list, GetMarkerAnyPattern());
+            result = ProcessListItems(list, GetMarkerAnyPattern());
 
             // from Markdown 1.0.2b8 -- not doing this for now
             //
@@ -1020,12 +1013,12 @@ namespace MarkdownSharp
             // HTML block parser. This is a hack to work around the terrible
             // hack that is the HTML block parser.
             //
-            //output = Regex.Replace(output, @"\s+$", "");
-            //output = string.Format("<{0}>{1}</{0}>\n", listType, output);
+            //result = Regex.Replace(output, @"\s+$", "");
+            //result = string.Format("<{0}>{1}</{0}>\n", listType, result);
 
-            output = string.Format("<{0}>\n{1}</{0}>\n", listType, output);
+            result = string.Format("<{0}>\n{1}</{0}>\n", listType, result);
 
-            return output;
+            return result;
         }
 
         /// <summary>
@@ -1162,12 +1155,12 @@ namespace MarkdownSharp
 
         private string CodeSpanEvaluator(Match match)
         {
-            string s = match.Groups[2].Value;
-            s = Regex.Replace(s, @"^[ \t]*", ""); // leading whitespace
-            s = Regex.Replace(s, @"[ \t]*$", ""); // trailing whitespace
-            s = EncodeCode(s);
+            string span = match.Groups[2].Value;
+            span = Regex.Replace(span, @"^[ \t]*", ""); // leading whitespace
+            span = Regex.Replace(span, @"[ \t]*$", ""); // trailing whitespace
+            span = EncodeCode(span);
 
-            return string.Concat("<code>", s, "</code>");
+            return string.Concat("<code>", span, "</code>");
         }
 
 
