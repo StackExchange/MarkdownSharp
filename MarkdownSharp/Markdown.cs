@@ -128,11 +128,21 @@ namespace MarkdownSharp
         /// </summary>
         private const bool _autoHyperlink = false;
 
-
-        private struct Pair
+        private enum TokenType
         {
-            public string First;
-            public string Second;
+            Text,
+            Tag
+        }
+
+        private struct Token
+        {
+            public Token(TokenType type, string value)
+            {
+                this.Type = type;
+                this.Value = value;
+            }
+            public TokenType Type;
+            public string Value;
         }
 
         private const string _markerUL = @"[*+-]";
@@ -144,9 +154,9 @@ namespace MarkdownSharp
         private static readonly Dictionary<string, string> _escapeTable;
         private static readonly Dictionary<string, string> _backslashEscapeTable;
 
-        private Dictionary<string, string> _urls;
-        private Dictionary<string, string> _titles;
-        private Dictionary<string, string> _htmlBlocks;
+        private readonly Dictionary<string, string> _urls = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _titles = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _htmlBlocks = new Dictionary<string, string>();
 
         private int _listLevel = 0;
 
@@ -159,35 +169,29 @@ namespace MarkdownSharp
         static Markdown()
         {
             // Table of hash values for escaped characters:
-            _escapeTable = new Dictionary<string, string>();
-            _escapeTable[@"\"] = @"\".GetHashCode().ToString();
-            _escapeTable["`"] = "`".GetHashCode().ToString();
-            _escapeTable["*"] = "*".GetHashCode().ToString();
-            _escapeTable["_"] = "_".GetHashCode().ToString();
-            _escapeTable["{"] = "{".GetHashCode().ToString();
-            _escapeTable["}"] = "}".GetHashCode().ToString();
-            _escapeTable["["] = "[".GetHashCode().ToString();
-            _escapeTable["]"] = "]".GetHashCode().ToString();
-            _escapeTable["("] = "(".GetHashCode().ToString();
-            _escapeTable[")"] = ")".GetHashCode().ToString();
-            _escapeTable[">"] = ">".GetHashCode().ToString();
-            _escapeTable["#"] = "#".GetHashCode().ToString();
-            _escapeTable["+"] = "+".GetHashCode().ToString();
-            _escapeTable["-"] = "-".GetHashCode().ToString();
-            _escapeTable["."] = ".".GetHashCode().ToString();
-            _escapeTable["!"] = "!".GetHashCode().ToString();
+            _escapeTable = new Dictionary<string, string> {
+                { @"\", @"\".GetHashCode().ToString() },
+                { "`", "`".GetHashCode().ToString() },
+                { "*", "*".GetHashCode().ToString() },
+                { "_", "_".GetHashCode().ToString() },
+                { "{", "{".GetHashCode().ToString() },
+                { "}", "}".GetHashCode().ToString() },
+                { "[", "[".GetHashCode().ToString() },
+                { "]", "]".GetHashCode().ToString() },
+                { "(", "(".GetHashCode().ToString() },
+                { ")", ")".GetHashCode().ToString() },
+                { ">", ">".GetHashCode().ToString() },
+                { "#", "#".GetHashCode().ToString() },
+                { "+", "+".GetHashCode().ToString() },
+                { "-", "-".GetHashCode().ToString() },
+                { ".", ".".GetHashCode().ToString() },
+                { "!", "!".GetHashCode().ToString() }
+             };
 
             // Create an identical table but for escaped characters.
             _backslashEscapeTable = new Dictionary<string, string>();
             foreach (string key in _escapeTable.Keys)
-                _backslashEscapeTable[@"\" + key] = _escapeTable[key];
-        }
-
-        public Markdown()
-        {
-            _urls = new Dictionary<string, string>();
-            _titles = new Dictionary<string, string>();
-            _htmlBlocks = new Dictionary<string, string>();
+                _backslashEscapeTable.Add(@"\" + key, _escapeTable[key]);
         }
 
         /// <summary>
@@ -196,7 +200,7 @@ namespace MarkdownSharp
         /// </summary>
         public string Version
         {
-            get { return "1.004"; }
+            get { return "1.005"; }
         }
 
         /// <summary>
@@ -537,42 +541,32 @@ namespace MarkdownSharp
         /// array is a two-element array; the first is either 'tag' or 'text'; the second is 
         /// the actual value.
         /// </returns>
-        private ArrayList TokenizeHTML(string text)
+        private List<Token> TokenizeHTML(string text)
         {
             // Regular expression derived from the _tokenize() subroutine in 
             // Brad Choate's MTRegex plugin.
             // http://www.bradchoate.com/past/mtregex.php
             int pos = 0;
-            ArrayList tokens = new ArrayList();
+            var tokens = new List<Token>();
 
             foreach (Match m in _htmlTokens.Matches(text))
             {
                 string wholeTag = m.Value;
                 int tagStart = m.Index;
-                Pair token;
 
                 if (pos < tagStart)
                 {
-                    token = new Pair();
-                    token.First = "text";
-                    token.Second = text.Substring(pos, tagStart - pos);
-                    tokens.Add(token);
+                    tokens.Add(new Token(TokenType.Text, text.Substring(pos, tagStart - pos)));
                 }
 
-                token = new Pair();
-                token.First = "tag";
-                token.Second = wholeTag;
-                tokens.Add(token);
+                tokens.Add(new Token(TokenType.Tag, wholeTag));
 
                 pos = m.Index + m.Length;
             }
 
             if (pos < text.Length)
             {
-                Pair token = new Pair();
-                token.First = "text";
-                token.Second = text.Substring(pos, text.Length - pos);
-                tokens.Add(token);
+                tokens.Add(new Token(TokenType.Text, text.Substring(pos, text.Length - pos)));
             }
 
             return tokens;
@@ -588,16 +582,16 @@ namespace MarkdownSharp
         /// </summary>
         private string EscapeSpecialCharsWithinTagAttributes(string text)
         {
-            ArrayList tokens = TokenizeHTML(text);
+            var tokens = TokenizeHTML(text);
 
             // now, rebuild text from the tokens
             var sb = new StringBuilder(text.Length);
 
-            foreach (Pair token in tokens)
+            foreach (var token in tokens)
             {
-                string value = token.Second;
+                string value = token.Value;
 
-                if (token.First == "tag")
+                if (token.Type == TokenType.Tag)
                 {
                     value = value.Replace(@"\", _escapeTable[@"\"]);
                     value = Regex.Replace(value, "(?<=.)</?code>(?=.)", _escapeTable[@"`"]);
@@ -1382,7 +1376,6 @@ namespace MarkdownSharp
             Random rnd = new Random();
             int r = rnd.Next(0, 100);
 
-            // Original author note:
             // Roughly 10% raw, 45% hex, 45% dec 
             // '@' *must* be encoded. I insist.
             if (r > 90 && c != '@') return c.ToString();
