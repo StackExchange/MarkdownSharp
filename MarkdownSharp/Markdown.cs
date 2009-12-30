@@ -267,6 +267,8 @@ namespace MarkdownSharp
         /// </summary>
         public string Transform(string text)
         {
+            if (text == null) return "";
+
             // Clear the global hashes. If we don't clear these, you get conflicts
             // from other articles when generating a page which contains more than
             // one article (e.g. an index page that shows the N most recent
