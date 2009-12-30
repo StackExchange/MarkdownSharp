@@ -55,7 +55,7 @@ namespace MarkdownSharpTests
         {
             var m = new MarkdownSharp.Markdown();
 
-            string input = "Here's another where the [link \nbreaks] across lines, but with a line-ending space.\n\n\n[link breaks]: /url/";
+            string input = "mail me at <username@example.com> please";
             string output = m.Transform(input);
 
             Console.WriteLine("input:");
@@ -152,6 +152,9 @@ namespace MarkdownSharpTests
 
         }
 
+        /// <summary>
+        /// returns CRC-16 of string as 4 hex characters
+        /// </summary>
         private static string GetCrc16(string s)
         {            
             if (String.IsNullOrEmpty(s)) return "";
@@ -214,9 +217,9 @@ namespace MarkdownSharpTests
             Console.WriteLine(@"MarkdownSharp v" + new MarkdownSharp.Markdown().Version + " benchmark, takes 10 ~ 30 seconds...");
             Console.WriteLine();
 
-            Benchmark(FileContents("benchmark/markdown-example-short-1.txt"), 4000);
-            Benchmark(FileContents("benchmark/markdown-example-medium-1.txt"), 1000);
-            Benchmark(FileContents("benchmark/markdown-example-long-2.txt"), 100);
+            Benchmark(FileContents("benchmark/markdown-example-short-1.text"), 4000);
+            Benchmark(FileContents("benchmark/markdown-example-medium-1.text"), 1000);
+            Benchmark(FileContents("benchmark/markdown-example-long-2.text"), 100);
             Benchmark(FileContents("benchmark/markdown-readme.text"), 1);
             Benchmark(FileContents("benchmark/markdown-readme.8.text"), 1);
             Benchmark(FileContents("benchmark/markdown-readme.32.text"), 1);
@@ -239,7 +242,10 @@ namespace MarkdownSharpTests
 
             Console.WriteLine("input string length: " + text.Length);
             Console.Write("performed " + iterations + " iterations in " + sw.ElapsedMilliseconds);
-            Console.WriteLine(" (" + Convert.ToDouble(sw.ElapsedMilliseconds) / Convert.ToDouble(iterations) + " ms per iteration)");
+            if (iterations == 1)
+                Console.WriteLine();
+            else
+                Console.WriteLine(" (" + Convert.ToDouble(sw.ElapsedMilliseconds) / Convert.ToDouble(iterations) + " ms per iteration)");
         }
 
 

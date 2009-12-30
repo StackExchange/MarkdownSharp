@@ -117,6 +117,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="mdtest-1.1-alt\!readme.txt" />
     <Content Include="mdtest-1.1-alt\Amps_and_angle_encoding.html" />
     <Content Include="mdtest-1.1-alt\Auto_links.html" />
     <Content Include="mdtest-1.1-alt\Backslash_escapes.html" />
@@ -142,17 +143,19 @@
     <Content Include="mdtest-1.1-alt\Tidyness.html" />
     <Content Include="mdtest-1.1\Inline_HTML_Simple.html" />
     <Content Include="mdtest-1.1\Inline_HTML_comments.html" />
-    <Content Include="benchmark\markdown-example-short-2.txt" />
-    <Content Include="benchmark\markdown-example-long-1.txt" />
-    <Content Include="benchmark\markdown-example-long-2.txt" />
-    <Content Include="benchmark\markdown-example-medium-1.txt" />
-    <Content Include="benchmark\markdown-example-medium-2.txt" />
-    <Content Include="benchmark\markdown-example-short-1.txt" />
+    <None Include="benchmark\markdown-example-short-2.text" />
+    <None Include="benchmark\markdown-example-long-1.text" />
+    <None Include="benchmark\markdown-example-long-2.text" />
+    <None Include="benchmark\markdown-example-medium-1.text" />
+    <None Include="benchmark\markdown-example-medium-2.text" />
+    <None Include="benchmark\markdown-example-short-1.text" />
+    <Content Include="mdtest-1.1\!readme.txt" />
     <Content Include="nunit-console\nunit-console-runner.dll" />
     <Content Include="nunit-console\nunit-console.exe" />
     <Content Include="nunit-console\nunit.core.dll" />
     <Content Include="nunit-console\nunit.core.interfaces.dll" />
     <Content Include="nunit-console\nunit.util.dll" />
+    <Content Include="test-input\!readme.txt" />
     <Content Include="test-input\markdown-readme.html" />
     <Content Include="test-input\reality-check.html" />
     <Content Include="mdtest-1.1-alt\Amps_and_angle_encoding.text" />
