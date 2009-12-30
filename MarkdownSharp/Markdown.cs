@@ -84,7 +84,6 @@ software, even if advised of the possibility of such damage.
 #endregion
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -190,7 +189,7 @@ namespace MarkdownSharp
 
             // Create an identical table but for escaped characters.
             _backslashEscapeTable = new Dictionary<string, string>();
-            foreach (string key in _escapeTable.Keys)
+            foreach (var key in _escapeTable.Keys)
                 _backslashEscapeTable.Add(@"\" + key, _escapeTable[key]);
         }
 
@@ -1360,7 +1359,7 @@ namespace MarkdownSharp
             email = "mailto:" + email;
 
             // leave ':' alone (to spot mailto: later) 
-            email = Regex.Replace(email, @"([^\:])", new MatchEvaluator(EncodeEmailEvaluator));
+            email = EncodeEmailAddress(email);
 
             email = string.Format("<a href=\"{0}\">{0}</a>", email);
 
@@ -1369,19 +1368,27 @@ namespace MarkdownSharp
             return email;
         }
 
-        private string EncodeEmailEvaluator(Match match)
+        /// <summary>
+        /// encodes email address randomly  
+        /// roughly 10% raw, 45% hex, 45% dec 
+        /// note that @ is always encoded and : never is
+        /// </summary>
+        private string EncodeEmailAddress(string addr)
         {
-            char c = Convert.ToChar(match.Groups[1].Value);
-
-            Random rnd = new Random();
-            int r = rnd.Next(0, 100);
-
-            // Roughly 10% raw, 45% hex, 45% dec 
-            // '@' *must* be encoded. I insist.
-            if (r > 90 && c != '@') return c.ToString();
-            if (r < 45) return string.Format("&#x{0:x};", (int)c);
-
-            return string.Format("&#x{0:x};", (int)c);
+            var sb = new StringBuilder(addr.Length * 5);
+            var rand = new Random();
+            int r;
+            foreach (char c in addr)
+            {
+                r = rand.Next(1, 100);
+                if ((r > 90 || c == ':') && c != '@')
+                    sb.Append(c);                         // m
+                else if (r < 45)
+                    sb.AppendFormat("&#x{0:x};", (int)c); // &#x6D
+                else
+                    sb.AppendFormat("&#{0};", (int)c);    // &#109
+            }
+            return sb.ToString();
         }
 
 
