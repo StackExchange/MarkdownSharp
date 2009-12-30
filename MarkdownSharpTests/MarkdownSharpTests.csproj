@@ -107,7 +107,6 @@
     <Content Include="mdtest-1.1\Tidyness.html" />
     <None Include="nunit-console\nunit-console.exe.config" />
     <None Include="perl-original-source\License.text" />
-    <None Include="perl-original-source\Markdown Readme.text" />
     <None Include="perl-original-source\Markdown.101.pl" />
     <None Include="perl-original-source\Markdown.102b8.pl" />
   </ItemGroup>
@@ -154,9 +153,13 @@
     <Content Include="nunit-console\nunit.core.dll" />
     <Content Include="nunit-console\nunit.core.interfaces.dll" />
     <Content Include="nunit-console\nunit.util.dll" />
+    <Content Include="test-input\markdown-readme.html" />
     <Content Include="test-input\reality-check.html" />
     <Content Include="mdtest-1.1-alt\Amps_and_angle_encoding.text" />
     <Content Include="mdtest-1.1-alt\Auto_links.text" />
+    <None Include="benchmark\markdown-readme.32.text" />
+    <None Include="benchmark\markdown-readme.8.text" />
+    <None Include="benchmark\markdown-readme.text" />
     <None Include="mdtest-1.1-alt\Backslash_escapes.text" />
     <None Include="mdtest-1.1-alt\Blockquotes_with_code_blocks.text" />
     <None Include="mdtest-1.1-alt\Code_Blocks.text" />
@@ -178,6 +181,7 @@
     <None Include="mdtest-1.1-alt\Strong_and_em_together.text" />
     <None Include="mdtest-1.1-alt\Tabs.text" />
     <None Include="mdtest-1.1-alt\Tidyness.text" />
+    <None Include="test-input\markdown-readme.text" />
     <None Include="test-input\reality-check.text" />
   </ItemGroup>
   <ItemGroup>

@@ -35,7 +35,9 @@ namespace MarkdownSharpTests
             //
             GenerateTestOutput(@"mdtest-1.1-alt");
 
-            // quick and dirty "Hello World" type test
+            //
+            // a few additional random "Hello World" type tests
+            //
             GenerateTestOutput(@"test-input");
 
             Benchmark();
@@ -171,7 +173,15 @@ namespace MarkdownSharpTests
         /// </summary>
         static string FileContents(string filename)
         {
-            return File.ReadAllText(Path.Combine(ExecutingAssemblyPath, filename));
+            try
+            {
+                return File.ReadAllText(Path.Combine(ExecutingAssemblyPath, filename));
+            }
+            catch (FileNotFoundException)
+            {
+                return "";
+            }
+            
         }
 
         /// <summary>
@@ -207,6 +217,9 @@ namespace MarkdownSharpTests
             Benchmark(FileContents("benchmark/markdown-example-short-1.txt"), 4000);
             Benchmark(FileContents("benchmark/markdown-example-medium-1.txt"), 1000);
             Benchmark(FileContents("benchmark/markdown-example-long-2.txt"), 100);
+            Benchmark(FileContents("benchmark/markdown-readme.text"), 1);
+            Benchmark(FileContents("benchmark/markdown-readme.8.text"), 1);
+            Benchmark(FileContents("benchmark/markdown-readme.32.text"), 1);
         }
 
         /// <summary>
