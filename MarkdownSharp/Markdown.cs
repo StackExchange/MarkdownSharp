@@ -126,6 +126,12 @@ namespace MarkdownSharp
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
         private const bool _autoHyperlink = false;
+        /// <summary>
+        /// when true, problematic URL characters like [, ], (, and so forth will be encoded 
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        private const bool _encodeProblemUrlCharacters = false;
+
 
         private enum TokenType
         {
@@ -199,7 +205,7 @@ namespace MarkdownSharp
         /// </summary>
         public string Version
         {
-            get { return "1.005"; }
+            get { return "1.006"; }
         }
 
         /// <summary>
@@ -351,7 +357,6 @@ namespace MarkdownSharp
         }
 
 
-        // profiler says this one is expensive
         private static string _blockTags1 = "p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|ins|del";
         private static Regex _blocksNested = new Regex(string.Format(@"
                 (						# save in $1
@@ -733,24 +738,28 @@ namespace MarkdownSharp
 
         /// <summary>
         /// encodes problem characters in URLs, such as 
-        /// ' () [] * _ :
+        /// * _  and optionally ' () []  :
         /// this is to avoid problems with markup later
         /// </summary>
         private string EncodeProblemUrlChars(string url)
-        {
-            // TODO: should just be bold/italic unless we're in strict mode
-            url = url.Replace("'", "%27");
-            url = url.Replace("(", "%28");
-            url = url.Replace(")", "%29");
-            url = url.Replace("[", "%5B");
-            url = url.Replace("]", "%5D");
+        {            
             url = url.Replace("*", "%2A");
             url = url.Replace("_", "%5F");
-            if (url.Length > 7 && url.Substring(7).Contains(":"))
+
+            if (_encodeProblemUrlCharacters)
             {
-                // replace any colons in the body of the URL that are NOT followed by 2 or more numbers
-                url = url.Substring(0, 7) + Regex.Replace(url.Substring(7), @":(?!\d{2,})", "%3A");
+                url = url.Replace("'", "%27");
+                url = url.Replace("(", "%28");
+                url = url.Replace(")", "%29");
+                url = url.Replace("[", "%5B");
+                url = url.Replace("]", "%5D");
+                if (url.Length > 7 && url.Substring(7).Contains(":"))
+                {
+                    // replace any colons in the body of the URL that are NOT followed by 2 or more numbers
+                    url = url.Substring(0, 7) + Regex.Replace(url.Substring(7), @":(?!\d{2,})", "%3A");
+                }
             }
+
             return url;
         }
 
@@ -894,11 +903,9 @@ namespace MarkdownSharp
             return output;
         }
 
-        // profiler says this one is expensive
         private static Regex _header1 = new Regex(@"^(.+?)[ \t]*\n=+[ \t]*\n+",
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        // profiler says this one is expensive
         private static Regex _header2 = new Regex(@"^(.+?)[ \t]*\n-+[ \t]*\n+",
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
@@ -978,7 +985,6 @@ namespace MarkdownSharp
         private static Regex _listNested = new Regex(@"^" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        // profiler says this one is expensive
         private static Regex _listTopLevel = new Regex(@"(?:(?<=\n\n)|\A\n?)" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
@@ -1128,6 +1134,7 @@ namespace MarkdownSharp
         {
             //
             //    *	Backtick quotes are used for <code></code> spans.
+            //
             //    *	You can use multiple backticks as the delimiters if you want to
             //        include literal backticks in the code span. So, this input:
             //
@@ -1194,10 +1201,8 @@ namespace MarkdownSharp
         }
 
 
-        // profiler says this one is expensive
         private static Regex _strong = new Regex(GetBoldPattern(),
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
-        // profiler says this one is expensive
         private static Regex _italics = new Regex(GetItalicPattern(),
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
@@ -1285,7 +1290,6 @@ namespace MarkdownSharp
             return string.Join("\n\n", paragraphs);
         }
 
-        // profiler says this one is expensive
         private static Regex _autolinkBare = new Regex(@"(^|\s)(https?|ftp)(://[-A-Z0-9+&@#/%?=~_|\[\]\(\)!:,\.;]*[-A-Z0-9+&@#/%=~_|\[\]])($|\W)",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
@@ -1440,7 +1444,6 @@ namespace MarkdownSharp
             return _outDent.Replace(block, "");
         }
 
-        // profiler says this one is expensive
         private static Regex _deTab = new Regex(@"^(.*?)(\t+)", RegexOptions.Multiline | RegexOptions.Compiled);
 
         private string Detab(string text)
