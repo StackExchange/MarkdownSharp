@@ -11,6 +11,7 @@ namespace MarkdownSharpTests
 {
     class Program
     {
+
         static void Main(string[] args)
         {
 
@@ -82,18 +83,15 @@ namespace MarkdownSharpTests
         /// </remarks>
         static void GenerateTestOutput(string testfolder)
         {
-            testfolder += @"\";
-
             var m = new MarkdownSharp.Markdown();
 
             Console.WriteLine();
-            Console.WriteLine(@"MarkdownSharp v" + m.Version + @" test run on \" + testfolder);
+            Console.WriteLine(@"MarkdownSharp v" + m.Version + @" test run on " + Path.DirectorySeparatorChar + testfolder);
             Console.WriteLine();
 
             string path = Path.Combine(ExecutingAssemblyPath, testfolder);
             string output;
             string expected;
-            string filename;
             string actual;
 
             int ok = 0;
@@ -103,14 +101,13 @@ namespace MarkdownSharpTests
 
             foreach (var file in Directory.GetFiles(path, "*.text"))
             {
-                expected = FileContents(file.Replace(".text", ".html"));                
-                output = m.Transform(FileContents(file));
-                actual = file.Replace(".text", "." + GetCrc16(output) + ".actual.html");
 
+                expected = FileContents(Path.ChangeExtension(file, "html"));
+                output = m.Transform(FileContents(file));
+                
                 total++;
 
-                filename = GetFileName(file);
-                Console.Write(String.Format("{0:000} {1,-55}", total, filename.Replace(".text", "")));
+                Console.Write(String.Format("{0:000} {1,-55}", total, Path.GetFileNameWithoutExtension(file)));
 
                 if (output == expected)
                 {
@@ -119,6 +116,9 @@ namespace MarkdownSharpTests
                 }
                 else
                 {
+
+                    actual = Path.ChangeExtension(file, GetCrc16(output) + ".actual.html");
+
                     err++;
                     if (File.Exists(actual))
                     {
@@ -127,7 +127,7 @@ namespace MarkdownSharpTests
                     else
                     {
                         errnew++;
-                        Console.WriteLine("Mismatch *NEW*");
+                        Console.WriteLine("Mismatch *NEW*");                        
                         File.WriteAllText(actual, output);
                     }
                 }
@@ -138,7 +138,7 @@ namespace MarkdownSharpTests
             Console.WriteLine("OK           : " + ok);
             Console.Write("Mismatch     : " + err);
             if (errnew > 0)
-                Console.Write(" (" + errnew + " *NEW*)");
+                Console.WriteLine(" (" + errnew + " *NEW*)");
             else
                 Console.WriteLine();
 
@@ -162,13 +162,6 @@ namespace MarkdownSharpTests
             return b[0].ToString("x2") + b[1].ToString("x2");
         }
 
-        /// <summary>
-        /// given a full path string return just the filename
-        /// </summary>
-        private static string GetFileName(string path)
-        {
-            return Regex.Match(path, @"\\[^\\]+?$").Value.Replace(@"\", "");
-        }
 
         /// <summary>
         /// returns the contents of the specified file as a string  
@@ -188,17 +181,18 @@ namespace MarkdownSharpTests
         }
 
         /// <summary>
-        /// returns the path of the currently executing assembly
+        /// returns the root path of the currently executing assembly
         /// </summary>
         static private string ExecutingAssemblyPath
         {
             get
             {
-                // very hacky, feel free to improve this
                 string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                path = path.Replace(@"\bin\Release", "");
-                path = path.Replace(@"\bin\Debug", "");
-                path = path.Replace("MarkdownSharpTests.exe", "");
+                // removes executable part
+                path = Path.GetDirectoryName(path);
+                // we're typically in \bin\debug or bin\release so move up two folders
+                path = Path.Combine(path, "..");
+                path = Path.Combine(path, "..");
                 return path;
             }
         }
@@ -217,12 +211,12 @@ namespace MarkdownSharpTests
             Console.WriteLine(@"MarkdownSharp v" + new MarkdownSharp.Markdown().Version + " benchmark, takes 10 ~ 30 seconds...");
             Console.WriteLine();
 
-            Benchmark(FileContents("benchmark/markdown-example-short-1.text"), 4000);
-            Benchmark(FileContents("benchmark/markdown-example-medium-1.text"), 1000);
-            Benchmark(FileContents("benchmark/markdown-example-long-2.text"), 100);
-            Benchmark(FileContents("benchmark/markdown-readme.text"), 1);
-            Benchmark(FileContents("benchmark/markdown-readme.8.text"), 1);
-            Benchmark(FileContents("benchmark/markdown-readme.32.text"), 1);
+            Benchmark(FileContents(Path.Combine("benchmark", "markdown-example-short-1.text")), 4000);
+            Benchmark(FileContents(Path.Combine("benchmark", "markdown-example-medium-1.text")), 1000);
+            Benchmark(FileContents(Path.Combine("benchmark", "markdown-example-long-2.text")), 100);
+            Benchmark(FileContents(Path.Combine("benchmark", "markdown-readme.text")), 1);
+            Benchmark(FileContents(Path.Combine("benchmark", "markdown-readme.8.text")), 1);
+            Benchmark(FileContents(Path.Combine("benchmark", "markdown-readme.32.text")), 1);
         }
 
         /// <summary>
@@ -241,7 +235,7 @@ namespace MarkdownSharpTests
             sw.Stop();
 
             Console.WriteLine("input string length: " + text.Length);
-            Console.Write("performed " + iterations + " iterations in " + sw.ElapsedMilliseconds);
+            Console.Write(iterations + " iteration" + (iterations == 1 ? "" : "s") + " in " + sw.ElapsedMilliseconds + " ms");
             if (iterations == 1)
                 Console.WriteLine();
             else
