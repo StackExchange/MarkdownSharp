@@ -24,7 +24,7 @@ namespace MarkdownSharpTests
             // and http://michelf.com/docs/projets/mdtest-1.1.zip
             // and http://git.michelf.com/mdtest/
             //
-            GenerateTestOutput(@"mdtest-1.1");
+            Test(@"mdtest-1.1");
 
             //
             // same as mdtest-1.1, but:
@@ -34,12 +34,12 @@ namespace MarkdownSharpTests
             // * comment out any edge conditions we aren't dealing with yet; search for
             //   the string "omitted:" to see what those are
             //
-            GenerateTestOutput(@"mdtest-1.1-alt");
+            Test(@"mdtest-1.1-alt");
 
             //
             // a few additional random "Hello World" type tests
             //
-            GenerateTestOutput(@"test-input");
+            Test(@"test-input");
 
             Benchmark();
 
@@ -50,7 +50,7 @@ namespace MarkdownSharpTests
 
         /// <summary>
         /// mini test harness for one-liner Markdown bug repros 
-        /// for anything larger, I recommend using the folder based approach and GenerateTestOutput()
+        /// for anything larger, I recommend using the folder based approach and Test()
         /// </summary>
         private static void AdHocTest()
         {
@@ -81,7 +81,7 @@ namespace MarkdownSharpTests
         ///                             -- xxxx is the 16-bit CRC checksum of the file contents; this is included
         ///                                so you can tell if the contents of a failing test have changed
         /// </remarks>
-        static void GenerateTestOutput(string testfolder)
+        static void Test(string testfolder)
         {
             var m = new MarkdownSharp.Markdown();
 
@@ -92,9 +92,10 @@ namespace MarkdownSharpTests
             string path = Path.Combine(ExecutingAssemblyPath, testfolder);
             string output;
             string expected;
-            string actual;
+            string actualpath;
 
             int ok = 0;
+            int okalt = 0;
             int err = 0;
             int errnew = 0;
             int total = 0;            
@@ -102,8 +103,10 @@ namespace MarkdownSharpTests
             foreach (var file in Directory.GetFiles(path, "*.text"))
             {
 
-                expected = FileContents(Path.ChangeExtension(file, "html"));
+                expected = FileContents(Path.ChangeExtension(file, "html"));                
                 output = m.Transform(FileContents(file));
+
+                actualpath = Path.ChangeExtension(file, GetCrc16(output) + ".actual.html");
                 
                 total++;
 
@@ -114,28 +117,35 @@ namespace MarkdownSharpTests
                     ok++;
                     Console.WriteLine("OK");
                 }
-                else
+                else if (RemoveWhitespace(output) == RemoveWhitespace(expected))
                 {
-
-                    actual = Path.ChangeExtension(file, GetCrc16(output) + ".actual.html");
-
+                    ok++;
+                    okalt++;
+                    Console.WriteLine("OK^");
+                    File.WriteAllText(actualpath, output);
+                }
+                else
+                {                    
                     err++;
-                    if (File.Exists(actual))
+                    if (File.Exists(actualpath))
                     {
                         Console.WriteLine("Mismatch");
                     }
                     else
                     {
                         errnew++;
-                        Console.WriteLine("Mismatch *NEW*");                        
-                        File.WriteAllText(actual, output);
+                        Console.WriteLine("Mismatch *NEW*");
+                        File.WriteAllText(actualpath, output);
                     }
                 }
             }
 
             Console.WriteLine();
             Console.WriteLine("Tests        : " + total);
-            Console.WriteLine("OK           : " + ok);
+            if (okalt > 0)
+                Console.WriteLine("OK           : " + ok + " (^ " + okalt + " whitespace differences)");
+            else
+                Console.WriteLine("OK           : " + ok);
             Console.Write("Mismatch     : " + err);
             if (errnew > 0)
                 Console.WriteLine(" (" + errnew + " *NEW*)");
@@ -151,6 +161,15 @@ namespace MarkdownSharpTests
             }
 
         }
+
+        /// <summary>
+        /// removes any empty newlines and any leading spaces at the start of lines
+        /// </summary>
+        private static string RemoveWhitespace(string s)
+        {
+            return Regex.Replace(s, @"^\n|^\s+", "", RegexOptions.Multiline);
+        }
+
 
         /// <summary>
         /// returns CRC-16 of string as 4 hex characters
