@@ -177,15 +177,12 @@ namespace MarkdownSharp
             _escapeTable = new Dictionary<string, string>();
             // Table of hash value for backslash escaped characters:
             _backslashEscapeTable = new Dictionary<string, string>();
-
-            string key;
-            string hash;
             
             foreach (char c in @"\`*_{}[]()>#+-.!")
             {
-                key = c.ToString();
-                hash = key.GetHashCode().ToString();                
-                _escapeTable.Add(key, hash);                
+                string key = c.ToString();
+                string hash = key.GetHashCode().ToString();
+                _escapeTable.Add(key, hash);
                 _backslashEscapeTable.Add(@"\" + key, hash);
             }
                             
@@ -197,7 +194,7 @@ namespace MarkdownSharp
         /// </summary>
         public string Version
         {
-            get { return "1.006"; }
+            get { return "1.007"; }
         }
 
         /// <summary>
@@ -1433,23 +1430,24 @@ namespace MarkdownSharp
             return text;
         }
 
-        private string EncodeBackslashEscapes(string value)
+        /// <summary>
+        /// process any escaped characters such as \`, \*, \[ etc
+        /// </summary>
+        private string EncodeBackslashEscapes(string text)
         {
             // Must process escaped backslashes first.
-            foreach (string key in _backslashEscapeTable.Keys)
-                value = value.Replace(key, _backslashEscapeTable[key]);
-
-            return value;
+            foreach (var pair in _backslashEscapeTable)
+                text = text.Replace(pair.Key, pair.Value);
+            return text;
         }
 
         /// <summary>
-        /// Swap back in all the special characters we've hidden. 
+        /// swap back in all the special characters we've hidden
         /// </summary>
         private string UnescapeSpecialChars(string text)
         {
-            foreach (string key in _escapeTable.Keys)
-                text = text.Replace(_escapeTable[key], key);
-
+            foreach (var pair in _escapeTable)
+                text = text.Replace(pair.Value, pair.Key);
             return text;
         }
 
