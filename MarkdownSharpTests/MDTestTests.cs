@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.IO;
 
 using NUnit.Framework;
 
@@ -13,16 +14,16 @@ namespace MarkdownSharpTests
     public class MDTestTests : BaseTest
     {
 
-        const string folder = @"mdtest-1.1\";
+        const string folder = @"mdtest-1.1";
 
         private string LoadInput(string filename)
         {
-            return FileContents(folder + @"\" + filename + ".text");
+            return FileContents(Path.Combine(folder, filename + ".text"));
         }
 
         private string LoadExpected(string filename)
         {
-            return FileContents(folder + @"\" + filename + ".html");
+            return FileContents(Path.Combine(folder, filename + ".html"));
         }
 
         [Test]
@@ -30,7 +31,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -38,7 +39,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -46,7 +47,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -54,7 +55,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -62,7 +63,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -70,7 +71,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -78,7 +79,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -86,7 +87,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -94,7 +95,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -102,7 +103,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -110,7 +111,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -118,7 +119,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -126,7 +127,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -134,7 +135,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -142,7 +143,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -150,7 +151,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -158,7 +159,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -166,7 +167,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -174,7 +175,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -182,7 +183,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -190,7 +191,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -198,7 +199,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
         [Test]
@@ -206,7 +207,7 @@ namespace MarkdownSharpTests
         {
             string name = MethodBase.GetCurrentMethod().Name;
             var m = new MarkdownSharp.Markdown();
-            Assert.AreEqual(LoadExpected(name), m.Transform(LoadInput(name)));
+            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
         }
 
     }

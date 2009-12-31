@@ -15,7 +15,7 @@ namespace MarkdownSharpTests
         static void Main(string[] args)
         {
 
-            //UnitTests();
+            UnitTests();
 
             //
             // this is the closest thing to a set of Markdown reference tests I could find
@@ -166,7 +166,7 @@ namespace MarkdownSharpTests
         /// removes any empty newlines and any leading spaces at the start of lines 
         /// all tabs, and all carriage returns
         /// </summary>
-        private static string RemoveWhitespace(string s)
+        public static string RemoveWhitespace(string s)
         {
             // Standardize line endings             
             s = s.Replace("\r\n", "\n");    // DOS to Unix

@@ -48,7 +48,9 @@ namespace MarkdownSharpTests
         {
             var m = new MarkdownSharp.Markdown();
             string s = m.Transform("Have you visited http://www.example.com before?");
-            Assert.AreEqual("<p>Have you visited <a href=\"http://www.example.com\">http://www.example.com</a> before?</p>\n", s);
+            // result will depend on _doAutoLinks setting
+            //Assert.AreEqual("<p>Have you visited <a href=\"http://www.example.com\">http://www.example.com</a> before?</p>\n", s);
+            Assert.AreEqual("<p>Have you visited http://www.example.com before?</p>\n", s);
         }
 
         [Test]
@@ -64,7 +66,7 @@ namespace MarkdownSharpTests
         {
             var m = new MarkdownSharp.Markdown();
             string s = m.Transform("An image goes here: ![alt text][1]\n\n  [1]: http://www.google.com/intl/en_ALL/images/logo.gif");
-            Assert.AreEqual("<p>An image goes here: <img src=\"http://www.google.com/intl/en%5FALL/images/logo.gif\" alt=\"alt text\" /></p>\n", s);
+            Assert.AreEqual("<p>An image goes here: <img src=\"http://www.google.com/intl/en_ALL/images/logo.gif\" alt=\"alt text\" /></p>\n", s);
         }
 
         [Test]
