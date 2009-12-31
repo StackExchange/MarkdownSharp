@@ -27,16 +27,6 @@ namespace MarkdownSharpTests
             Test(@"mdtest-1.1");
 
             //
-            // same as mdtest-1.1, but:
-            //
-            // * remove any non-significant whitespace or extra paragraph differences
-            //   (there are only two as I recall; not sure why, but frankly who cares)
-            // * comment out any edge conditions we aren't dealing with yet; search for
-            //   the string "omitted:" to see what those are
-            //
-            Test(@"mdtest-1.1-alt");
-
-            //
             // a few additional random "Hello World" type tests
             //
             Test(@"test-input");
@@ -56,7 +46,7 @@ namespace MarkdownSharpTests
         {
             var m = new MarkdownSharp.Markdown();
 
-            string input = "mail me at <username@example.com> please";
+            string input = "Here's an inline [link](</script?foo=1&bar=2>).";
             string output = m.Transform(input);
 
             Console.WriteLine("input:");

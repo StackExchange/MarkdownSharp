@@ -103,9 +103,9 @@ namespace MarkdownSharp
         /// </summary>
         private const int _tabWidth = 4;
         /// <summary>
-        /// maximum nested bracket depth supported by the transform
+        /// maximum nested depth of [] and () supported by the transform
         /// </summary>
-        private const int _nestedBracketDepth = 6;
+        private const int _nestDepth = 6;
 
 
 
@@ -153,6 +153,7 @@ namespace MarkdownSharp
         private const string _markerOL = @"\d+[.]";
 
         private static string _nestedBracketsPattern;
+        private static string _nestedParensPattern;
         private static string _markerAnyPattern;
                 
         private static readonly Dictionary<string, string> _escapeTable;
@@ -173,29 +174,21 @@ namespace MarkdownSharp
         static Markdown()
         {
             // Table of hash values for escaped characters:
-            _escapeTable = new Dictionary<string, string> {
-                { @"\", @"\".GetHashCode().ToString() },
-                { "`", "`".GetHashCode().ToString() },
-                { "*", "*".GetHashCode().ToString() },
-                { "_", "_".GetHashCode().ToString() },
-                { "{", "{".GetHashCode().ToString() },
-                { "}", "}".GetHashCode().ToString() },
-                { "[", "[".GetHashCode().ToString() },
-                { "]", "]".GetHashCode().ToString() },
-                { "(", "(".GetHashCode().ToString() },
-                { ")", ")".GetHashCode().ToString() },
-                { ">", ">".GetHashCode().ToString() },
-                { "#", "#".GetHashCode().ToString() },
-                { "+", "+".GetHashCode().ToString() },
-                { "-", "-".GetHashCode().ToString() },
-                { ".", ".".GetHashCode().ToString() },
-                { "!", "!".GetHashCode().ToString() }
-             };
-
-            // Create an identical table but for escaped characters.
+            _escapeTable = new Dictionary<string, string>();
+            // Table of hash value for backslash escaped characters:
             _backslashEscapeTable = new Dictionary<string, string>();
-            foreach (var key in _escapeTable.Keys)
-                _backslashEscapeTable.Add(@"\" + key, _escapeTable[key]);
+
+            string key;
+            string hash;
+            
+            foreach (char c in @"\`*_{}[]()>#+-.!")
+            {
+                key = c.ToString();
+                hash = key.GetHashCode().ToString();                
+                _escapeTable.Add(key, hash);                
+                _backslashEscapeTable.Add(@"\" + key, hash);
+            }
+                            
         }
 
         /// <summary>
@@ -208,13 +201,13 @@ namespace MarkdownSharp
         }
 
         /// <summary>
-        /// Regex to match balanced [brackets]. See Friedl's
+        /// Reusable pattern to match balanced [brackets]. See Friedl's 
         /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
         /// </summary>
         private static string GetNestedBracketsPattern()
         {
             // in other words [this] and [this[also]] and [this[also[too]]]
-            // up to _nestedBracketDepth
+            // up to _nestDepth
             if (_nestedBracketsPattern == null)
                 _nestedBracketsPattern = 
                     RepeatString(@"
@@ -222,11 +215,33 @@ namespace MarkdownSharp
                        [^\[\]]+      # Anything other than brackets
                      |
                        \[
-                           ", _nestedBracketDepth) + RepeatString(
+                           ", _nestDepth) + RepeatString(
                     @" \]
                     )*"
-                    , _nestedBracketDepth);
+                    , _nestDepth);
             return _nestedBracketsPattern;
+        }
+
+        /// <summary>
+        /// Reusable pattern to match balanced (parens). See Friedl's 
+        /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
+        /// </summary>
+        private static string GetNestedParensPattern()
+        {
+            // in other words (this) and (this(also)) and (this(also(too)))
+            // up to _nestDepth
+            if (_nestedParensPattern == null)
+                _nestedParensPattern =
+                    RepeatString(@"
+                    (?>              # Atomic matching
+                       [^()\s]+      # Anything other than parens or whitespace
+                     |
+                       \(
+                           ", _nestDepth) + RepeatString(
+                    @" \)
+                    )*"
+                    , _nestDepth);
+            return _nestedParensPattern;
         }
 
         private static string GetMarkerAnyPattern()
@@ -530,8 +545,8 @@ namespace MarkdownSharp
 
         private static Regex _htmlTokens = new Regex(
             @"(?s:<!(?:--.*?--\s*)+>)|(?s:<\?.*?\?>)|" + 
-            RepeatString(@"(?:<[a-z\/!$](?:[^<>]|", _nestedBracketDepth) + 
-            RepeatString(@")*>)", _nestedBracketDepth), 
+            RepeatString(@"(?:<[a-z\/!$](?:[^<>]|", _nestDepth) + 
+            RepeatString(@")*>)", _nestDepth), 
             RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
 
         /// <summary>
@@ -630,7 +645,7 @@ namespace MarkdownSharp
                     \]
                     \(                     # literal paren
                         [ \t]*
-                        <?(.*?)>?          # href = $3
+                        ({1})              # href = $3
                         [ \t]*
                         (                  # $4
                         (['\x22])          # quote char = $5
@@ -639,7 +654,8 @@ namespace MarkdownSharp
                         [ \t]*             # ignore any spaces/tabs between closing quote and )
                         )?                 # title is optional
                     \)
-                )", GetNestedBracketsPattern()), RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                )", GetNestedBracketsPattern(), GetNestedParensPattern()),
+                  RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _anchorRefShortcut = new Regex(@"
             (					# wrap whole match in $1
@@ -681,6 +697,8 @@ namespace MarkdownSharp
             if (_urls.ContainsKey(linkID))
             {
                 string url = _urls[linkID];
+
+                url = EscapeBoldItalic(url);
                 url = EncodeProblemUrlChars(url);
                 result = "<a href=\"" + url + "\"";
 
@@ -711,6 +729,8 @@ namespace MarkdownSharp
             if (_urls.ContainsKey(linkID))
             {
                 string url = _urls[linkID];
+
+                url = EscapeBoldItalic(url);
                 url = EncodeProblemUrlChars(url);
                 result = "<a href=\"" + url + "\"";
 
@@ -730,6 +750,16 @@ namespace MarkdownSharp
             return result;
         }
 
+        /// <summary>
+        /// escapes Bold [ * ] and Italic [ _ ] characters
+        /// </summary>
+        private string EscapeBoldItalic(string s)
+        {
+            s = s.Replace("*", _escapeTable["*"]);
+            s = s.Replace("_", _escapeTable["_"]);
+            return s;
+        }
+
 
         /// <summary>
         /// encodes problem characters in URLs, such as 
@@ -737,12 +767,11 @@ namespace MarkdownSharp
         /// this is to avoid problems with markup later
         /// </summary>
         private string EncodeProblemUrlChars(string url)
-        {            
-            url = url.Replace("*", "%2A");
-            url = url.Replace("_", "%5F");
-
+        {
             if (_encodeProblemUrlCharacters)
             {
+                url = url.Replace("*", "%2A");
+                url = url.Replace("_", "%5F");
                 url = url.Replace("'", "%27");
                 url = url.Replace("(", "%28");
                 url = url.Replace(")", "%29");
@@ -764,7 +793,10 @@ namespace MarkdownSharp
             string url = match.Groups[3].Value;
             string title = match.Groups[6].Value;
             string result;
-
+           
+            url = EscapeBoldItalic(url);
+            if (url.StartsWith("<") && url.EndsWith(">")) 
+                url = url.Substring(1, url.Length - 2); // remove <>'s surrounding URL, if present
             url = EncodeProblemUrlChars(url);
 
             result = string.Format("<a href=\"{0}\"", url);
@@ -796,15 +828,15 @@ namespace MarkdownSharp
 
                     )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private static Regex _imagesInline = new Regex(@"
-                (				# wrap whole match in $1
+        private static Regex _imagesInline = new Regex(String.Format(@"
+              (                 # wrap whole match in $1
                 !\[
                     (.*?)		# alt text = $2
                 \]
                 \s?             # one optional whitespace character
                 \(			    # literal paren
                     [ \t]*
-                    <?(\S*?)>?	# href = $3
+                    ({0})   # href = $3
                     [ \t]*
                     (			# $4
                     (['\x22])	# quote char = $5
@@ -813,7 +845,8 @@ namespace MarkdownSharp
                     [ \t]*
                     )?			# title is optional
                 \)
-                )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+              )", GetNestedParensPattern()),
+                  RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown image shortcuts into <img> tags. 
@@ -846,8 +879,8 @@ namespace MarkdownSharp
             if (_urls.ContainsKey(linkID))
             {
                 string url = _urls[linkID];
+                url = EscapeBoldItalic(url);
                 url = EncodeProblemUrlChars(url);
-
                 result = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, altText);
 
                 if (_titles.ContainsKey(linkID))
@@ -876,11 +909,15 @@ namespace MarkdownSharp
             string url = match.Groups[3].Value;
             string title = match.Groups[6].Value;
             string result;
-
+            
             alt = alt.Replace("\"", "&quot;");
             title = title.Replace("\"", "&quot;");
+
+            url = EscapeBoldItalic(url);
+            if (url.StartsWith("<") && url.EndsWith(">"))
+                url = url.Substring(1, url.Length - 2);    // Remove <>'s surrounding URL, if present
+
             url = EncodeProblemUrlChars(url);
-            url = Regex.Replace(url, @"^<(.*)>$", "$1");            // remove <>'s surrounding URL, if present
 
             result = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, alt);
 
@@ -1295,17 +1332,6 @@ namespace MarkdownSharp
                 // note that at this point, all other URL in the text are already hyperlinked as <a href=""></a>
                 // *except* for the <http://www.foo.com> case
                 text = _autolinkBare.Replace(text, @"$1<$2$3>$4");
-            }
-
-            if (Regex.IsMatch(text, @"<(https?|ftp)://[^>]+>"))
-            {
-                string newtext;
-                foreach (Match m in Regex.Matches(text, @"<(https?|ftp)://[^>]+>"))
-                {
-                    // fixup arbitrary URLs -- encode problem characters
-                    newtext = EncodeProblemUrlChars(m.Value);
-                    text = text.Replace(m.Value, newtext);
-                }
             }
 
             // Hyperlinks: <http://foo.com>

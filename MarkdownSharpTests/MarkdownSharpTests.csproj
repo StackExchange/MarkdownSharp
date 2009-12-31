@@ -117,30 +117,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="mdtest-1.1-alt\!readme.txt" />
-    <Content Include="mdtest-1.1-alt\Amps_and_angle_encoding.html" />
-    <Content Include="mdtest-1.1-alt\Auto_links.html" />
-    <Content Include="mdtest-1.1-alt\Backslash_escapes.html" />
-    <Content Include="mdtest-1.1-alt\Blockquotes_with_code_blocks.html" />
-    <Content Include="mdtest-1.1-alt\Code_Blocks.html" />
-    <Content Include="mdtest-1.1-alt\Code_Spans.html" />
-    <Content Include="mdtest-1.1-alt\Hard_wrapped_paragraphs_with_list_like_lines.html" />
-    <Content Include="mdtest-1.1-alt\Horizontal_rules.html" />
-    <Content Include="mdtest-1.1-alt\Images.html" />
-    <Content Include="mdtest-1.1-alt\Inline_HTML_Advanced.html" />
-    <Content Include="mdtest-1.1-alt\Inline_HTML_comments.html" />
-    <Content Include="mdtest-1.1-alt\Inline_HTML_Simple.html" />
-    <Content Include="mdtest-1.1-alt\Links_inline_style.html" />
-    <Content Include="mdtest-1.1-alt\Links_reference_style.html" />
-    <Content Include="mdtest-1.1-alt\Links_shortcut_references.html" />
-    <Content Include="mdtest-1.1-alt\Literal_quotes_in_titles.html" />
-    <Content Include="mdtest-1.1-alt\Markdown_Documentation_Basics.html" />
-    <Content Include="mdtest-1.1-alt\Markdown_Documentation_Syntax.html" />
-    <Content Include="mdtest-1.1-alt\Nested_blockquotes.html" />
-    <Content Include="mdtest-1.1-alt\Ordered_and_unordered_lists.html" />
-    <Content Include="mdtest-1.1-alt\Strong_and_em_together.html" />
-    <Content Include="mdtest-1.1-alt\Tabs.html" />
-    <Content Include="mdtest-1.1-alt\Tidyness.html" />
     <Content Include="mdtest-1.1\Inline_HTML_Simple.html" />
     <Content Include="mdtest-1.1\Inline_HTML_comments.html" />
     <None Include="benchmark\markdown-example-short-2.text" />
@@ -158,32 +134,9 @@
     <Content Include="test-input\!readme.txt" />
     <Content Include="test-input\markdown-readme.html" />
     <Content Include="test-input\reality-check.html" />
-    <Content Include="mdtest-1.1-alt\Amps_and_angle_encoding.text" />
-    <Content Include="mdtest-1.1-alt\Auto_links.text" />
     <None Include="benchmark\markdown-readme.32.text" />
     <None Include="benchmark\markdown-readme.8.text" />
     <None Include="benchmark\markdown-readme.text" />
-    <None Include="mdtest-1.1-alt\Backslash_escapes.text" />
-    <None Include="mdtest-1.1-alt\Blockquotes_with_code_blocks.text" />
-    <None Include="mdtest-1.1-alt\Code_Blocks.text" />
-    <None Include="mdtest-1.1-alt\Code_Spans.text" />
-    <None Include="mdtest-1.1-alt\Hard_wrapped_paragraphs_with_list_like_lines.text" />
-    <None Include="mdtest-1.1-alt\Horizontal_rules.text" />
-    <None Include="mdtest-1.1-alt\Images.text" />
-    <None Include="mdtest-1.1-alt\Inline_HTML_Advanced.text" />
-    <None Include="mdtest-1.1-alt\Inline_HTML_comments.text" />
-    <None Include="mdtest-1.1-alt\Inline_HTML_Simple.text" />
-    <None Include="mdtest-1.1-alt\Links_inline_style.text" />
-    <None Include="mdtest-1.1-alt\Links_reference_style.text" />
-    <None Include="mdtest-1.1-alt\Links_shortcut_references.text" />
-    <None Include="mdtest-1.1-alt\Literal_quotes_in_titles.text" />
-    <None Include="mdtest-1.1-alt\Markdown_Documentation_Basics.text" />
-    <None Include="mdtest-1.1-alt\Markdown_Documentation_Syntax.text" />
-    <None Include="mdtest-1.1-alt\Nested_blockquotes.text" />
-    <None Include="mdtest-1.1-alt\Ordered_and_unordered_lists.text" />
-    <None Include="mdtest-1.1-alt\Strong_and_em_together.text" />
-    <None Include="mdtest-1.1-alt\Tabs.text" />
-    <None Include="mdtest-1.1-alt\Tidyness.text" />
     <None Include="test-input\markdown-readme.text" />
     <None Include="test-input\reality-check.text" />
   </ItemGroup>
