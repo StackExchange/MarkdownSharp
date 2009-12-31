@@ -27,6 +27,16 @@ namespace MarkdownSharpTests
             Test(@"mdtest-1.1");
 
             //
+            // see http://six.pairlist.net/pipermail/markdown-discuss/2009-February/001526.html
+            //
+            // "another testsuite I made for testing PHP Markdown which should probably 
+            // apply to any Markdown parser (the PHP Markdown testsuite)"
+            //
+            // NB: these tests are quite tough, many complex edge conditions
+            //
+            //Test(@"php-markdown-test");
+
+            //
             // a few additional random "Hello World" type tests
             //
             Test(@"test-input");
@@ -153,11 +163,29 @@ namespace MarkdownSharpTests
         }
 
         /// <summary>
-        /// removes any empty newlines and any leading spaces at the start of lines
+        /// removes any empty newlines and any leading spaces at the start of lines 
+        /// all tabs, and all carriage returns
         /// </summary>
         private static string RemoveWhitespace(string s)
         {
-            return Regex.Replace(s, @"^\n|^\s+", "", RegexOptions.Multiline);
+            // Standardize line endings             
+            s = s.Replace("\r\n", "\n");    // DOS to Unix
+            s = s.Replace("\r", "\n");      // Mac to Unix
+
+            // remove any tabs entirely
+            s = s.Replace("\t", "");
+
+            // remove empty newlines
+            s = Regex.Replace(s, @"^\n", "", RegexOptions.Multiline);
+
+            // remove leading space at the start of lines
+            s = Regex.Replace(s, @"^\s+", "", RegexOptions.Multiline);
+
+            // if we have an ending newline, let's try removing it
+            if (s.EndsWith("\n"))
+                s = s.Substring(0, s.Length - 1);
+
+            return s;
         }
 
 
