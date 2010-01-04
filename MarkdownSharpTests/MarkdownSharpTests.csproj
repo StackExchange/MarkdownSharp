@@ -155,6 +155,9 @@
     <None Include="benchmark\markdown-readme.32.text" />
     <None Include="benchmark\markdown-readme.8.text" />
     <None Include="benchmark\markdown-readme.text" />
+    <None Include="php-markdown-source\License.text" />
+    <None Include="php-markdown-source\markdown.php" />
+    <None Include="php-markdown-source\PHP Markdown Readme.text" />
     <None Include="php-markdown-test\Backslash escapes.text" />
     <None Include="php-markdown-test\Code block in a list item.text" />
     <None Include="php-markdown-test\Code Spans.text" />
