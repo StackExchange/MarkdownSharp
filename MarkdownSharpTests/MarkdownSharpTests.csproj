@@ -31,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL" />
-    <Reference Include="nunit.framework, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821" />
+    <Reference Include="nunit.framework, Version=2.5.3.9345, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -55,50 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Content Include="mdtest-1.1\Amps_and_angle_encoding.text" />
-    <Content Include="mdtest-1.1\Amps_and_angle_encoding.html" />
-    <Content Include="mdtest-1.1\Auto_links.text" />
-    <Content Include="mdtest-1.1\Auto_links.html" />
-    <None Include="mdtest-1.1\Backslash_escapes.text" />
-    <Content Include="mdtest-1.1\Backslash_escapes.html" />
-    <None Include="mdtest-1.1\Blockquotes_with_code_blocks.text" />
-    <Content Include="mdtest-1.1\Blockquotes_with_code_blocks.html" />
-    <None Include="mdtest-1.1\Code_Blocks.text" />
-    <Content Include="mdtest-1.1\Code_Blocks.html" />
-    <None Include="mdtest-1.1\Code_Spans.text" />
-    <Content Include="mdtest-1.1\Code_Spans.html" />
-    <None Include="mdtest-1.1\Hard_wrapped_paragraphs_with_list_like_lines.text" />
-    <Content Include="mdtest-1.1\Hard_wrapped_paragraphs_with_list_like_lines.html" />
-    <None Include="mdtest-1.1\Horizontal_rules.text" />
-    <Content Include="mdtest-1.1\Horizontal_rules.html" />
-    <None Include="mdtest-1.1\Images.text" />
-    <Content Include="mdtest-1.1\Images.html" />
-    <None Include="mdtest-1.1\Inline_HTML_Advanced.text" />
-    <Content Include="mdtest-1.1\Inline_HTML_Advanced.html" />
-    <None Include="mdtest-1.1\Inline_HTML_Simple.text" />
-    <None Include="mdtest-1.1\Inline_HTML_comments.text" />
-    <None Include="mdtest-1.1\Links_inline_style.text" />
-    <Content Include="mdtest-1.1\Links_inline_style.html" />
-    <None Include="mdtest-1.1\Links_reference_style.text" />
-    <Content Include="mdtest-1.1\Links_reference_style.html" />
-    <None Include="mdtest-1.1\Links_shortcut_references.text" />
-    <Content Include="mdtest-1.1\Links_shortcut_references.html" />
-    <None Include="mdtest-1.1\Literal_quotes_in_titles.text" />
-    <Content Include="mdtest-1.1\Literal_quotes_in_titles.html" />
-    <None Include="mdtest-1.1\Markdown_Documentation_Basics.text" />
-    <Content Include="mdtest-1.1\Markdown_Documentation_Basics.html" />
-    <None Include="mdtest-1.1\Markdown_Documentation_Syntax.text" />
-    <Content Include="mdtest-1.1\Markdown_Documentation_Syntax.html" />
-    <None Include="mdtest-1.1\Nested_blockquotes.text" />
-    <Content Include="mdtest-1.1\Nested_blockquotes.html" />
-    <None Include="mdtest-1.1\Ordered_and_unordered_lists.text" />
-    <Content Include="mdtest-1.1\Ordered_and_unordered_lists.html" />
-    <None Include="mdtest-1.1\Strong_and_em_together.text" />
-    <Content Include="mdtest-1.1\Strong_and_em_together.html" />
-    <None Include="mdtest-1.1\Tabs.text" />
-    <Content Include="mdtest-1.1\Tabs.html" />
-    <None Include="mdtest-1.1\Tidyness.text" />
-    <Content Include="mdtest-1.1\Tidyness.html" />
     <None Include="nunit-console\nunit-console.exe.config" />
     <None Include="perl-original-source\License.text" />
     <None Include="perl-original-source\Markdown.101.pl" />
@@ -113,8 +69,6 @@
   <ItemGroup>
     <Content Include="lib\log4net.dll" />
     <Content Include="lib\nunit.framework.dll" />
-    <Content Include="mdtest-1.1\Inline_HTML_Simple.html" />
-    <Content Include="mdtest-1.1\Inline_HTML_comments.html" />
     <None Include="benchmark\markdown-example-short-2.text" />
     <None Include="benchmark\markdown-example-long-1.text" />
     <None Include="benchmark\markdown-example-long-2.text" />
@@ -122,6 +76,29 @@
     <None Include="benchmark\markdown-example-medium-2.text" />
     <None Include="benchmark\markdown-example-short-1.text" />
     <Content Include="mdtest-1.1\!readme.txt" />
+    <EmbeddedResource Include="mdtest-1.1\Amps_and_angle_encoding.html" />
+    <EmbeddedResource Include="mdtest-1.1\Auto_links.html" />
+    <EmbeddedResource Include="mdtest-1.1\Backslash_escapes.html" />
+    <EmbeddedResource Include="mdtest-1.1\Blockquotes_with_code_blocks.html" />
+    <EmbeddedResource Include="mdtest-1.1\Code_Blocks.html" />
+    <EmbeddedResource Include="mdtest-1.1\Code_Spans.html" />
+    <EmbeddedResource Include="mdtest-1.1\Hard_wrapped_paragraphs_with_list_like_lines.html" />
+    <EmbeddedResource Include="mdtest-1.1\Horizontal_rules.html" />
+    <EmbeddedResource Include="mdtest-1.1\Images.html" />
+    <EmbeddedResource Include="mdtest-1.1\Inline_HTML_Advanced.html" />
+    <EmbeddedResource Include="mdtest-1.1\Inline_HTML_comments.html" />
+    <EmbeddedResource Include="mdtest-1.1\Inline_HTML_Simple.html" />
+    <EmbeddedResource Include="mdtest-1.1\Links_inline_style.html" />
+    <EmbeddedResource Include="mdtest-1.1\Links_reference_style.html" />
+    <EmbeddedResource Include="mdtest-1.1\Links_shortcut_references.html" />
+    <EmbeddedResource Include="mdtest-1.1\Literal_quotes_in_titles.html" />
+    <EmbeddedResource Include="mdtest-1.1\Markdown_Documentation_Basics.html" />
+    <EmbeddedResource Include="mdtest-1.1\Markdown_Documentation_Syntax.html" />
+    <EmbeddedResource Include="mdtest-1.1\Nested_blockquotes.html" />
+    <EmbeddedResource Include="mdtest-1.1\Ordered_and_unordered_lists.html" />
+    <EmbeddedResource Include="mdtest-1.1\Strong_and_em_together.html" />
+    <EmbeddedResource Include="mdtest-1.1\Tabs.html" />
+    <EmbeddedResource Include="mdtest-1.1\Tidyness.html" />
     <Content Include="nunit-console\nunit-console-runner.dll" />
     <Content Include="nunit-console\nunit-console.exe" />
     <Content Include="nunit-console\nunit.core.dll" />
@@ -151,6 +128,29 @@
     <None Include="benchmark\markdown-readme.32.text" />
     <None Include="benchmark\markdown-readme.8.text" />
     <None Include="benchmark\markdown-readme.text" />
+    <EmbeddedResource Include="mdtest-1.1\Amps_and_angle_encoding.text" />
+    <EmbeddedResource Include="mdtest-1.1\Auto_links.text" />
+    <EmbeddedResource Include="mdtest-1.1\Backslash_escapes.text" />
+    <EmbeddedResource Include="mdtest-1.1\Blockquotes_with_code_blocks.text" />
+    <EmbeddedResource Include="mdtest-1.1\Code_Blocks.text" />
+    <EmbeddedResource Include="mdtest-1.1\Code_Spans.text" />
+    <EmbeddedResource Include="mdtest-1.1\Hard_wrapped_paragraphs_with_list_like_lines.text" />
+    <EmbeddedResource Include="mdtest-1.1\Horizontal_rules.text" />
+    <EmbeddedResource Include="mdtest-1.1\Images.text" />
+    <EmbeddedResource Include="mdtest-1.1\Inline_HTML_Advanced.text" />
+    <EmbeddedResource Include="mdtest-1.1\Inline_HTML_comments.text" />
+    <EmbeddedResource Include="mdtest-1.1\Inline_HTML_Simple.text" />
+    <EmbeddedResource Include="mdtest-1.1\Links_inline_style.text" />
+    <EmbeddedResource Include="mdtest-1.1\Links_reference_style.text" />
+    <EmbeddedResource Include="mdtest-1.1\Links_shortcut_references.text" />
+    <EmbeddedResource Include="mdtest-1.1\Literal_quotes_in_titles.text" />
+    <EmbeddedResource Include="mdtest-1.1\Markdown_Documentation_Basics.text" />
+    <EmbeddedResource Include="mdtest-1.1\Markdown_Documentation_Syntax.text" />
+    <EmbeddedResource Include="mdtest-1.1\Nested_blockquotes.text" />
+    <EmbeddedResource Include="mdtest-1.1\Ordered_and_unordered_lists.text" />
+    <EmbeddedResource Include="mdtest-1.1\Strong_and_em_together.text" />
+    <EmbeddedResource Include="mdtest-1.1\Tabs.text" />
+    <EmbeddedResource Include="mdtest-1.1\Tidyness.text" />
     <None Include="php-markdown-source\License.text" />
     <None Include="php-markdown-source\markdown.php" />
     <None Include="php-markdown-source\PHP Markdown Readme.text" />

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MarkdownSharp;
-
+﻿using MarkdownSharp;
 using NUnit.Framework;
 
 namespace MarkdownSharpTests
@@ -11,8 +6,7 @@ namespace MarkdownSharpTests
     [TestFixture]
     public class SimpleTests : BaseTest
     {
-
-        private Markdown m = new MarkdownSharp.Markdown();
+        private Markdown m = new Markdown();
 
         [Test]
         public void Bold()
@@ -214,6 +208,5 @@ namespace MarkdownSharpTests
 
             Assert.AreEqual(expected, actual);
         }
-
     }
 }

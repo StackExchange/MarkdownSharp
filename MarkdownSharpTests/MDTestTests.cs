@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 using System.IO;
 using MarkdownSharp;
@@ -14,181 +13,49 @@ namespace MarkdownSharpTests
     [TestFixture]
     public class MDTestTests : BaseTest
     {
+        const string folder = "mdtest_1._1";
 
-        const string folder = @"mdtest-1.1";
 
-        private Markdown m = new MarkdownSharp.Markdown();
-
-        private string LoadInput(string filename)
+        private static IEnumerable<TestCaseData> GetTests()
         {
-            return FileContents(Path.Combine(folder, Path.ChangeExtension(filename, "text")));
+            Markdown m = new Markdown();
+            Assembly assembly = Assembly.GetAssembly(typeof(BaseTest));
+            string namespacePrefix = String.Concat(assembly.GetName().Name, '.', folder);
+            string[] resourceNames = assembly.GetManifestResourceNames();
+            
+            Func<string, string> getResourceFileContent = filename =>
+            {
+                using (Stream stream = assembly.GetManifestResourceStream(filename))
+                {
+                    if (stream == null)
+                        return null;
+
+                    using (StreamReader streamReader = new StreamReader(stream))
+                        return streamReader.ReadToEnd();
+                }
+            };
+
+            return from name in resourceNames
+                   // Skip resource names that aren't within the namespace (folder) we want
+                   // and doesn't have the extension '.html'.
+                   where name.StartsWith(namespacePrefix) && name.EndsWith(".html")
+                   let actualName = Path.ChangeExtension(name, "text")
+                   let actualContent = getResourceFileContent(actualName)
+                   let actual = Program.RemoveWhitespace(m.Transform(actualContent))
+                   let expectedContent = getResourceFileContent(name)
+                   let expected = Program.RemoveWhitespace(expectedContent)
+                   select new TestCaseData(actualName, name, actual, expected);
         }
 
-        private string LoadExpected(string filename)
-        {
-            return FileContents(Path.Combine(folder, Path.ChangeExtension(filename, "html")));
-        }
 
-        [Test]
-        public void Auto_Links()
+        [Test, TestCaseSource("GetTests")]
+        public void Test(string actualName, string expectedName, string actual, string expected)
         {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
+            Assert.That(actual,
+                        Is.EqualTo(expected),
+                        "Mismatch between '{0}' and the transformed '{1}'.",
+                        actualName,
+                        expectedName);
         }
-
-        [Test]
-        public void Amps_and_angle_encoding()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Backslash_escapes()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Blockquotes_with_code_blocks()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Code_Blocks()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Code_Spans()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Hard_wrapped_paragraphs_with_list_like_lines()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Horizontal_rules()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Images()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Inline_HTML_Advanced()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Inline_HTML_comments()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Inline_HTML_Simple()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Links_inline_style()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Links_reference_style()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Links_shortcut_references()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Literal_quotes_in_titles()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Markdown_Documentation_Basics()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Markdown_Documentation_Syntax()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Nested_blockquotes()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Ordered_and_unordered_lists()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Strong_and_em_together()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Tabs()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
-        [Test]
-        public void Tidyness()
-        {
-            string name = MethodBase.GetCurrentMethod().Name;
-            Assert.AreEqual(Program.RemoveWhitespace(LoadExpected(name)), Program.RemoveWhitespace(m.Transform(LoadInput(name))));
-        }
-
     }
 }
