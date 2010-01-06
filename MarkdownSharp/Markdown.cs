@@ -477,17 +477,6 @@ namespace MarkdownSharp
             return string.Concat("\n\n", key, "\n\n");
         }
 
-        private static Regex _horizontalRules = new Regex(@"
-            ^[ ]{0,3}	        # Leading space
-                ([-*_])		    # $1: First marker
-                (?>			    # Repeated marker group
-                    [ ]{0,2}	# Zero, one, or two spaces.
-                    \1			# Marker character
-                ){2,}		    # Group repeated at least twice
-                [ ]*		    # Trailing spaces
-                $			    # End of line.
-            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
         /// <summary>
         /// These are all the transformations that form block-level 
         /// tags like paragraphs, headers, and list items.
@@ -495,9 +484,7 @@ namespace MarkdownSharp
         private string RunBlockGamut(string text)
         {
             text = DoHeaders(text);
-
-            text = _horizontalRules.Replace(text, "<hr" + _emptyElementSuffix + "\n");
-
+            text = DoHorizontalRules(text); 
             text = DoLists(text);
             text = DoCodeBlocks(text);
             text = DoBlockQuotes(text);
@@ -521,7 +508,6 @@ namespace MarkdownSharp
         private string RunSpanGamut(string text)
         {
             text = DoCodeSpans(text);
-
             text = EscapeSpecialCharsWithinTagAttributes(text);
             text = EncodeBackslashEscapes(text);
 
@@ -540,11 +526,7 @@ namespace MarkdownSharp
 
             text = DoItalicsAndBold(text);
 
-            // do hard breaks
-            if (_autoNewlines)
-                text = Regex.Replace(text, @"\n", string.Format("<br{0}\n", _emptyElementSuffix));
-            else
-                text = Regex.Replace(text, @" {2,}\n", string.Format("<br{0}\n", _emptyElementSuffix));
+            text = DoHardBreaks(text);
 
             return text;
         }
@@ -998,6 +980,23 @@ namespace MarkdownSharp
             return string.Concat("<h", headerSig.Length, ">", RunSpanGamut(headerText), "</h", headerSig.Length, ">\n\n");
         }
 
+
+        private static Regex _horizontalRules = new Regex(@"
+            ^[ ]{0,3}	        # Leading space
+                ([-*_])		    # $1: First marker
+                (?>			    # Repeated marker group
+                    [ ]{0,2}	# Zero, one, or two spaces.
+                    \1			# Marker character
+                ){2,}		    # Group repeated at least twice
+                [ ]*		    # Trailing spaces
+                $			    # End of line.
+            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private string DoHorizontalRules(string text)
+        {
+            return _horizontalRules.Replace(text, "<hr" + _emptyElementSuffix + "\n");
+        }
+
         private static string _wholeList = string.Format(@"
             (                               # $1 = whole list
               (                             # $2
@@ -1248,6 +1247,15 @@ namespace MarkdownSharp
             // Then <em>:
             text = _italics.Replace(text, GetItalicReplace());
 
+            return text;
+        }
+
+        private string DoHardBreaks(string text)
+        {
+            if (_autoNewlines)
+                text = Regex.Replace(text, @"\n", string.Format("<br{0}\n", _emptyElementSuffix));
+            else
+                text = Regex.Replace(text, @" {2,}\n", string.Format("<br{0}\n", _emptyElementSuffix));
             return text;
         }
 
