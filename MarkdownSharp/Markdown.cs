@@ -96,49 +96,46 @@ namespace MarkdownSharp
         /// <summary>
         /// use ">" for HTML output, or " />" for XHTML output
         /// </summary>
-        private const string _emptyElementSuffix = " />";
+        const string _emptyElementSuffix = " />";
         /// <summary>
         /// Tabs are automatically converted to spaces as part of the transform  
         /// this variable determines how "wide" those tabs become in spaces
         /// </summary>
-        private const int _tabWidth = 4;
+        const int _tabWidth = 4;
         /// <summary>
         /// maximum nested depth of [] and () supported by the transform
         /// </summary>
-        private const int _nestDepth = 6;
-
-
+        const int _nestDepth = 6;
 
         /// <summary>
         /// when false, email addresses will never be auto-linked  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        private const bool _linkEmails = true;
+        const bool _linkEmails = true;
         /// <summary>
         /// when true, bold and italic require non-word characters on either side  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        private const bool _strictBoldItalic = false;
+        const bool _strictBoldItalic = false;
         /// <summary>
         /// when true, RETURN becomes a literal newline  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        private const bool _autoNewlines = false;
+        const bool _autoNewlines = false;
         /// <summary>
         /// when true, (most) bare plain URLs are auto-hyperlinked  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        private const bool _autoHyperlink = false;
+        const bool _autoHyperlink = false;
         /// <summary>
         /// when true, problematic URL characters like [, ], (, and so forth will be encoded 
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        private const bool _encodeProblemUrlCharacters = false;
+        const bool _encodeProblemUrlCharacters = false;
 
+        enum TokenType { Text, Tag }
 
-        private enum TokenType { Text, Tag }
-
-        private struct Token
+        struct Token
         {
             public Token(TokenType type, string value)
             {
@@ -149,21 +146,21 @@ namespace MarkdownSharp
             public string Value;
         }
 
-        private const string _markerUL = @"[*+-]";
-        private const string _markerOL = @"\d+[.]";
+        const string _markerUL = @"[*+-]";
+        const string _markerOL = @"\d+[.]";
 
-        private static string _nestedBracketsPattern;
-        private static string _nestedParensPattern;
-        private static string _markerAnyPattern;
+        static string _nestedBracketsPattern;
+        static string _nestedParensPattern;
+        static string _markerAnyPattern;
 
-        private static readonly Dictionary<string, string> _escapeTable;
-        private static readonly Dictionary<string, string> _backslashEscapeTable;
+        static readonly Dictionary<string, string> _escapeTable;
+        static readonly Dictionary<string, string> _backslashEscapeTable;
 
-        private static readonly Dictionary<string, string> _urls = new Dictionary<string, string>();
-        private static readonly Dictionary<string, string> _titles = new Dictionary<string, string>();
-        private static readonly Dictionary<string, string> _htmlBlocks = new Dictionary<string, string>();
+        static readonly Dictionary<string, string> _urls = new Dictionary<string, string>();
+        static readonly Dictionary<string, string> _titles = new Dictionary<string, string>();
+        static readonly Dictionary<string, string> _htmlBlocks = new Dictionary<string, string>();
 
-        private static int _listLevel = 0;
+        static int _listLevel = 0;
 
         /// <summary>
         /// Static constructor
@@ -189,12 +186,56 @@ namespace MarkdownSharp
         }
 
         /// <summary>
-        /// current version of MarkdownSharp  
-        /// see http://code.google.com/p/markdownsharp/ for latest or to contribute
+        /// returns current version of MarkdownSharp;  
+        /// see http://code.google.com/p/markdownsharp/ for the latest code or to contribute
         /// </summary>
         public static string Version
         {
-            get { return "1.007"; }
+            get { return "1.008"; }
+        }
+
+        /// <summary>
+        /// Transforms the provided Markdown-formatted text to HTML; see http://en.wikipedia.org/wiki/Markdown
+        /// </summary>
+        /// <remarks>
+        /// Main function. The order in which other subs are called here is
+        /// essential. Link and image substitutions need to happen before
+        /// EscapeSpecialChars(), so that any *'s or _'s in the &lt;a&gt;
+        /// and &lt;img&gt; tags get encoded.
+        /// </remarks>
+        public static string Transform(string text)
+        {
+            if (text == null) return "";
+
+            Setup();
+
+            // Standardize line endings
+            text = text.Replace("\r\n", "\n");    // DOS to Unix
+            text = text.Replace("\r", "\n");      // Mac to Unix
+
+            // Make sure $text ends with a couple of newlines:
+            text += "\n\n";
+
+            // Convert all tabs to spaces.
+            text = Detab(text);
+
+            // Strip any lines consisting only of spaces and tabs.
+            // This makes subsequent regexen easier to write, because we can
+            // match consecutive blank lines with /\n+/ instead of something
+            // contorted like /[ \t]*\n+/ .
+            text = Regex.Replace(text, @"^[ \t]+$", "", RegexOptions.Multiline);
+
+            // Turn block-level HTML blocks into hash entries
+            text = HashHTMLBlocks(text);
+
+            // Strip link definitions, store in hashes.
+            text = StripLinkDefinitions(text);
+
+            text = RunBlockGamut(text);
+
+            text = UnescapeSpecialChars(text);
+
+            return text + "\n";
         }
 
         /// <summary>
@@ -223,7 +264,7 @@ namespace MarkdownSharp
         /// Reusable pattern to match balanced (parens). See Friedl's 
         /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
         /// </summary>
-        private static string GetNestedParensPattern()
+        static string GetNestedParensPattern()
         {
             // in other words (this) and (this(also)) and (this(also(too)))
             // up to _nestDepth
@@ -276,48 +317,6 @@ namespace MarkdownSharp
                 return "$1<em>$3</em>$4";
             else
                 return "<em>$2</em>";
-        }
-
-
-        /// <summary>
-        /// Main function. The order in which other subs are called here is
-        /// essential. Link and image substitutions need to happen before
-        /// EscapeSpecialChars(), so that any *'s or _'s in the &lt;a&gt;
-        /// and &lt;img&gt; tags get encoded.
-        /// </summary>
-        public static string Transform(string text)
-        {
-            if (text == null) return "";
-
-            Setup();
-
-            // Standardize line endings
-            text = text.Replace("\r\n", "\n");    // DOS to Unix
-            text = text.Replace("\r", "\n");      // Mac to Unix
-
-            // Make sure $text ends with a couple of newlines:
-            text += "\n\n";
-
-            // Convert all tabs to spaces.
-            text = Detab(text);
-
-            // Strip any lines consisting only of spaces and tabs.
-            // This makes subsequent regexen easier to write, because we can
-            // match consecutive blank lines with /\n+/ instead of something
-            // contorted like /[ \t]*\n+/ .
-            text = Regex.Replace(text, @"^[ \t]+$", "", RegexOptions.Multiline);
-
-            // Turn block-level HTML blocks into hash entries
-            text = HashHTMLBlocks(text);
-
-            // Strip link definitions, store in hashes.
-            text = StripLinkDefinitions(text);
-
-            text = RunBlockGamut(text);
-
-            text = UnescapeSpecialChars(text);
-
-            return text + "\n";
         }
 
 
