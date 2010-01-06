@@ -289,15 +289,9 @@ namespace MarkdownSharp
         {
             if (text == null) return "";
 
-            // Clear the global hashes. If we don't clear these, you get conflicts
-            // from other articles when generating a page which contains more than
-            // one article (e.g. an index page that shows the N most recent
-            // articles):
-            _urls.Clear();
-            _titles.Clear();
-            _htmlBlocks.Clear();
+            Setup();
 
-            // Standardize line endings             
+            // Standardize line endings
             text = text.Replace("\r\n", "\n");    // DOS to Unix
             text = text.Replace("\r", "\n");      // Mac to Unix
 
@@ -326,6 +320,17 @@ namespace MarkdownSharp
             return text + "\n";
         }
 
+
+        private void Setup()
+        {
+            // Clear the global hashes. If we don't clear these, you get conflicts
+            // from other articles when generating a page which contains more than
+            // one article (e.g. an index page that shows the N most recent
+            // articles):
+            _urls.Clear();
+            _titles.Clear();
+            _htmlBlocks.Clear();
+        }
 
         private static Regex _linkDef = new Regex(string.Format(@"
                         ^[ ]{{0,{0}}}\[(.+)\]:	# id = $1
@@ -472,9 +477,16 @@ namespace MarkdownSharp
             return string.Concat("\n\n", key, "\n\n");
         }
 
-        private static Regex _block1 = new Regex(@"^[ ]{0,2}([ ]?\*[ ]?){3,}[ \t]*$", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-        private static Regex _block2 = new Regex(@"^[ ]{0,2}([ ]? -[ ]?){3,}[ \t]*$", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-        private static Regex _block3 = new Regex(@"^[ ]{0,2}([ ]? _[ ]?){3,}[ \t]*$", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+        private static Regex _horizontalRules = new Regex(@"
+            ^[ ]{0,3}	        # Leading space
+                ([-*_])		    # $1: First marker
+                (?>			    # Repeated marker group
+                    [ ]{0,2}	# Zero, one, or two spaces.
+                    \1			# Marker character
+                ){2,}		    # Group repeated at least twice
+                [ ]*		    # Trailing spaces
+                $			    # End of line.
+            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// These are all the transformations that form block-level 
@@ -484,10 +496,7 @@ namespace MarkdownSharp
         {
             text = DoHeaders(text);
 
-            // Do Horizontal Rules:
-            text = _block1.Replace(text, "<hr" + _emptyElementSuffix + "\n");
-            text = _block2.Replace(text, "<hr" + _emptyElementSuffix + "\n");
-            text = _block3.Replace(text, "<hr" + _emptyElementSuffix + "\n");
+            text = _horizontalRules.Replace(text, "<hr" + _emptyElementSuffix + "\n");
 
             text = DoLists(text);
             text = DoCodeBlocks(text);
@@ -1142,9 +1151,8 @@ namespace MarkdownSharp
             string codeBlock = match.Groups[1].Value;
 
             codeBlock = EncodeCode(Outdent(codeBlock));
-            codeBlock = Detab(codeBlock);            
-            codeBlock = Regex.Replace(codeBlock, @"^\n+", ""); // trim leading newlines
-            codeBlock = Regex.Replace(codeBlock, @"\n+\z", ""); // trim trailing newlines
+            codeBlock = Detab(codeBlock);
+            codeBlock = _newlinesLeadingTrailing.Replace(codeBlock, "");
 
             return string.Concat("\n\n<pre><code>", codeBlock, "\n</code></pre>\n\n");
         }
@@ -1279,43 +1287,41 @@ namespace MarkdownSharp
             return Regex.Replace(match.Groups[1].Value, @"^  ", "", RegexOptions.Multiline);
         }
 
-        private static Regex _newlinesLeading = new Regex(@"^\n+", RegexOptions.Compiled);
-        private static Regex _newlinesTrailing = new Regex(@"\n+\z" , RegexOptions.Compiled);
+        private static Regex _newlinesLeadingTrailing = new Regex(@"^\n+|\n+\z", RegexOptions.Compiled);
         private static Regex _newlinesMultiple = new Regex(@"\n{2,}", RegexOptions.Compiled);
         private static Regex _tabsLeading = new Regex(@"^([ \t]*)", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
         private string FormParagraphs(string text)
         {
-            // strip leading and trailing lines
-            text = _newlinesLeading.Replace(text, "");
-            text = _newlinesTrailing.Replace(text, "");
+            text = _newlinesLeadingTrailing.Replace(text, "");
 
-            string[] paragraphs = _newlinesMultiple.Split(text);
+            string[] grafs = _newlinesMultiple.Split(text);
 
             // Wrap <p> tags.
-            for (int i = 0; i < paragraphs.Length; i++)
+            for (int i = 0; i < grafs.Length; i++)
             {
-                if (!_htmlBlocks.ContainsKey(paragraphs[i]))
+                if (!_htmlBlocks.ContainsKey(grafs[i]))
                 {
-                    string block = paragraphs[i];
+                    string block = grafs[i];
 
                     block = RunSpanGamut(block);
                     block = _tabsLeading.Replace(block, "<p>");
                     block += "</p>";
 
-                    paragraphs[i] = block;
+                    grafs[i] = block;
                 }
             }
 
             // Unhashify HTML blocks
-            for (int i = 0; i < paragraphs.Length; i++)
+            for (int i = 0; i < grafs.Length; i++)
             {
-                if (_htmlBlocks.ContainsKey(paragraphs[i]))
-                    paragraphs[i] = _htmlBlocks[paragraphs[i]];
+                if (_htmlBlocks.ContainsKey(grafs[i]))
+                    grafs[i] = _htmlBlocks[grafs[i]];
             }
 
-            return string.Join("\n\n", paragraphs);
+            return string.Join("\n\n", grafs);
         }
+
 
         private static Regex _autolinkBare = new Regex(@"(^|\s)(https?|ftp)(://[-A-Z0-9+&@#/%?=~_|\[\]\(\)!:,\.;]*[-A-Z0-9+&@#/%=~_|\[\]])($|\W)",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
