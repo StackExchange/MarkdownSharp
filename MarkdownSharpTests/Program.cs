@@ -15,7 +15,7 @@ namespace MarkdownSharpTests
         static void Main(string[] args)
         {
 
-            UnitTests();
+            //UnitTests();
 
             //
             // this is the closest thing to a set of Markdown reference tests I could find
@@ -56,7 +56,9 @@ namespace MarkdownSharpTests
         {
             var m = new MarkdownSharp.Markdown();
 
-            string input = "Here's an inline [link](</script?foo=1&bar=2>).";
+            string input = "<div class=\"inlinepage\">\n<div class=\"toggleableend\">\nfoo\n</div>\n</div>";
+            //string input = "Same thing but with paragraphs:\n\n1. First\n\n2. Second:\n\t* Fee\n\t* Fie\n\t* Foe\n\n3. Third\n\n";
+
             string output = m.Transform(input);
 
             Console.WriteLine("input:");

@@ -372,100 +372,154 @@ namespace MarkdownSharp
             return "";
         }
 
+        // compiling this regex results in much worse performance
+        private static Regex _blocksHtml = new Regex(GetBlockPattern(), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
 
-        private static string _blockTags1 = "p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|ins|del";
-        private static Regex _blocksNested = new Regex(string.Format(@"
-                (           # save in $1
-                    ^         # start of line  (with /m)
-                    <({0})              # start tag = $2
-                    \b          # word break
-                    (.*\n)*?      # any number of lines, minimally matching
-                    </\2>       # the matching end tag
-                    [ \t]*        # trailing spaces/tabs
-                    (?=\n+|\Z)          # followed by a newline or end of document
-                )", _blockTags1), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static string _blockTags2 = "p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math";
-        private static Regex _blocksNestedLiberal = new Regex(string.Format(@"
-               (            # save in $1
-                    ^         # start of line  (with /m)
-                    <({0})              # start tag = $2
-                    \b          # word break
-                    (.*\n)*?      # any number of lines, minimally matching
-                    .*</\2>       # the matching end tag
-                    [ \t]*        # trailing spaces/tabs
-                    (?=\n+|\Z)          # followed by a newline or end of document
-                )", _blockTags2), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static Regex _blocksHr = new Regex(string.Format(@"
-                (?:
-                    (?<=\n\n)       # Starting after a blank line
-                    |           # or
-                    \A\n?         # the beginning of the doc
-                )
-                (           # save in $1
-                    [ ]{{0,{0}}}
-                    <(hr)       # start tag = $2
-                    \b          # word break
-                    ([^<>])*?     #
-                    /?>         # the matching end tag
-                    [ \t]*
-                    (?=\n{{2,}}|\Z)   # followed by a blank line or end of document
-                )", _tabWidth - 1), RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static Regex _blocksHtmlComments = new Regex(string.Format(@"
-                (?:
-                    (?<=\n\n)   # Starting after a blank line
-                    |       # or
-                    \A\n?     # the beginning of the doc
-                )
-                (           # save in $1
-                    [ ]{{0,{0}}}
-                    (?s:
-                        <!
-                        (--.*?--\s*)+
-                        >
-                    )
-                    [ \t]*
-                    (?=\n{{2,}}|\Z)   # followed by a blank line or end of document
-                )", _tabWidth - 1), RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        /// <summary>
-        /// Hashify HTML blocks:
-        /// We only want to do this for block-level HTML tags, such as headers,
-        /// lists, and tables. That's because we still want to wrap &lt;p&gt;s around
-        /// "paragraphs" that are wrapped in non-block-level tags, such as anchors,
-        /// phrase emphasis, and spans. The list of tags we're looking for is
-        /// hard-coded.        
-        /// </summary>
-        private string HashHTMLBlocks(string text)
+        private static string GetBlockPattern()
         {
-            //
-            // First, look for nested blocks, e.g.:
-            // <div>
-            //    <div>
-            //    tags for inner block must be indented.
-            //    </div>
-            // </div>
 
+            // Hashify HTML blocks:
+            // We only want to do this for block-level HTML tags, such as headers,
+            // lists, and tables. That's because we still want to wrap <p>s around
+            // "paragraphs" that are wrapped in non-block-level tags, such as anchors,
+            // phrase emphasis, and spans. The list of tags we're looking for is
+            // hard-coded:
+            //
+            // *  List "a" is made of tags which can be both inline or block-level.
+            //    These will be treated block-level when the start tag is alone on 
+            //    its line, otherwise they're not matched here and will be taken as 
+            //    inline later.
+            // *  List "b" is made of tags which are always block-level;
+            //
+            string blockTagsA = "ins|del";
+            string blockTagsB = "p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|address|script|noscript|form|fieldset|iframe|math";
+
+            // Regular expression for the content of a block tag.
+            string attr = @"
+            (?>				            # optional tag attributes
+              \s			            # starts with whitespace
+              (?>
+                [^>""/]+	            # text outside quotes
+              |
+                /+(?!>)		            # slash not followed by >
+              |
+                ""[^""]*""		        # text inside double quotes (tolerate >)
+              |
+                '[^']*'	                # text inside single quotes (tolerate >)
+              )*
+            )?	
+            ";
+
+            string content = RepeatString(@"
+                (?>
+                  [^<]+			           # content without tag
+                |
+                  <\2			           # nested opening tag
+                    " + attr + @"          # attributes
+                  (?>
+                      />
+                  |
+                      >", _nestDepth) +   // end of opening tag
+                      ".*?" +             // last level nested tag content
+            RepeatString(@"
+                      </\2\s*>	           # closing nested tag
+                  )
+                  |				
+                  <(?!/\2\s*>              # other tags with a different name
+                  )
+                )*", _nestDepth);
+
+            string content2 = content.Replace(@"\2", @"\3");
+
+            // First, look for nested blocks, e.g.:
+            // 	<div>
+            // 		<div>
+            // 		tags for inner block must be indented.
+            // 		</div>
+            // 	</div>
+            //
             // The outermost tags must start at the left margin for this to match, and
             // the inner nested divs must be indented.
             // We need to do this before the next, more liberal match, because the next
             // match will start at the first `<div>` and stop at the first `</div>`.
-            text = _blocksNested.Replace(text, new MatchEvaluator(HtmlEvaluator));
+            string pattern = @"
+            (?>
+                  (?>
+                    (?<=\n\n)   # Starting after a blank line
+                    |           # or
+                    \A\n?       # the beginning of the doc
+                  )
+                  (             # save in $1
 
-            // Now match more liberally, simply from `\n<tag>` to `</tag>\n`
-            text = _blocksNestedLiberal.Replace(text, new MatchEvaluator(HtmlEvaluator));
+                    # Match from `\n<tag>` to `</tag>\n`, handling nested tags 
+                    # in between.
+                      
+                        [ ]{0,$less_than_tab}
+                        <($block_tags_b_re)   # start tag = $2
+                        $attr>                # attributes followed by > and \n
+                        $content              # content, support nesting
+                        </\2>                 # the matching end tag
+                        [ ]*                  # trailing spaces/tabs
+                        (?=\n+|\Z)            # followed by a newline or end of document
 
-            // Special case just for <hr />. It was easier to make a special case than
-            // to make the other regex more complicated.
-            text = _blocksHr.Replace(text, new MatchEvaluator(HtmlEvaluator));
+                  | # Special version for tags of group a.
 
-            // Special case for standalone HTML comments:
-            text = _blocksHtmlComments.Replace(text, new MatchEvaluator(HtmlEvaluator));
+                        [ ]{0,$less_than_tab}
+                        <($block_tags_a_re)   # start tag = $3
+                        $attr>[ ]*\n          # attributes followed by >
+                        $content2             # content, support nesting
+                        </\3>                 # the matching end tag
+                        [ ]*                  # trailing spaces/tabs
+                        (?=\n+|\Z)            # followed by a newline or end of document
+                      
+                  | # Special case just for <hr />. It was easier to make a special 
+                    # case than to make the other regex more complicated.
+                  
+                        [ ]{0,$less_than_tab}
+                        <(hr)                 # start tag = $2
+                        $attr                 # attributes
+                        /?>                   # the matching end tag
+                        [ ]*
+                        (?=\n{2,}|\Z)         # followed by a blank line or end of document
+                  
+                  | # Special case for standalone HTML comments:
+                  
+                      [ ]{0,$less_than_tab}
+                      (?s:
+                        <!-- .*? -->
+                      )
+                      [ ]*
+                      (?=\n{2,}|\Z)            # followed by a blank line or end of document
+                  
+                  | # PHP and ASP-style processor instructions (<? and <%)
+                  
+                      [ ]{0,$less_than_tab}
+                      (?s:
+                        <([?%])                # $2
+                        .*?
+                        \2>
+                      )
+                      [ ]*
+                      (?=\n{2,}|\Z)            # followed by a blank line or end of document
+                      
+                  )
+            )";
 
-            return text;
+            pattern = pattern.Replace("$less_than_tab", (_tabWidth - 1).ToString());
+            pattern = pattern.Replace("$block_tags_b_re", blockTagsB);
+            pattern = pattern.Replace("$block_tags_a_re", blockTagsA);
+            pattern = pattern.Replace("$attr", attr);
+            pattern = pattern.Replace("$content2", content2);
+            pattern = pattern.Replace("$content", content);            
+
+            return pattern;
         }
+
+        private string HashHTMLBlocks(string text)
+        {
+            return _blocksHtml.Replace(text, new MatchEvaluator(HtmlEvaluator));
+        }
+
 
         private string HtmlEvaluator(Match match)
         {
@@ -1313,8 +1367,11 @@ namespace MarkdownSharp
                     string block = grafs[i];
 
                     block = RunSpanGamut(block);
-                    block = _tabsLeading.Replace(block, "<p>");
-                    block += "</p>";
+                    if (!Unwrappable(block))
+                    {
+                        block = _tabsLeading.Replace(block, "<p>");
+                        block += "</p>";
+                    }
 
                     grafs[i] = block;
                 }
@@ -1328,6 +1385,19 @@ namespace MarkdownSharp
             }
 
             return string.Join("\n\n", grafs);
+        }
+
+        /// <summary>
+        /// This is a nasty hack, a side-effect of combining the PHP Markdown HashHtmlBlocks() 
+        /// with the Perl 1.0.1 implementation. But, it appears to work...
+        /// </summary>
+        private bool Unwrappable(string text)
+        {
+            // if the block matches any of the following, do NOT wrap it in <p> elements:
+            // ^<h1>foo</h1>$
+            // ^<hr/>$
+            // ^<blockquote>..</blockquote>$
+            return Regex.IsMatch(text, @"^(<h\d>[^>]+</h\d>|<hr\s?/?>|<blockquote>.*</blockquote>)$", RegexOptions.Singleline | RegexOptions.ExplicitCapture);
         }
 
 
