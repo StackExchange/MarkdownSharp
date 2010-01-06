@@ -335,16 +335,16 @@ namespace MarkdownSharp
         private static Regex _linkDef = new Regex(string.Format(@"
                         ^[ ]{{0,{0}}}\[(.+)\]:  # id = $1
                           [ \t]*
-                          \n?       # maybe *one* newline
+                          \n?                   # maybe *one* newline
                           [ \t]*
-                        <?(\S+?)>?      # url = $2
+                        <?(\S+?)>?              # url = $2
                           [ \t]*
-                          \n?       # maybe one newline
+                          \n?                   # maybe one newline
                           [ \t]*
                         (?:
-                            (?<=\s)     # lookbehind for whitespace
+                            (?<=\s)             # lookbehind for whitespace
                             [\x22(]
-                            (.+?)     # title = $3
+                            (.+?)               # title = $3
                             [\x22)]
                             [ \t]*
                         )?  # title is optional
@@ -372,7 +372,7 @@ namespace MarkdownSharp
             return "";
         }
 
-        // compiling this regex results in much worse performance
+        // compiling this monster regex results in worse performance. trust me.
         private static Regex _blocksHtml = new Regex(GetBlockPattern(), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
 
         private static string GetBlockPattern()
@@ -585,6 +585,7 @@ namespace MarkdownSharp
             return text;
         }
 
+
         private static Regex _htmlTokens = new Regex(
             @"(?s:<!(?:--.*?--\s*)+>)|(?s:<\?.*?\?>)|" +
             RepeatString(@"(?:<[a-z\/!$](?:[^<>]|", _nestDepth) +
@@ -592,42 +593,34 @@ namespace MarkdownSharp
             RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="text">String containing HTML markup.</param>
-        /// <returns>An array of the tokens comprising the input string. Each token is 
+        /// returns an array of HTML tokens comprising the input string. Each token is 
         /// either a tag (possibly with nested, tags contained therein, such 
         /// as &lt;a href="&lt;MTFoo&gt;"&gt;, or a run of text between tags. Each element of the 
         /// array is a two-element array; the first is either 'tag' or 'text'; the second is 
         /// the actual value.
-        /// </returns>
+        /// </summary>
         private List<Token> TokenizeHTML(string text)
         {
-            // Regular expression derived from the _tokenize() subroutine in 
-            // Brad Choate's MTRegex plugin.
-            // http://www.bradchoate.com/past/mtregex.php
             int pos = 0;
             var tokens = new List<Token>();
 
+            // this regex is derived from the _tokenize() subroutine in 
+            // Brad Choate's MTRegex plugin.
+            // http://www.bradchoate.com/past/mtregex.php
             foreach (Match m in _htmlTokens.Matches(text))
             {
                 string wholeTag = m.Value;
                 int tagStart = m.Index;
 
                 if (pos < tagStart)
-                {
                     tokens.Add(new Token(TokenType.Text, text.Substring(pos, tagStart - pos)));
-                }
 
                 tokens.Add(new Token(TokenType.Tag, wholeTag));
-
                 pos = m.Index + m.Length;
             }
 
             if (pos < text.Length)
-            {
                 tokens.Add(new Token(TokenType.Text, text.Substring(pos, text.Length - pos)));
-            }
 
             return tokens;
         }
@@ -1038,12 +1031,12 @@ namespace MarkdownSharp
         private static Regex _horizontalRules = new Regex(@"
             ^[ ]{0,3}         # Leading space
                 ([-*_])       # $1: First marker
-                (?>         # Repeated marker group
+                (?>           # Repeated marker group
                     [ ]{0,2}  # Zero, one, or two spaces.
-                    \1      # Marker character
-                ){2,}       # Group repeated at least twice
-                [ ]*        # Trailing spaces
-                $         # End of line.
+                    \1        # Marker character
+                ){2,}         # Group repeated at least twice
+                [ ]*          # Trailing spaces
+                $             # End of line.
             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private string DoHorizontalRules(string text)
@@ -1101,16 +1094,6 @@ namespace MarkdownSharp
             // paragraph for the last item in a list, if necessary:
             list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
             result = ProcessListItems(list, GetMarkerAnyPattern());
-
-            // from Markdown 1.0.2b8 -- not doing this for now
-            //
-            // Trim any trailing whitespace, to put the closing `</$list_type>`
-            // up on the preceding line, to get it past the current stupid
-            // HTML block parser. This is a hack to work around the terrible
-            // hack that is the HTML block parser.
-            //
-            //result = Regex.Replace(output, @"\s+$", "");
-            //result = string.Format("<{0}>{1}</{0}>\n", listType, result);
 
             result = string.Format("<{0}>\n{1}</{0}>\n", listType, result);
 
@@ -1184,7 +1167,7 @@ namespace MarkdownSharp
 
         private static Regex _codeBlock = new Regex(string.Format(@"
                     (?:\n\n|\A)
-                    (                      # $1 = the code block -- one or more lines, starting with a space/tab
+                    (                        # $1 = the code block -- one or more lines, starting with a space/tab
                     (?:
                         (?:[ ]{{{0}}} | \t)  # Lines must start with a tab or a tab-width of spaces
                         .*\n+
@@ -1212,8 +1195,8 @@ namespace MarkdownSharp
 
         private static Regex _codeSpan = new Regex(@"
                     (?<!\\)   # Character before opening ` can't be a backslash
-                    (`+)    # $1 = Opening run of `
-                    (.+?)   # $2 = The code block
+                    (`+)      # $1 = Opening run of `
+                    (.+?)     # $2 = The code block
                     (?<!`)
                     \1
                     (?!`)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
@@ -1316,10 +1299,10 @@ namespace MarkdownSharp
         private static Regex _blockquote = new Regex(@"
             (                           # Wrap whole match in $1
                 (
-                ^[ \t]*>[ \t]?      # '>' at the start of a line
-                    .+\n        # rest of the first line
-                (.+\n)*         # subsequent consecutive lines
-                \n*           # blanks
+                ^[ \t]*>[ \t]?          # '>' at the start of a line
+                    .+\n                # rest of the first line
+                (.+\n)*                 # subsequent consecutive lines
+                \n*                     # blanks
                 )+
             )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
