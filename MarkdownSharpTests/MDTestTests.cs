@@ -18,7 +18,6 @@ namespace MarkdownSharpTests
 
         private static IEnumerable<TestCaseData> GetTests()
         {
-            Markdown m = new Markdown();
             Assembly assembly = Assembly.GetAssembly(typeof(BaseTest));
             string namespacePrefix = String.Concat(assembly.GetName().Name, '.', folder);
             string[] resourceNames = assembly.GetManifestResourceNames();
@@ -41,7 +40,7 @@ namespace MarkdownSharpTests
                    where name.StartsWith(namespacePrefix) && name.EndsWith(".html")
                    let actualName = Path.ChangeExtension(name, "text")
                    let actualContent = getResourceFileContent(actualName)
-                   let actual = Program.RemoveWhitespace(m.Transform(actualContent))
+                   let actual = Program.RemoveWhitespace(Markdown.Transform(actualContent))
                    let expectedContent = getResourceFileContent(name)
                    let expected = Program.RemoveWhitespace(expectedContent)
                    select new TestCaseData(actualName, name, actual, expected);

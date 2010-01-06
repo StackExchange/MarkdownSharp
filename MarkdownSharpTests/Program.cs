@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Text.RegularExpressions;
 
+using MarkdownSharp;
+
 namespace MarkdownSharpTests
 {
     class Program
@@ -15,7 +17,7 @@ namespace MarkdownSharpTests
         static void Main(string[] args)
         {
 
-            UnitTests();
+            //UnitTests();
 
             //
             // this is the closest thing to a set of Markdown reference tests I could find
@@ -54,12 +56,10 @@ namespace MarkdownSharpTests
         /// </summary>
         private static void AdHocTest()
         {
-            var m = new MarkdownSharp.Markdown();
-
             string input = "<div class=\"inlinepage\">\n<div class=\"toggleableend\">\nfoo\n</div>\n</div>";
             //string input = "Same thing but with paragraphs:\n\n1. First\n\n2. Second:\n\t* Fee\n\t* Fie\n\t* Foe\n\n3. Third\n\n";
 
-            string output = m.Transform(input);
+            string output = Markdown.Transform(input);
 
             Console.WriteLine("input:");
             Console.WriteLine(input);
@@ -85,10 +85,8 @@ namespace MarkdownSharpTests
         /// </remarks>
         static void Test(string testfolder)
         {
-            var m = new MarkdownSharp.Markdown();
-
             Console.WriteLine();
-            Console.WriteLine(@"MarkdownSharp v" + m.Version + @" test run on " + Path.DirectorySeparatorChar + testfolder);
+            Console.WriteLine(@"MarkdownSharp v" + Markdown.Version + @" test run on " + Path.DirectorySeparatorChar + testfolder);
             Console.WriteLine();
 
             string path = Path.Combine(ExecutingAssemblyPath, testfolder);
@@ -106,7 +104,7 @@ namespace MarkdownSharpTests
             {
 
                 expected = FileContents(Path.ChangeExtension(file, "html"));                
-                output = m.Transform(FileContents(file));
+                output = Markdown.Transform(FileContents(file));
 
                 actualpath = Path.ChangeExtension(file, GetCrc16(output) + ".actual.html");
                 
@@ -247,7 +245,7 @@ namespace MarkdownSharpTests
         {
             Console.WriteLine();
             Console.WriteLine();
-            Console.WriteLine(@"MarkdownSharp v" + new MarkdownSharp.Markdown().Version + " benchmark, takes 10 ~ 30 seconds...");
+            Console.WriteLine(@"MarkdownSharp v" + Markdown.Version + " benchmark, takes 10 ~ 30 seconds...");
             Console.WriteLine();
 
             Benchmark(FileContents(Path.Combine("benchmark", "markdown-example-short-1.text")), 4000);
@@ -265,12 +263,10 @@ namespace MarkdownSharpTests
         /// </summary>
         static void Benchmark(string text, int iterations)
         {
-            var m = new MarkdownSharp.Markdown();
-
             var sw = new Stopwatch();
             sw.Start();
             for (int i = 0; i < iterations; i++)
-                m.Transform(text);
+                Markdown.Transform(text);
             sw.Stop();
 
             Console.WriteLine("input string length: " + text.Length);
