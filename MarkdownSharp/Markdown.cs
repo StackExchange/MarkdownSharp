@@ -648,8 +648,7 @@ namespace MarkdownSharp
                 {
                     value = value.Replace(@"\", _escapeTable[@"\"]);
                     value = Regex.Replace(value, "(?<=.)</?code>(?=.)", _escapeTable[@"`"]);
-                    value = value.Replace("*", _escapeTable["*"]);
-                    value = value.Replace("_", _escapeTable["_"]);
+                    value = EscapeBoldItalic(value);
                 }
 
                 sb.Append(value);
@@ -740,8 +739,7 @@ namespace MarkdownSharp
                 if (_titles.ContainsKey(linkID))
                 {
                     string title = _titles[linkID];
-                    title = title.Replace("*", _escapeTable["*"]);
-                    title = title.Replace("_", _escapeTable["_"]);
+                    title = EscapeBoldItalic(title);
                     result += " title=\"" + title + "\"";
                 }
 
@@ -772,8 +770,7 @@ namespace MarkdownSharp
                 if (_titles.ContainsKey(linkID))
                 {
                     string title = _titles[linkID];
-                    title = title.Replace("*", _escapeTable["*"]);
-                    title = title.Replace("_", _escapeTable["_"]);
+                    title = EscapeBoldItalic(title);
                     result += " title=\"" + title + "\"";
                 }
 
@@ -839,8 +836,7 @@ namespace MarkdownSharp
             if (!String.IsNullOrEmpty(title))
             {
                 title = title.Replace("\"", "&quot;");
-                title = title.Replace("*", _escapeTable["*"]);
-                title = title.Replace("_", _escapeTable["_"]);
+                title = EscapeBoldItalic(title);
                 result += string.Format(" title=\"{0}\"", title);
             }
 
@@ -921,8 +917,7 @@ namespace MarkdownSharp
                 if (_titles.ContainsKey(linkID))
                 {
                     string title = _titles[linkID];
-                    title = title.Replace("*", _escapeTable["*"]);
-                    title = title.Replace("_", _escapeTable["_"]);
+                    title = EscapeBoldItalic(title);
 
                     result += string.Format(" title=\"{0}\"", title);
                 }
@@ -958,8 +953,7 @@ namespace MarkdownSharp
 
             if (!String.IsNullOrEmpty(title))
             {
-                title = title.Replace("*", _escapeTable["*"]);
-                title = title.Replace("_", _escapeTable["_"]);
+                title = EscapeBoldItalic(title);
                 result += string.Format(" title=\"{0}\"", title);
             }
 
