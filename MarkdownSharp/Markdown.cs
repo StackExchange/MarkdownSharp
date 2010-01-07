@@ -102,44 +102,89 @@ namespace MarkdownSharp
         /// <summary>
         /// use ">" for HTML output, or " />" for XHTML output
         /// </summary>
-        private const string _emptyElementSuffix = " />";
+        public static string EmptyElementSuffix
+        {
+            get { return _emptyElementSuffix; }
+            set { _emptyElementSuffix = value; }
+        }
+        private static string _emptyElementSuffix = " />";
+
         /// <summary>
         /// Tabs are automatically converted to spaces as part of the transform  
         /// this variable determines how "wide" those tabs become in spaces
         /// </summary>
-        private const int _tabWidth = 4;
+        public static int TabWidth
+        {
+            get { return _tabWidth; }
+            set { _tabWidth = value; }
+        }
+        private static int _tabWidth = 4;
+
         /// <summary>
         /// maximum nested depth of [] and () supported by the transform
         /// </summary>
-        private const int _nestDepth = 6;
-
+        public static int NestingDepth
+        {
+            get { return _nestDepth; }
+            set { _nestDepth = value; }
+        }
+        private static int _nestDepth = 6;
 
 
         /// <summary>
         /// when false, email addresses will never be auto-linked  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        private const bool _linkEmails = true;
+        public static bool LinkEmails
+        {
+            get { return _linkEmails; }
+            set { _linkEmails = value; }
+        }
+        private static bool _linkEmails = true;
+
         /// <summary>
         /// when true, bold and italic require non-word characters on either side  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        private const bool _strictBoldItalic = false;
+        public static bool StrictBoldItalic
+        {
+            get { return _strictBoldItalic; }
+            set { _strictBoldItalic = value; }
+        }
+        private static bool _strictBoldItalic = false;
+
         /// <summary>
         /// when true, RETURN becomes a literal newline  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        private const bool _autoNewlines = false;
+        public static bool AutoNewLines
+        {
+            get { return _autoNewlines; }
+            set { _autoNewlines = value; }
+        }
+        private static bool _autoNewlines = false;
+
         /// <summary>
         /// when true, (most) bare plain URLs are auto-hyperlinked  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        private const bool _autoHyperlink = false;
+        public static bool AutoHyperlink
+        {
+            get { return _autoHyperlink; }
+            set { _autoHyperlink = value; }
+        }
+        private static bool _autoHyperlink = false;
+
         /// <summary>
         /// when true, problematic URL characters like [, ], (, and so forth will be encoded 
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        private const bool _encodeProblemUrlCharacters = false;
+        public static bool EncodeProblemUrlCharacters
+        {
+            get { return _encodeProblemUrlCharacters; }
+            set { _encodeProblemUrlCharacters = value; }
+        }
+        private static bool _encodeProblemUrlCharacters = false;
 
 
         private enum TokenType { Text, Tag }
