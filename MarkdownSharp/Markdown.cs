@@ -1473,7 +1473,7 @@ namespace MarkdownSharp
         }
 
 
-        private static Regex _amps = new Regex(@"&(?!#?[xX]?([0-9a-fA-F]+|\w+);)", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
+        private static Regex _amps = new Regex(@"&(?!(#[0-9]+)|(#[xX][a-fA-F0-9])|([a-zA-Z][a-zA-Z0-9]*);)", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
         private static Regex _angles = new Regex(@"<(?![A-Za-z/?\$!])", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
         /// <summary>
@@ -1481,13 +1481,8 @@ namespace MarkdownSharp
         /// </summary>
         private string EncodeAmpsAndAngles(string text)
         {
-            // Ampersand-encoding based entirely on Nat Irons's Amputator MT plugin:
-            // http://bumppo.net/projects/amputator/
             text = _amps.Replace(text, "&amp;");
-
-            // Encode naked <'s
             text = _angles.Replace(text, "&lt;");
-
             return text;
         }
 
