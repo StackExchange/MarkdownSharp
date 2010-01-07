@@ -113,7 +113,8 @@ namespace MarkdownSharp
 
         /// <summary>
         /// Tabs are automatically converted to spaces as part of the transform  
-        /// this variable determines how "wide" those tabs become in spaces
+        /// this variable determines how "wide" those tabs become in spaces  
+        /// WARNING: this configuration option does NOT work yet!
         /// </summary>
         public static int TabWidth
         {
@@ -121,16 +122,6 @@ namespace MarkdownSharp
             set { _tabWidth = value; }
         }
         private static int _tabWidth = 4;
-
-        /// <summary>
-        /// maximum nested depth of [] and () supported by the transform
-        /// </summary>
-        public static int NestingDepth
-        {
-            get { return _nestDepth; }
-            set { _nestDepth = value; }
-        }
-        private static int _nestDepth = 6;
 
         /// <summary>
         /// when false, email addresses will never be auto-linked  
@@ -201,6 +192,11 @@ namespace MarkdownSharp
             public TokenType Type;
             public string Value;
         }
+
+        /// <summary>
+        /// maximum nested depth of [] and () supported by the transform; implementation detail
+        /// </summary>
+        private static int _nestDepth = 6;
 
         private const string _markerUL = @"[*+-]";
         private const string _markerOL = @"\d+[.]";
