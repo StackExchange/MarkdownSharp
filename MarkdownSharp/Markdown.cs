@@ -197,6 +197,7 @@ namespace MarkdownSharp
             get { return "1.009"; }
         }
 
+        private static Regex _blankLines = new Regex(@"^[ \t]+$", RegexOptions.Multiline | RegexOptions.Compiled);
 
         /// <summary>
         /// Transforms the provided Markdown-formatted text to HTML;  
@@ -227,7 +228,7 @@ namespace MarkdownSharp
             // This makes subsequent regexen easier to write, because we can
             // match consecutive blank lines with /\n+/ instead of something
             // contorted like /[ \t]*\n+/ .
-            text = Regex.Replace(text, @"^[ \t]+$", "", RegexOptions.Multiline);
+            text = _blankLines.Replace(text, "");
 
             text = HashHTMLBlocks(text);
             text = StripLinkDefinitions(text);
@@ -586,11 +587,13 @@ namespace MarkdownSharp
         }
 
 
-        private static Regex _htmlTokens = new Regex(
-            @"(?s:<!(?:--.*?--\s*)+>)|(?s:<\?.*?\?>)|" +
-            RepeatString(@"(?:<[a-z\/!$](?:[^<>]|", _nestDepth) +
-            RepeatString(@")*>)", _nestDepth),
-            RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
+        private static Regex _htmlTokens = new Regex(@"
+            (<!(?:--.*?--\s*)+>)|        # match <!-- foo -->
+            (<\?.*?\?>)|                 # match <?foo?> " +
+            RepeatString(@" 
+            (<[A-Za-z\/!$](?:[^<>]|", _nestDepth) + RepeatString(@")*>)", _nestDepth) + 
+                                       " # match <tag> and </tag>",
+            RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.ExplicitCapture | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// returns an array of HTML tokens comprising the input string. Each token is 
@@ -608,13 +611,12 @@ namespace MarkdownSharp
             // http://www.bradchoate.com/past/mtregex.php
             foreach (Match m in _htmlTokens.Matches(text))
             {
-                string wholeTag = m.Value;
                 int tagStart = m.Index;
 
                 if (pos < tagStart)
                     tokens.Add(new Token(TokenType.Text, text.Substring(pos, tagStart - pos)));
 
-                tokens.Add(new Token(TokenType.Tag, wholeTag));
+                tokens.Add(new Token(TokenType.Tag, m.Value));
                 pos = m.Index + m.Length;
             }
 
