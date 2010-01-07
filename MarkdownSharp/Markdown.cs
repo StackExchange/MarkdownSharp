@@ -207,7 +207,6 @@ namespace MarkdownSharp
         private readonly Dictionary<string, string> _urls = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _titles = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _htmlBlocks = new Dictionary<string, string>();
-        private readonly Dictionary<string, string> _htmlHashes = new Dictionary<string, string>();
 
         private int _listLevel;
 
@@ -281,8 +280,6 @@ namespace MarkdownSharp
             text = RunBlockGamut(text);
             text = UnescapeSpecialChars(text);
 
-            text = UnHashBlock(text);
-
             Cleanup();
 
             return text + "\n";
@@ -345,7 +342,6 @@ namespace MarkdownSharp
             _urls.Clear();
             _titles.Clear();
             _htmlBlocks.Clear();
-            _htmlHashes.Clear();
             _listLevel = 0;
         }
 
@@ -515,7 +511,7 @@ namespace MarkdownSharp
             string pattern = @"
             (?>
                   (?>
-                    (?<=\n\n)   # Starting after a blank line
+                    (?<=\n)     # Starting after a blank line
                     |           # or
                     \A\n?       # the beginning of the doc
                   )
@@ -601,27 +597,6 @@ namespace MarkdownSharp
             _htmlBlocks[key] = text;
 
             return string.Concat("\n\n", key, "\n\n");
-        }
-
-        private string HashBlock(string block)
-        {
-            // swap back any hashes found in the text
-            // so we don't have to unhash multiple times
-            block = UnHashBlock(block);
-
-            string key = block.GetHashCode().ToString();
-            _htmlHashes[key] = block;
-            return key;
-        }
-
-        private string UnHashBlock(string block)
-        {
-            foreach (var pair in _htmlHashes)
-            {
-                if (block.Contains(pair.Key))
-                    block = block.Replace(pair.Key, pair.Value);
-            }
-            return block;
         }
 
         private static Regex _htmlTokens = new Regex(@"
@@ -1140,8 +1115,8 @@ namespace MarkdownSharp
 
             // Turn double returns into triple returns, so that we can make a
             // paragraph for the last item in a list, if necessary:
-            list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
-            result = ProcessListItems(list, string.Format("(?:{0}|{1})", _markerUL, _markerOL));
+            list = Regex.Replace(list, @"\n{2,}", "\n\n\n");            
+            result = ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL);
 
             result = string.Format("<{0}>\n{1}</{0}>\n", listType, result);
             return result;
@@ -1199,10 +1174,11 @@ namespace MarkdownSharp
             string leadingLine = match.Groups[1].Value;
 
             if (!String.IsNullOrEmpty(leadingLine) || Regex.IsMatch(item, @"\n{2,}"))
-                item = RunBlockGamut(Outdent(item));
+                // we could correct any bad indentation here..
+                item = RunBlockGamut(Outdent(item) + "\n");
             else
             {
-                // Recursion for sub-lists:
+                // recursion for sub-lists
                 item = DoLists(Outdent(item));
                 item = item.TrimEnd('\n');
                 item = RunSpanGamut(item);
@@ -1419,11 +1395,8 @@ namespace MarkdownSharp
                     string block = grafs[i];
 
                     block = RunSpanGamut(block);
-                    if (!Unwrappable(block))
-                    {
-                        block = _leadingWhitespace.Replace(block, "<p>");
-                        block += "</p>";
-                    }
+                    block = _leadingWhitespace.Replace(block, "<p>");
+                    block += "</p>";
 
                     grafs[i] = block;
                 }
@@ -1437,19 +1410,6 @@ namespace MarkdownSharp
             }
 
             return string.Join("\n\n", grafs);
-        }
-
-        /// <summary>
-        /// This is a nasty hack, a side-effect of combining the PHP Markdown HashHtmlBlocks() 
-        /// with the Perl 1.0.1 implementation. But, it appears to work...
-        /// </summary>
-        private bool Unwrappable(string text)
-        {
-            // if the block matches any of the following, do NOT wrap it in <p> elements:
-            // ^<h1>foo</h1>$
-            // ^<hr/>$
-            // ^<blockquote>..</blockquote>$
-            return Regex.IsMatch(text, @"^(<h\d>[^>]+</h\d>|<hr\s?/?>|<blockquote>.*</blockquote>)$", RegexOptions.Singleline | RegexOptions.ExplicitCapture);
         }
 
 

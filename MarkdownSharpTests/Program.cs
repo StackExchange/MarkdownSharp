@@ -15,7 +15,7 @@ namespace MarkdownSharpTests
         static void Main(string[] args)
         {
 
-            UnitTests();
+            //UnitTests();
 
             //
             // this is the closest thing to a set of Markdown reference tests I could find
@@ -55,9 +55,11 @@ namespace MarkdownSharpTests
         private static void AdHocTest()
         {
             var m = new MarkdownSharp.Markdown();
+            //var m = new MarkdownSharp.MarkdownOld();
 
-            string input = "<div class=\"inlinepage\">\n<div class=\"toggleableend\">\nfoo\n</div>\n</div>";
+            //string input = "<div class=\"inlinepage\">\n<div class=\"toggleableend\">\nfoo\n</div>\n</div>";
             //string input = "Same thing but with paragraphs:\n\n1. First\n\n2. Second:\n\t* Fee\n\t* Fie\n\t* Foe\n\n3. Third\n\n";
+            string input = "*\tthis\n\n\t*\tsub\n\n\tthat";
 
             string output = m.Transform(input);
 
@@ -124,15 +126,14 @@ namespace MarkdownSharpTests
                     ok++;
                     okalt++;
                     Console.WriteLine("OK^");
-                    File.WriteAllText(actualpath, output);
+                    if (!File.Exists(actualpath))
+                        File.WriteAllText(actualpath, output);
                 }
                 else
                 {                    
                     err++;
                     if (File.Exists(actualpath))
-                    {
                         Console.WriteLine("Mismatch");
-                    }
                     else
                     {
                         errnew++;
@@ -183,9 +184,8 @@ namespace MarkdownSharpTests
             // remove leading space at the start of lines
             s = Regex.Replace(s, @"^\s+", "", RegexOptions.Multiline);
 
-            // if we have an ending newline, let's try removing it
-            if (s.EndsWith("\n"))
-                s = s.Substring(0, s.Length - 1);
+            // remove all newlines
+            s = s.Replace("\n", "");
 
             return s;
         }
