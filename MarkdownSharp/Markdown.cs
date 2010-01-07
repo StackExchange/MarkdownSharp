@@ -241,6 +241,53 @@ namespace MarkdownSharp
         }
 
 
+        /// <summary>
+        /// Perform transformations that form block-level tags like paragraphs, headers, and list items.
+        /// </summary>
+        private string RunBlockGamut(string text)
+        {
+            text = DoHeaders(text);
+            text = DoHorizontalRules(text);
+            text = DoLists(text);
+            text = DoCodeBlocks(text);
+            text = DoBlockQuotes(text);
+
+            // We already ran HashHTMLBlocks() before, in Markdown(), but that
+            // was to escape raw HTML in the original Markdown source. This time,
+            // we're escaping the markup we've just created, so that we don't wrap
+            // <p> tags around block-level tags.
+            text = HashHTMLBlocks(text);
+
+            text = FormParagraphs(text);
+
+            return text;
+        }
+
+
+        /// <summary>
+        /// Perform transformations that occur *within* block-level tags like paragraphs, headers, and list items.
+        /// </summary>
+        private string RunSpanGamut(string text)
+        {
+            text = DoCodeSpans(text);
+            text = EscapeSpecialCharsWithinTagAttributes(text);
+            text = EncodeBackslashEscapes(text);
+
+            // Images must come first, because ![foo][f] looks like an anchor.
+            text = DoImages(text);
+            text = DoAnchors(text);
+
+            // Must come after DoAnchors(), because you can use < and >
+            // delimiters in inline links like [this](<url>).
+            text = DoAutoLinks(text);
+
+            text = EncodeAmpsAndAngles(text);
+            text = DoItalicsAndBold(text);
+            text = DoHardBreaks(text);
+
+            return text;
+        }
+
         private void Setup()
         {
             // Clear the global hashes. If we don't clear these, you get conflicts
@@ -538,54 +585,6 @@ namespace MarkdownSharp
 
             return string.Concat("\n\n", key, "\n\n");
         }
-
-        /// <summary>
-        /// Perform transformations that form block-level tags like paragraphs, headers, and list items.
-        /// </summary>
-        private string RunBlockGamut(string text)
-        {
-            text = DoHeaders(text);
-            text = DoHorizontalRules(text);
-            text = DoLists(text);
-            text = DoCodeBlocks(text);
-            text = DoBlockQuotes(text);
-
-            // We already ran HashHTMLBlocks() before, in Markdown(), but that
-            // was to escape raw HTML in the original Markdown source. This time,
-            // we're escaping the markup we've just created, so that we don't wrap
-            // <p> tags around block-level tags.
-            text = HashHTMLBlocks(text);
-
-            text = FormParagraphs(text);
-
-            return text;
-        }
-
-
-        /// <summary>
-        /// Perform transformations that occur *within* block-level tags like paragraphs, headers, and list items.
-        /// </summary>
-        private string RunSpanGamut(string text)
-        {
-            text = DoCodeSpans(text);
-            text = EscapeSpecialCharsWithinTagAttributes(text);
-            text = EncodeBackslashEscapes(text);
-
-            // Images must come first, because ![foo][f] looks like an anchor.
-            text = DoImages(text);
-            text = DoAnchors(text);
-            
-            // Must come after DoAnchors(), because you can use < and >
-            // delimiters in inline links like [this](<url>).
-            text = DoAutoLinks(text);
-
-            text = EncodeAmpsAndAngles(text);
-            text = DoItalicsAndBold(text);
-            text = DoHardBreaks(text);
-
-            return text;
-        }
-
 
         private static Regex _htmlTokens = new Regex(@"
             (<!(?:--.*?--\s*)+>)|        # match <!-- foo -->
