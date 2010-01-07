@@ -207,6 +207,7 @@ namespace MarkdownSharp
         private readonly Dictionary<string, string> _urls = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _titles = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _htmlBlocks = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _htmlHashes = new Dictionary<string, string>();
 
         private int _listLevel;
 
@@ -280,6 +281,8 @@ namespace MarkdownSharp
             text = RunBlockGamut(text);
             text = UnescapeSpecialChars(text);
 
+            text = UnHashBlock(text);
+
             Cleanup();
 
             return text + "\n";
@@ -342,6 +345,7 @@ namespace MarkdownSharp
             _urls.Clear();
             _titles.Clear();
             _htmlBlocks.Clear();
+            _htmlHashes.Clear();
             _listLevel = 0;
         }
 
@@ -597,6 +601,27 @@ namespace MarkdownSharp
             _htmlBlocks[key] = text;
 
             return string.Concat("\n\n", key, "\n\n");
+        }
+
+        private string HashBlock(string block)
+        {
+            // swap back any hashes found in the text
+            // so we don't have to unhash multiple times
+            block = UnHashBlock(block);
+
+            string key = block.GetHashCode().ToString();
+            _htmlHashes[key] = block;
+            return key;
+        }
+
+        private string UnHashBlock(string block)
+        {
+            foreach (var pair in _htmlHashes)
+            {
+                if (block.Contains(pair.Key))
+                    block = block.Replace(pair.Key, pair.Value);
+            }
+            return block;
         }
 
         private static Regex _htmlTokens = new Regex(@"
@@ -1119,7 +1144,6 @@ namespace MarkdownSharp
             result = ProcessListItems(list, string.Format("(?:{0}|{1})", _markerUL, _markerOL));
 
             result = string.Format("<{0}>\n{1}</{0}>\n", listType, result);
-
             return result;
         }
 
@@ -1163,18 +1187,18 @@ namespace MarkdownSharp
                 (\n{{1,2}}))      
                 (?= \n* (\z | \2 ({0}) [ \t]+))", marker);
 
-            list = Regex.Replace(list, pattern, new MatchEvaluator(ListEvaluator2),
+            list = Regex.Replace(list, pattern, new MatchEvaluator(ListItemEvaluator),
                                   RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline);
             _listLevel--;
             return list;
         }
 
-        private string ListEvaluator2(Match match)
+        private string ListItemEvaluator(Match match)
         {
             string item = match.Groups[4].Value;
             string leadingLine = match.Groups[1].Value;
 
-            if ((leadingLine != null && leadingLine != "") || Regex.IsMatch(item, @"\n{2,}"))
+            if (!String.IsNullOrEmpty(leadingLine) || Regex.IsMatch(item, @"\n{2,}"))
                 item = RunBlockGamut(Outdent(item));
             else
             {
