@@ -154,7 +154,6 @@ namespace MarkdownSharp
 
         private static string _nestedBracketsPattern;
         private static string _nestedParensPattern;
-        private static string _markerAnyPattern;
 
         private static readonly Dictionary<string, string> _escapeTable;
         private static readonly Dictionary<string, string> _backslashEscapeTable;
@@ -163,7 +162,7 @@ namespace MarkdownSharp
         private readonly Dictionary<string, string> _titles = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _htmlBlocks = new Dictionary<string, string>();
 
-        private int _listLevel = 0;
+        private int _listLevel;
 
         /// <summary>
         /// Static constructor
@@ -297,6 +296,7 @@ namespace MarkdownSharp
             _urls.Clear();
             _titles.Clear();
             _htmlBlocks.Clear();
+            _listLevel = 0;
         }
 
         private void Cleanup()
@@ -346,43 +346,6 @@ namespace MarkdownSharp
                     )*"
                     , _nestDepth);
             return _nestedParensPattern;
-        }
-
-        private static string GetMarkerAnyPattern()
-        {
-            if (_markerAnyPattern == null)
-                _markerAnyPattern = string.Format("(?:{0}|{1})", _markerUL, _markerOL);
-            return _markerAnyPattern;
-        }
-
-        private static string GetBoldPattern()
-        {
-            if (_strictBoldItalic)
-                return @"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)";
-            else
-                return @"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1";
-        }
-        private static string GetBoldReplace()
-        {
-            if (_strictBoldItalic)
-                return "$1<strong>$3</strong>$4";
-            else
-                return "<strong>$2</strong>";
-        }
-
-        private static string GetItalicPattern()
-        {
-            if (_strictBoldItalic)
-                return @"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)";
-            else
-                return @"(\*|_) (?=\S) (.+?) (?<=\S) \1";
-        }
-        private static string GetItalicReplace()
-        {
-            if (_strictBoldItalic)
-                return "$1<em>$3</em>$4";
-            else
-                return "<em>$2</em>";
         }
 
         private static Regex _linkDef = new Regex(string.Format(@"
@@ -1071,7 +1034,7 @@ namespace MarkdownSharp
                     {0}[ \t]+
                   )
               )
-            )", GetMarkerAnyPattern(), _tabWidth - 1);
+            )", string.Format("(?:{0}|{1})", _markerUL, _markerOL), _tabWidth - 1);
 
         private static Regex _listNested = new Regex(@"^" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
@@ -1103,7 +1066,7 @@ namespace MarkdownSharp
             // Turn double returns into triple returns, so that we can make a
             // paragraph for the last item in a list, if necessary:
             list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
-            result = ProcessListItems(list, GetMarkerAnyPattern());
+            result = ProcessListItems(list, string.Format("(?:{0}|{1})", _markerUL, _markerOL));
 
             result = string.Format("<{0}>\n{1}</{0}>\n", listType, result);
 
@@ -1285,9 +1248,16 @@ namespace MarkdownSharp
         }
 
 
-        private static Regex _strong = new Regex(GetBoldPattern(),
+        private static Regex _strong = new Regex(
+            _strictBoldItalic ? 
+            @"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)" :
+            @"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
-        private static Regex _italics = new Regex(GetItalicPattern(),
+
+        private static Regex _italics = new Regex(
+            _strictBoldItalic ?
+            @"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)" :
+            @"(\*|_) (?=\S) (.+?) (?<=\S) \1",    
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         /// <summary>
@@ -1296,10 +1266,9 @@ namespace MarkdownSharp
         private string DoItalicsAndBold(string text)
         {
             // <strong> must go first:
-            text = _strong.Replace(text, GetBoldReplace());
+            text = _strong.Replace(text, _strictBoldItalic ? "$1<strong>$3</strong>$4" : "<strong>$2</strong>");
             // Then <em>:
-            text = _italics.Replace(text, GetItalicReplace());
-
+            text = _italics.Replace(text, _strictBoldItalic ? "$1<em>$3</em>$4" : "<em>$2</em>");
             return text;
         }
 
