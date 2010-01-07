@@ -90,6 +90,12 @@ using System.Text.RegularExpressions;
 
 namespace MarkdownSharp
 {
+
+    /// <summary>
+    /// Markdown is a text-to-HTML conversion tool for web writers. 
+    /// Markdown allows you to write using an easy-to-read, easy-to-write plain text format, 
+    /// then convert it to structurally valid XHTML (or HTML).
+    /// </summary>
     public class Markdown
     {
 
@@ -1248,13 +1254,13 @@ namespace MarkdownSharp
         }
 
 
-        private static Regex _strong = new Regex(
+        private static Regex _bold = new Regex(
             _strictBoldItalic ? 
             @"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)" :
             @"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private static Regex _italics = new Regex(
+        private static Regex _italic = new Regex(
             _strictBoldItalic ?
             @"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)" :
             @"(\*|_) (?=\S) (.+?) (?<=\S) \1",    
@@ -1266,9 +1272,9 @@ namespace MarkdownSharp
         private string DoItalicsAndBold(string text)
         {
             // <strong> must go first:
-            text = _strong.Replace(text, _strictBoldItalic ? "$1<strong>$3</strong>$4" : "<strong>$2</strong>");
+            text = _bold.Replace(text, _strictBoldItalic ? "$1<strong>$3</strong>$4" : "<strong>$2</strong>");
             // Then <em>:
-            text = _italics.Replace(text, _strictBoldItalic ? "$1<em>$3</em>$4" : "<em>$2</em>");
+            text = _italic.Replace(text, _strictBoldItalic ? "$1<em>$3</em>$4" : "<em>$2</em>");
             return text;
         }
 

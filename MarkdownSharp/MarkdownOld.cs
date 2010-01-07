@@ -56,6 +56,7 @@ using System.Text.RegularExpressions;
 
 namespace MarkdownSharp
 {
+    [Obsolete("This old version is included only for historical comparison purposes; use at your own risk!")]
     public class MarkdownOld
     {
         public class Pair
