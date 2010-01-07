@@ -604,19 +604,20 @@ namespace MarkdownSharp
         private List<Token> TokenizeHTML(string text)
         {
             int pos = 0;
+            int tagStart = 0;
             var tokens = new List<Token>();
 
             // this regex is derived from the _tokenize() subroutine in Brad Choate's MTRegex plugin.
             // http://www.bradchoate.com/past/mtregex.php
             foreach (Match m in _htmlTokens.Matches(text))
             {
-                int tagStart = m.Index;
+                tagStart = m.Index;
 
                 if (pos < tagStart)
                     tokens.Add(new Token(TokenType.Text, text.Substring(pos, tagStart - pos)));
 
                 tokens.Add(new Token(TokenType.Tag, m.Value));
-                pos = m.Index + m.Length;
+                pos = tagStart + m.Length;
             }
 
             if (pos < text.Length)
@@ -1009,7 +1010,6 @@ namespace MarkdownSharp
         {
             text = _headerSetext.Replace(text, new MatchEvaluator(SetextHeaderEvaluator));
             text = _headerAtx.Replace(text, new MatchEvaluator(AtxHeaderEvaluator));
-
             return text;
         }
 
