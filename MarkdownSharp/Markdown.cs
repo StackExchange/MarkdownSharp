@@ -99,6 +99,8 @@ namespace MarkdownSharp
     public class Markdown
     {
 
+        #region Configurable options
+
         /// <summary>
         /// use ">" for HTML output, or " />" for XHTML output
         /// </summary>
@@ -129,7 +131,6 @@ namespace MarkdownSharp
             set { _nestDepth = value; }
         }
         private static int _nestDepth = 6;
-
 
         /// <summary>
         /// when false, email addresses will never be auto-linked  
@@ -186,6 +187,7 @@ namespace MarkdownSharp
         }
         private static bool _encodeProblemUrlCharacters = false;
 
+        #endregion
 
         private enum TokenType { Text, Tag }
 
@@ -202,9 +204,6 @@ namespace MarkdownSharp
 
         private const string _markerUL = @"[*+-]";
         private const string _markerOL = @"\d+[.]";
-
-        private static string _nestedBracketsPattern;
-        private static string _nestedParensPattern;
 
         private static readonly Dictionary<string, string> _escapeTable;
         private static readonly Dictionary<string, string> _backslashEscapeTable;
@@ -355,6 +354,8 @@ namespace MarkdownSharp
             Setup();
         }
 
+        private static string _nestedBracketsPattern;
+        
         /// <summary>
         /// Reusable pattern to match balanced [brackets]. See Friedl's 
         /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
@@ -376,6 +377,8 @@ namespace MarkdownSharp
                     , _nestDepth);
             return _nestedBracketsPattern;
         }
+
+        private static string _nestedParensPattern;
 
         /// <summary>
         /// Reusable pattern to match balanced (parens). See Friedl's 
@@ -414,7 +417,7 @@ namespace MarkdownSharp
                             (.+?)               # title = $3
                             [\x22)]
                             [ \t]*
-                        )?  # title is optional
+                        )?                      # title is optional
                         (?:\n+|\Z)", _tabWidth - 1), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
@@ -479,20 +482,20 @@ namespace MarkdownSharp
 
             string content = RepeatString(@"
                 (?>
-                  [^<]+			           # content without tag
+                  [^<]+			        # content without tag
                 |
-                  <\2			           # nested opening tag
-                    " + attr + @"          # attributes
+                  <\2			        # nested opening tag
+                    " + attr + @"       # attributes
                   (?>
                       />
                   |
                       >", _nestDepth) +   // end of opening tag
                       ".*?" +             // last level nested tag content
             RepeatString(@"
-                      </\2\s*>	           # closing nested tag
+                      </\2\s*>	        # closing nested tag
                   )
                   |				
-                  <(?!/\2\s*>              # other tags with a different name
+                  <(?!/\2\s*>           # other tags with a different name
                   )
                 )*", _nestDepth);
 
