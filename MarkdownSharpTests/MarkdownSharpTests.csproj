@@ -56,9 +56,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="nunit-console\nunit-console.exe.config" />
-    <None Include="perl-original-source\License.text" />
-    <None Include="perl-original-source\Markdown.101.pl" />
-    <None Include="perl-original-source\Markdown.102b8.pl" />
+    <None Include="source\perl\License.text" />
+    <None Include="source\perl\Markdown.101.pl" />
+    <None Include="source\perl\Markdown.102b8.pl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MarkdownSharp\MarkdownSharp.csproj">
@@ -151,9 +151,9 @@
     <EmbeddedResource Include="mdtest-1.1\Strong_and_em_together.text" />
     <EmbeddedResource Include="mdtest-1.1\Tabs.text" />
     <EmbeddedResource Include="mdtest-1.1\Tidyness.text" />
-    <None Include="php-markdown-source\License.text" />
-    <None Include="php-markdown-source\markdown.php" />
-    <None Include="php-markdown-source\PHP Markdown Readme.text" />
+    <None Include="source\php\License.text" />
+    <None Include="source\php\markdown.php" />
+    <None Include="source\php\PHP Markdown Readme.text" />
     <None Include="php-markdown-test\Backslash escapes.text" />
     <None Include="php-markdown-test\Code block in a list item.text" />
     <None Include="php-markdown-test\Code Spans.text" />
