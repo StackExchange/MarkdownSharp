@@ -13,7 +13,7 @@ namespace MarkdownSharpTests
     [TestFixture]
     public class MDTestTests : BaseTest
     {
-        const string folder = "mdtest_1._1";
+        const string folder = "testfiles.mdtest_1._1";
 
 
         private static IEnumerable<TestCaseData> GetTests()

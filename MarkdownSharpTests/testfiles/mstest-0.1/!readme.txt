@@ -16,4 +16,4 @@ test_name.xxxx.actual.html  -- actual output (actual cooked html output from our
 Contents
 ========
 
-a few additional random "Hello World" type tests
+beginnings of MarkdownSharp test suite

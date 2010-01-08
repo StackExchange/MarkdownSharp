@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using System.Threading;
 using System.Text.RegularExpressions;
 
 namespace MarkdownSharpTests
@@ -34,12 +31,12 @@ namespace MarkdownSharpTests
             //
             // NB: these tests are quite tough, many complex edge conditions
             //
-            //Test(@"php-markdown-test");
+            //Test(@"php-markdown");
 
             //
             // a few additional random "Hello World" type tests
             //
-            Test(@"test-input");
+            Test(@"mstest-0.1");
 
             Benchmark();
 
@@ -93,7 +90,7 @@ namespace MarkdownSharpTests
             Console.WriteLine(@"MarkdownSharp v" + m.Version + @" test run on " + Path.DirectorySeparatorChar + testfolder);
             Console.WriteLine();
 
-            string path = Path.Combine(ExecutingAssemblyPath, testfolder);
+            string path = Path.Combine(ExecutingAssemblyPath, Path.Combine("testfiles", testfolder));
             string output;
             string expected;
             string actualpath;
