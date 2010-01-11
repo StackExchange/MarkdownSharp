@@ -34,6 +34,7 @@
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821" />
     <Reference Include="nunit.framework, Version=2.5.3.9345, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -48,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseTest.cs" />
+    <Compile Include="ConfigTest.cs" />
     <Compile Include="helpers\crc16.cs" />
     <Compile Include="MDTestTests.cs" />
     <Compile Include="SimpleTests.cs" />
@@ -104,6 +106,7 @@
     <Content Include="nunit-console\nunit.core.dll" />
     <Content Include="nunit-console\nunit.core.interfaces.dll" />
     <Content Include="nunit-console\nunit.util.dll" />
+    <Content Include="testfiles\mstest-0.1\code-inside-list.html" />
     <Content Include="testfiles\php-markdown\!readme.txt" />
     <Content Include="testfiles\php-markdown\Backslash escapes.html" />
     <Content Include="testfiles\php-markdown\Code block in a list item.html" />
@@ -154,6 +157,7 @@
     <None Include="source\php\License.text" />
     <None Include="source\php\markdown.php" />
     <None Include="source\php\PHP Markdown Readme.text" />
+    <None Include="testfiles\mstest-0.1\code-inside-list.text" />
     <None Include="testfiles\php-markdown\Backslash escapes.text" />
     <None Include="testfiles\php-markdown\Code block in a list item.text" />
     <None Include="testfiles\php-markdown\Code Spans.text" />

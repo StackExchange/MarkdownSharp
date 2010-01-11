@@ -85,6 +85,7 @@ software, even if advised of the possibility of such damage.
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -98,85 +99,122 @@ namespace MarkdownSharp
     /// </summary>
     public class Markdown
     {
+        #region Constructors and Options
 
-        #region Configurable options
+        /// <summary>
+        /// Create a new Markdown instance using default options
+        /// </summary>
+        public Markdown() : this(false)
+        {
+        }
+
+        /// <summary>
+        /// Create a new Markdown instance and optionally load options from a configuration
+        /// file. There they should be stored in the appSettings section, available options are:
+        /// 
+        ///     Markdown.StrictBoldItalic (true/false)
+        ///     Markdown.EmptyElementSuffix (">" or " />" without the quotes)
+        ///     Markdown.LinkEmails (true/false)
+        ///     Markdown.AutoNewLines (true/false)
+        ///     Markdown.AutoHyperlink (true/false)
+        ///     Markdown.EncodeProblemUrlCharacters (true/false) 
+        /// </summary>
+        public Markdown(bool loadOptionsFromConfigFile)
+        {
+            if (!loadOptionsFromConfigFile) return;
+
+            var settings = ConfigurationManager.AppSettings;
+            foreach (string key in settings.Keys)
+            {
+                switch (key)
+                {
+                    case "Markdown.AutoHyperlink":
+                        _autoHyperlink = Convert.ToBoolean(settings[key]);
+                        break;
+                    case "Markdown.AutoNewlines":
+                        _autoNewlines = Convert.ToBoolean(settings[key]);
+                        break;
+                    case "Markdown.EmptyElementSuffix":
+                        _emptyElementSuffix = settings[key];
+                        break;
+                    case "Markdown.EncodeProblemUrlCharacters":
+                        _encodeProblemUrlCharacters = Convert.ToBoolean(settings[key]);
+                        break;
+                    case "Markdown.LinkEmails":
+                        _linkEmails = Convert.ToBoolean(settings[key]);
+                        break;
+                    case "Markdown.StrictBoldItalic":
+                        _strictBoldItalic = Convert.ToBoolean(settings[key]);
+                        break;
+                }
+            }
+        }
+
 
         /// <summary>
         /// use ">" for HTML output, or " />" for XHTML output
         /// </summary>
-        public static string EmptyElementSuffix
+        public string EmptyElementSuffix
         {
             get { return _emptyElementSuffix; }
             set { _emptyElementSuffix = value; }
         }
-        private static string _emptyElementSuffix = " />";
-
-        /// <summary>
-        /// Tabs are automatically converted to spaces as part of the transform  
-        /// this variable determines how "wide" those tabs become in spaces  
-        /// WARNING: this configuration option does NOT work yet!
-        /// </summary>
-        public static int TabWidth
-        {
-            get { return _tabWidth; }
-            set { _tabWidth = value; }
-        }
-        private static int _tabWidth = 4;
+        private string _emptyElementSuffix = " />";
 
         /// <summary>
         /// when false, email addresses will never be auto-linked  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        public static bool LinkEmails
+        public bool LinkEmails
         {
             get { return _linkEmails; }
             set { _linkEmails = value; }
         }
-        private static bool _linkEmails = true;
+        private bool _linkEmails = true;
 
         /// <summary>
         /// when true, bold and italic require non-word characters on either side  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        public static bool StrictBoldItalic
+        public bool StrictBoldItalic
         {
             get { return _strictBoldItalic; }
             set { _strictBoldItalic = value; }
         }
-        private static bool _strictBoldItalic = false;
+        private bool _strictBoldItalic = false;
 
         /// <summary>
         /// when true, RETURN becomes a literal newline  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        public static bool AutoNewLines
+        public bool AutoNewLines
         {
             get { return _autoNewlines; }
             set { _autoNewlines = value; }
         }
-        private static bool _autoNewlines = false;
+        private bool _autoNewlines = false;
 
         /// <summary>
         /// when true, (most) bare plain URLs are auto-hyperlinked  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        public static bool AutoHyperlink
+        public bool AutoHyperlink
         {
             get { return _autoHyperlink; }
             set { _autoHyperlink = value; }
         }
-        private static bool _autoHyperlink = false;
+        private bool _autoHyperlink = false;
 
         /// <summary>
         /// when true, problematic URL characters like [, ], (, and so forth will be encoded 
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        public static bool EncodeProblemUrlCharacters
+        public bool EncodeProblemUrlCharacters
         {
             get { return _encodeProblemUrlCharacters; }
             set { _encodeProblemUrlCharacters = value; }
         }
-        private static bool _encodeProblemUrlCharacters = false;
+        private bool _encodeProblemUrlCharacters = false;
 
         #endregion
 
@@ -196,7 +234,13 @@ namespace MarkdownSharp
         /// <summary>
         /// maximum nested depth of [] and () supported by the transform; implementation detail
         /// </summary>
-        private static int _nestDepth = 6;
+        private const int _nestDepth = 6;
+
+        /// <summary>
+        /// Tabs are automatically converted to spaces as part of the transform  
+        /// this constant determines how "wide" those tabs become in spaces  
+        /// </summary>
+        private const int _tabWidth = 4;
 
         private const string _markerUL = @"[*+-]";
         private const string _markerOL = @"\d+[.]";
@@ -351,7 +395,7 @@ namespace MarkdownSharp
         }
 
         private static string _nestedBracketsPattern;
-        
+
         /// <summary>
         /// Reusable pattern to match balanced [brackets]. See Friedl's 
         /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
@@ -576,7 +620,7 @@ namespace MarkdownSharp
             pattern = pattern.Replace("$block_tags_a_re", blockTagsA);
             pattern = pattern.Replace("$attr", attr);
             pattern = pattern.Replace("$content2", content2);
-            pattern = pattern.Replace("$content", content);            
+            pattern = pattern.Replace("$content", content);
 
             return pattern;
         }
@@ -603,7 +647,7 @@ namespace MarkdownSharp
             (<!(?:--.*?--\s*)+>)|        # match <!-- foo -->
             (<\?.*?\?>)|                 # match <?foo?> " +
             RepeatString(@" 
-            (<[A-Za-z\/!$](?:[^<>]|", _nestDepth) + RepeatString(@")*>)", _nestDepth) + 
+            (<[A-Za-z\/!$](?:[^<>]|", _nestDepth) + RepeatString(@")*>)", _nestDepth) +
                                        " # match <tag> and </tag>",
             RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.ExplicitCapture | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
@@ -1115,7 +1159,7 @@ namespace MarkdownSharp
 
             // Turn double returns into triple returns, so that we can make a
             // paragraph for the last item in a list, if necessary:
-            list = Regex.Replace(list, @"\n{2,}", "\n\n\n");            
+            list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
             result = ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL);
 
             result = string.Format("<{0}>\n{1}</{0}>\n", listType, result);
@@ -1293,21 +1337,19 @@ namespace MarkdownSharp
             code = code.Replace("}", _escapeTable["}"]);
             code = code.Replace("[", _escapeTable["["]);
             code = code.Replace("]", _escapeTable["]"]);
-            
+
             return code;
         }
 
 
-        private static Regex _bold = new Regex(
-            _strictBoldItalic ? 
-            @"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)" :
-            @"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1",
+        private static Regex _bold = new Regex(@"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1",
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static Regex _strictBold = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private static Regex _italic = new Regex(
-            _strictBoldItalic ?
-            @"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)" :
-            @"(\*|_) (?=\S) (.+?) (?<=\S) \1",    
+        private static Regex _italic = new Regex(@"(\*|_) (?=\S) (.+?) (?<=\S) \1",
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static Regex _strictItalic = new Regex(@"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         /// <summary>
@@ -1315,10 +1357,18 @@ namespace MarkdownSharp
         /// </summary>
         private string DoItalicsAndBold(string text)
         {
-            // <strong> must go first:
-            text = _bold.Replace(text, _strictBoldItalic ? "$1<strong>$3</strong>$4" : "<strong>$2</strong>");
-            // Then <em>:
-            text = _italic.Replace(text, _strictBoldItalic ? "$1<em>$3</em>$4" : "<em>$2</em>");
+
+            // <strong> must go first, then <em>
+            if (_strictBoldItalic)
+            {
+                text = _strictBold.Replace(text, "$1<strong>$3</strong>$4");
+                text = _strictItalic.Replace(text, "$1<em>$3</em>$4");
+            }
+            else
+            {
+                text = _bold.Replace(text, "<strong>$2</strong>");
+                text = _italic.Replace(text, "<em>$2</em>");
+            }
             return text;
         }
 

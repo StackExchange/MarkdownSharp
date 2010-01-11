@@ -12,7 +12,7 @@ namespace MarkdownSharpTests
         static void Main(string[] args)
         {
 
-            //UnitTests();
+            UnitTests();
 
             //
             // this is the closest thing to a set of Markdown reference tests I could find
@@ -34,9 +34,9 @@ namespace MarkdownSharpTests
             //Test(@"php-markdown");
 
             //
-            // a few additional random "Hello World" type tests
+            // our fledgling internal test suite, primarily to exercise MarkdownSharp specific options
             //
-            Test(@"mstest-0.1");
+            //Test(@"mstest-0.1");
 
             Benchmark();
 
@@ -56,7 +56,8 @@ namespace MarkdownSharpTests
 
             //string input = "<div class=\"inlinepage\">\n<div class=\"toggleableend\">\nfoo\n</div>\n</div>";
             //string input = "Same thing but with paragraphs:\n\n1. First\n\n2. Second:\n\t* Fee\n\t* Fie\n\t* Foe\n\n3. Third\n\n";
-            string input = "*\tthis\n\n\t*\tsub\n\n\tthat";
+            //string input = "*\tthis\n\n\t*\tsub\n\n\tthat";
+            string input = "1. one\n\n        code<t>\n\n2. two\n\n        code<t>\n            indented-12-spaces<t>\n\n";
 
             string output = m.Transform(input);
 
