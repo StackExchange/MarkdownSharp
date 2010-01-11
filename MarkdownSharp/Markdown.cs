@@ -308,14 +308,18 @@ namespace MarkdownSharp
             Setup();
 
             // Standardize line endings
-            text = text.Replace("\r\n", "\n");    // DOS to Unix
-            text = text.Replace("\r", "\n");      // Mac to Unix
+            if (text.Contains("\r"))
+            {
+                text = text.Replace("\r\n", "\n");    // DOS to Unix
+                text = text.Replace("\r", "\n");      // Mac to Unix
+            }
 
             // Make sure $text ends with a couple of newlines:
             text += "\n\n";
 
             // convert all tabs to spaces
-            text = Detab(text);
+            if (text.Contains("\t"))
+                text = Detab(text);
 
             // Strip any lines consisting only of spaces
             // This makes subsequent regexen easier to write, because we can
@@ -1618,7 +1622,7 @@ namespace MarkdownSharp
         /// Convert all tabs to _tabWidth spaces
         /// </summary>
         private string Detab(string text)
-        {
+        {            
             var sb = new StringBuilder(text.Length);
             int last = -1;
             for (int i = 0, linepos = 0; i < text.Length; ++i, ++linepos)
