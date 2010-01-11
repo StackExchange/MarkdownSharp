@@ -290,6 +290,7 @@ namespace MarkdownSharp
         }
 
         private static Regex _blankLines = new Regex(@"^[ ]+$", RegexOptions.Multiline | RegexOptions.Compiled);
+        private static Regex _lineEndings = new Regex(@"\r\n?", RegexOptions.Compiled);
 
         /// <summary>
         /// Transforms the provided Markdown-formatted text to HTML;  
@@ -307,12 +308,9 @@ namespace MarkdownSharp
 
             Setup();
 
-            // Standardize line endings
+            // standardize line endings from DOS (CR LF) / Mac (CR) to UNIX (LF)
             if (text.Contains("\r"))
-            {
-                text = text.Replace("\r\n", "\n");    // DOS to Unix
-                text = text.Replace("\r", "\n");      // Mac to Unix
-            }
+                text = _lineEndings.Replace(text, "\n");
 
             // Make sure $text ends with a couple of newlines:
             text += "\n\n";
