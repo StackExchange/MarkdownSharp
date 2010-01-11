@@ -99,6 +99,8 @@ namespace MarkdownSharp
     /// </summary>
     public class Markdown
     {
+        private const string _version = "1.10";
+
         #region Constructors and Options
 
         /// <summary>
@@ -284,7 +286,7 @@ namespace MarkdownSharp
         /// </summary>
         public string Version
         {
-            get { return "1.009"; }
+            get { return _version; }
         }
 
         private static Regex _blankLines = new Regex(@"^[ ]+$", RegexOptions.Multiline | RegexOptions.Compiled);
