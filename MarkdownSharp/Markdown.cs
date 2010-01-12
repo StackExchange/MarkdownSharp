@@ -440,9 +440,9 @@ namespace MarkdownSharp
                           [ ]*
                         (?:
                             (?<=\s)             # lookbehind for whitespace
-                            [\x22(]
+                            [""(]
                             (.+?)               # title = $3
-                            [\x22)]
+                            ["")]
                             [ ]*
                         )?                      # title is optional
                         (?:\n+|\Z)", _tabWidth - 1), RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
@@ -731,7 +731,7 @@ namespace MarkdownSharp
                         ({1})               # href = $3
                         [ ]*
                         (                   # $4
-                        (['\x22])           # quote char = $5
+                        (['""])           # quote char = $5
                         (.*?)               # title = $6
                         \5                  # matching quote
                         [ ]*                # ignore any spaces between closing quote and )
@@ -924,7 +924,7 @@ namespace MarkdownSharp
                     ({0})           # href = $3
                     [ ]*
                     (               # $4
-                    (['\x22])       # quote char = $5
+                    (['""])       # quote char = $5
                     (.*?)           # title = $6
                     \5              # matching quote
                     [ ]*
