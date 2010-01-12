@@ -1598,8 +1598,6 @@ namespace MarkdownSharp
         }
 
 
-        private static Regex _blankLines = new Regex(@"^[ ]+$", RegexOptions.Multiline | RegexOptions.Compiled);
-
         /// <summary>
         /// convert all tabs to _tabWidth spaces; 
         /// standardizes line endings from DOS (CR LF) or Mac (CR) to UNIX (LF); 
@@ -1609,60 +1607,60 @@ namespace MarkdownSharp
         private string Normalize(string text)
         {            
             var sb = new StringBuilder(text.Length);
-            int last = -1;
 
             for (int i = 0, linepos = 0; i < text.Length; ++i, ++linepos)
             {
-                switch (text[i])
+                char c = text[i];
+                switch (c)
                 {
-                    case '\n':
-                        linepos = -1;
+                    default:
+                        sb.Append(c); 
                         break;
-                    case '\t':
+                    case '\n':
                         {
-                            // convert tabs to spaces
-                            int count = i - 1 - last;
-                            if (count > 0)
-                                sb.Append(text, last + 1, count);
-                            last = i;
-
-                            for (int k = 0; k < (_tabWidth - linepos % _tabWidth); ++k)
-                                sb.Append(' ');
-
-                            linepos += (_tabWidth - linepos % _tabWidth) - 1;
+                            if (linepos > 0)
+                            {
+                                int last = sb.Length - 1;
+                                while (sb[last] == ' ') 
+                                    --last;
+                                if (sb[last] == '\n')
+                                    sb.Length = last + 1;
+                            }
+                            sb.Append('\n');
+                            linepos = -1;                            
                         }
                         break;
                     case '\r':
                         {
+                            if (linepos > 0)
+                            {
+                                int last = sb.Length - 1;
+                                while (sb[last] == ' ')
+                                    --last;
+                                if (sb[last] == '\n')
+                                    sb.Length = last + 1;
+                            }
                             // convert CRLF and CR to just LF
-                            int count = i - 1 - last;
-                            if (count > 0)
-                                sb.Append(text, last + 1, count);
                             if (i + 1 < text.Length && text[i + 1] == '\n')
                                 ++i;
-                            last = i;
                             sb.Append('\n');
                             linepos = -1;
+                        }
+                        break;
+                    case '\t':
+                        {
+                            int curWidth = (_tabWidth - linepos % _tabWidth);
+                            // convert tabs to spaces
+                            for (int k = 0; k < curWidth; ++k)
+                                sb.Append(' ');
+                            linepos += curWidth - 1;
                         }
                         break;
                 }
             }
 
-
-            // add two newlines at end
-            if (last == -1) 
-                text = text + "\n\n";
-            else
-            {
-                int remaining = text.Length - 1 - last;
-                if (remaining > 0) 
-                    sb.Append(text, last + 1, remaining);
-                sb.Append("\n\n");
-                text = sb.ToString();
-            }
-                   
-            // remove any remaining blank lines before return
-            return _blankLines.Replace(text, "");
+            // add two newlines to the end before return
+            return sb.Append("\n\n").ToString();
         }
 
         /// <summary>
