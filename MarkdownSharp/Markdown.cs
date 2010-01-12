@@ -277,7 +277,6 @@ namespace MarkdownSharp
                 _escapeTable.Add(key, hash);
                 _backslashEscapeTable.Add(@"\" + key, hash);
             }
-
         }
 
         /// <summary>
@@ -288,9 +287,6 @@ namespace MarkdownSharp
         {
             get { return _version; }
         }
-
-        private static Regex _blankLines = new Regex(@"^[ ]+$", RegexOptions.Multiline | RegexOptions.Compiled);
-        private static Regex _lineEndings = new Regex(@"\r\n?", RegexOptions.Compiled);
 
         /// <summary>
         /// Transforms the provided Markdown-formatted text to HTML;  
@@ -308,23 +304,8 @@ namespace MarkdownSharp
 
             Setup();
 
-            // standardize line endings from DOS (CR LF) / Mac (CR) to UNIX (LF)
-            if (text.Contains("\r"))
-                text = _lineEndings.Replace(text, "\n");
-
-            // Make sure $text ends with a couple of newlines:
-            text += "\n\n";
-
-            // convert all tabs to spaces
-            if (text.Contains("\t"))
-                text = Detab(text);
-
-            // Strip any lines consisting only of spaces
-            // This makes subsequent regexen easier to write, because we can
-            // match consecutive blank lines with /\n+/ instead of something
-            // contorted like /[ ]*\n+/ .
-            text = _blankLines.Replace(text, "");
-
+            text = Normalize(text);
+           
             text = HashHTMLBlocks(text);
             text = StripLinkDefinitions(text);
             text = RunBlockGamut(text);
@@ -1616,34 +1597,72 @@ namespace MarkdownSharp
             return _outDent.Replace(block, "");
         }
 
+
+        private static Regex _blankLines = new Regex(@"^[ ]+$", RegexOptions.Multiline | RegexOptions.Compiled);
+
         /// <summary>
-        /// Convert all tabs to _tabWidth spaces
+        /// convert all tabs to _tabWidth spaces; 
+        /// standardizes line endings from DOS (CR LF) or Mac (CR) to UNIX (LF); 
+        /// makes sure text ends with a couple of newlines; 
+        /// removes any blank lines (only spaces) in the text
         /// </summary>
-        private string Detab(string text)
+        private string Normalize(string text)
         {            
             var sb = new StringBuilder(text.Length);
             int last = -1;
+
             for (int i = 0, linepos = 0; i < text.Length; ++i, ++linepos)
             {
-                if (text[i] == '\n') linepos = -1;
-                else if (text[i] == '\t')
+                switch (text[i])
                 {
-                    int count = i - 1 - last;
-                    if (count > 0) sb.Append(text, last + 1, count);
-                    last = i;
+                    case '\n':
+                        linepos = -1;
+                        break;
+                    case '\t':
+                        {
+                            // convert tabs to spaces
+                            int count = i - 1 - last;
+                            if (count > 0)
+                                sb.Append(text, last + 1, count);
+                            last = i;
 
-                    for (int k = 0; k < (_tabWidth - linepos % _tabWidth); ++k)
-                        sb.Append(' ');
+                            for (int k = 0; k < (_tabWidth - linepos % _tabWidth); ++k)
+                                sb.Append(' ');
 
-                    linepos += (_tabWidth - linepos % _tabWidth) - 1;
+                            linepos += (_tabWidth - linepos % _tabWidth) - 1;
+                        }
+                        break;
+                    case '\r':
+                        {
+                            // convert CRLF and CR to just LF
+                            int count = i - 1 - last;
+                            if (count > 0)
+                                sb.Append(text, last + 1, count);
+                            if (i + 1 < text.Length && text[i + 1] == '\n')
+                                ++i;
+                            last = i;
+                            sb.Append('\n');
+                            linepos = -1;
+                        }
+                        break;
                 }
             }
 
-            if (last == -1) return text;
-            var remaining = text.Length - 1 - last;
-            if (remaining > 0) sb.Append(text, last + 1, remaining);
 
-            return sb.ToString();
+            // add two newlines at end
+            if (last == -1) 
+                text = text + "\n\n";
+            else
+            {
+                int remaining = text.Length - 1 - last;
+                if (remaining > 0) 
+                    sb.Append(text, last + 1, remaining);
+                sb.Append("\n\n");
+                text = sb.ToString();
+            }
+                   
+            // remove any remaining blank lines before return
+            return _blankLines.Replace(text, "");
         }
 
         /// <summary>
