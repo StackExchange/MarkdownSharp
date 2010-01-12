@@ -99,7 +99,7 @@ namespace MarkdownSharp
     /// </summary>
     public class Markdown
     {
-        private const string _version = "1.10";
+        private const string _version = "1.11";
 
         #region Constructors and Options
 
