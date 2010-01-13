@@ -1587,7 +1587,7 @@ namespace MarkdownSharp
             return text;
         }
 
-        private static Regex _outDent = new Regex(@"^([ ]{1," + _tabWidth + @"})", RegexOptions.Multiline | RegexOptions.Compiled);
+        private static Regex _outDent = new Regex(@"^[ ]{1," + _tabWidth + @"}", RegexOptions.Multiline | RegexOptions.Compiled);
 
         /// <summary>
         /// Remove one level of line-leading spaces
