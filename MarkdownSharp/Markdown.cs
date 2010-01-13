@@ -374,14 +374,13 @@ namespace MarkdownSharp
         private static Regex _leadingWhitespace = new Regex(@"^[ ]*", RegexOptions.Compiled);
 
         /// <summary>
-        /// removes leading and trailing newlines, splits on two or more newlines, to form "paragraphs".  
-        /// each paragraph is then unhashed (if it is a hash) or wrapped in HTML p tags
+        /// splits on two or more newlines, to form "paragraphs";    
+        /// each paragraph is then unhashed (if it is a hash) or wrapped in HTML p tag
         /// </summary>
         private string FormParagraphs(string text)
         {
-            text = _newlinesLeadingTrailing.Replace(text, "");
-
-            string[] grafs = _newlinesMultiple.Split(text);
+            // split on two or more newlines
+            string[] grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
             
             for (int i = 0; i < grafs.Length; i++)
             {
@@ -392,14 +391,8 @@ namespace MarkdownSharp
                 }
                 else
                 {
-                    // wrap <p> tags.
-                    string block = grafs[i];
-
-                    block = RunSpanGamut(block);
-                    block = _leadingWhitespace.Replace(block, "<p>");
-                    block += "</p>";
-
-                    grafs[i] = block;
+                    // do span level processing inside the block, then wrap result in <p> tags
+                    grafs[i] = _leadingWhitespace.Replace(RunSpanGamut(grafs[i]), "<p>") + "</p>";
                 }
             }
 
