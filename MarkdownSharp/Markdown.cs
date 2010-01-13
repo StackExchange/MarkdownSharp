@@ -259,11 +259,8 @@ namespace MarkdownSharp
         private int _listLevel;
 
         /// <summary>
-        /// Static constructor
-        /// </summary>
-        /// <remarks>
         /// In the static constuctor we'll initialize what stays the same across all transforms.
-        /// </remarks>
+        /// </summary>
         static Markdown()
         {
             // Table of hash values for escaped characters:
@@ -277,7 +274,7 @@ namespace MarkdownSharp
             foreach (char c in @"\`*_{}[]()>#+-.!")
             {
                 string key = c.ToString();
-                string hash = "\x1A" + Math.Abs(key.GetHashCode()).ToString() + "\x1A";
+                string hash = GetHashKey(key);
                 _escapeTable.Add(key, hash);
                 _invertedEscapeTable.Add(hash, key);
                 _backslashEscapeTable.Add(@"\" + key, hash);
@@ -308,7 +305,7 @@ namespace MarkdownSharp
         /// </remarks>
         public string Transform(string text)
         {
-            if (text == null) return "";
+            if (String.IsNullOrEmpty(text)) return "";
 
             Setup();
 
@@ -374,7 +371,7 @@ namespace MarkdownSharp
 
         private static Regex _newlinesLeadingTrailing = new Regex(@"^\n+|\n+\z", RegexOptions.Compiled);
         private static Regex _newlinesMultiple = new Regex(@"\n{2,}", RegexOptions.Compiled);
-        private static Regex _leadingWhitespace = new Regex(@"^([ ]*)", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
+        private static Regex _leadingWhitespace = new Regex(@"^[ ]*", RegexOptions.Compiled);
 
         /// <summary>
         /// removes leading and trailing newlines, splits on two or more newlines, to form "paragraphs".  
@@ -385,12 +382,17 @@ namespace MarkdownSharp
             text = _newlinesLeadingTrailing.Replace(text, "");
 
             string[] grafs = _newlinesMultiple.Split(text);
-
-            // Wrap <p> tags.
+            
             for (int i = 0; i < grafs.Length; i++)
             {
-                if (!_htmlBlocks.ContainsKey(grafs[i]))
+                if (grafs[i].StartsWith("\x1A"))
                 {
+                    // unhashify HTML blocks
+                    grafs[i] = _htmlBlocks[grafs[i]];
+                }
+                else
+                {
+                    // wrap <p> tags.
                     string block = grafs[i];
 
                     block = RunSpanGamut(block);
@@ -399,13 +401,6 @@ namespace MarkdownSharp
 
                     grafs[i] = block;
                 }
-            }
-
-            // Unhashify HTML blocks
-            for (int i = 0; i < grafs.Length; i++)
-            {
-                if (_htmlBlocks.ContainsKey(grafs[i]))
-                    grafs[i] = _htmlBlocks[grafs[i]];
             }
 
             return string.Join("\n\n", grafs);
@@ -672,14 +667,18 @@ namespace MarkdownSharp
             return _blocksHtml.Replace(text, new MatchEvaluator(HtmlEvaluator));
         }
 
-
         private string HtmlEvaluator(Match match)
         {
             string text = match.Groups[1].Value;
-            string key = text.GetHashCode().ToString();
+            string key = GetHashKey(text);
             _htmlBlocks[key] = text;
 
             return string.Concat("\n\n", key, "\n\n");
+        }
+
+        private static string GetHashKey(string s)
+        {
+            return "\x1A" + Math.Abs(s.GetHashCode()).ToString() + "\x1A";
         }
 
         private static Regex _htmlTokens = new Regex(@"
