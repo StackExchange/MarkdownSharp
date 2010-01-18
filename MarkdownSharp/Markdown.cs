@@ -1567,6 +1567,7 @@ namespace MarkdownSharp
                 url = url.Replace(")", "%29");
                 url = url.Replace("[", "%5B");
                 url = url.Replace("]", "%5D");
+                url = url.Replace("$", "%24");
                 if (url.Length > 7 && url.Substring(7).Contains(":"))
                 {
                     // replace any colons in the body of the URL that are NOT followed by 2 or more numbers
