@@ -1559,6 +1559,7 @@ namespace MarkdownSharp
         {
             if (_encodeProblemUrlCharacters)
             {
+                url = url.Replace("\"", "%22");
                 url = url.Replace("*", "%2A");
                 url = url.Replace("_", "%5F");
                 url = url.Replace("'", "%27");
