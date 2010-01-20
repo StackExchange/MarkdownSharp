@@ -1620,27 +1620,23 @@ namespace MarkdownSharp
         {            
             var output = new StringBuilder(text.Length);
             var line = new StringBuilder();
-            string tab = new String(' ', _tabWidth);
-            int len = text.Length;
             bool valid = false;
 
-            for (int i = 0; i < len; i++)
+            for (int i = 0; i < text.Length; i++)
             {
                 switch (text[i])
                 {
                     case '\n':
                         if (valid) output.Append(line);
                         output.Append('\n');
-                        line.Length = 0;
-                        valid = false;
+                        line.Length = 0; valid = false;
                         break;
                     case '\r':
-                        if ((i < len - 1) && (text[i + 1] != '\n'))
+                        if ((i < text.Length - 1) && (text[i + 1] != '\n'))
                         {
                             if (valid) output.Append(line);
                             output.Append('\n');
-                            line.Length = 0;
-                            valid = false;
+                            line.Length = 0; valid = false;
                         }
                         break;
                     case '\t':
