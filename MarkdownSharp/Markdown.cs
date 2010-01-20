@@ -99,7 +99,7 @@ namespace MarkdownSharp
     /// </summary>
     public class Markdown
     {
-        private const string _version = "1.11";
+        private const string _version = "1.12";
 
         #region Constructors and Options
 
@@ -1643,6 +1643,8 @@ namespace MarkdownSharp
                         int width = (_tabWidth - line.Length % _tabWidth);
                         for (int k = 0; k < width; k++)
                             line.Append(' ');
+                        break;
+                    case '\x1A':
                         break;
                     default:
                         if (!valid && text[i] != ' ') valid = true;
