@@ -1618,61 +1618,48 @@ namespace MarkdownSharp
         /// </summary>
         private string Normalize(string text)
         {            
-            var sb = new StringBuilder(text.Length);
+            var output = new StringBuilder(text.Length);
+            var line = new StringBuilder();
+            string tab = new String(' ', _tabWidth);
+            int len = text.Length;
+            bool valid = false;
 
-            for (int i = 0, linepos = 0; i < text.Length; ++i, ++linepos)
+            for (int i = 0; i < len; i++)
             {
-                char c = text[i];
-                switch (c)
+                switch (text[i])
                 {
-                    default:
-                        sb.Append(c); 
-                        break;
                     case '\n':
-                        {
-                            if (linepos > 0)
-                            {
-                                int last = sb.Length - 1;
-                                while (sb[last] == ' ') 
-                                    last--;
-                                if (sb[last] == '\n')
-                                    sb.Length = last + 1;
-                            }
-                            sb.Append('\n');
-                            linepos = -1;                            
-                        }
+                        if (valid) output.Append(line);
+                        output.Append('\n');
+                        line.Length = 0;
+                        valid = false;
                         break;
                     case '\r':
+                        if ((i < len - 1) && (text[i + 1] != '\n'))
                         {
-                            if (linepos > 0)
-                            {
-                                int last = sb.Length - 1;
-                                while (sb[last] == ' ')
-                                    last--;
-                                if (sb[last] == '\n')
-                                    sb.Length = last + 1;
-                            }
-                            // convert CRLF and CR to just LF
-                            if (i + 1 < text.Length && text[i + 1] == '\n')
-                                i++;
-                            sb.Append('\n');
-                            linepos = -1;
+                            if (valid) output.Append(line);
+                            output.Append('\n');
+                            line.Length = 0;
+                            valid = false;
                         }
                         break;
                     case '\t':
-                        {
-                            int curWidth = (_tabWidth - linepos % _tabWidth);
-                            // convert tabs to spaces
-                            for (int k = 0; k < curWidth; k++)
-                                sb.Append(' ');
-                            linepos += curWidth - 1;
-                        }
+                        int width = (_tabWidth - line.Length % _tabWidth);
+                        for (int k = 0; k < width; k++)
+                            line.Append(' ');
+                        break;
+                    default:
+                        if (!valid && text[i] != ' ') valid = true;
+                        line.Append(text[i]);
                         break;
                 }
             }
 
+            if (valid) output.Append(line);
+            output.Append('\n');
+
             // add two newlines to the end before return
-            return sb.Append("\n\n").ToString();
+            return output.Append("\n\n").ToString();
         }
 
         #endregion
