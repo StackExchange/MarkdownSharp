@@ -110,9 +110,10 @@
     <Content Include="testfiles\mstest-0.1\line-endings-cr.html" />
     <Content Include="testfiles\mstest-0.1\line-endings-crlf.html" />
     <None Include="testfiles\pandoc\unpredictable-sublists.text" />
+    <Content Include="testfiles\pandoc\!readme.txt" />
+    <Content Include="testfiles\pandoc\failure-to-escape-less-than.html" />
     <Content Include="testfiles\pandoc\nested-divs.html" />
     <Content Include="testfiles\pandoc\nested-emphasis.html" />
-    <Content Include="testfiles\pandoc\unordered-list-and-horizontal-rules.html" />
     <Content Include="testfiles\php-markdown\!readme.txt" />
     <Content Include="testfiles\php-markdown\Backslash escapes.html" />
     <Content Include="testfiles\php-markdown\Code block in a list item.html" />
