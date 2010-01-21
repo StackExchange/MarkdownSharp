@@ -38,6 +38,13 @@ namespace MarkdownSharpTests
             //
             Test(@"mstest-0.1");
 
+            
+            //
+            // pandoc edge condition tests from 
+            // http://code.google.com/p/pandoc/wiki/PandocVsMarkdownPl
+            //
+            //Test(@"pandoc");
+
             Benchmark();
 
             //AdHocTest();

@@ -109,6 +109,10 @@
     <Content Include="testfiles\mstest-0.1\code-inside-list.html" />
     <Content Include="testfiles\mstest-0.1\line-endings-cr.html" />
     <Content Include="testfiles\mstest-0.1\line-endings-crlf.html" />
+    <None Include="testfiles\pandoc\unpredictable-sublists.text" />
+    <Content Include="testfiles\pandoc\nested-divs.html" />
+    <Content Include="testfiles\pandoc\nested-emphasis.html" />
+    <Content Include="testfiles\pandoc\unordered-list-and-horizontal-rules.html" />
     <Content Include="testfiles\php-markdown\!readme.txt" />
     <Content Include="testfiles\php-markdown\Backslash escapes.html" />
     <Content Include="testfiles\php-markdown\Code block in a list item.html" />
@@ -163,6 +167,12 @@
     <None Include="testfiles\mstest-0.1\line-endings-cr.text" />
     <None Include="testfiles\mstest-0.1\line-endings-crlf.text" />
     <None Include="testfiles\mstest-0.1\line-endings-lf.text" />
+    <None Include="testfiles\pandoc\failure-to-escape-less-than.text" />
+    <None Include="testfiles\pandoc\indented-code-in-list-item.text" />
+    <None Include="testfiles\pandoc\nested-divs.text" />
+    <None Include="testfiles\pandoc\nested-emphasis.text" />
+    <None Include="testfiles\pandoc\unordered-list-and-horizontal-rules.text" />
+    <None Include="testfiles\pandoc\unordered-list-followed-by-ordered-list.text" />
     <None Include="testfiles\php-markdown\Backslash escapes.text" />
     <None Include="testfiles\php-markdown\Code block in a list item.text" />
     <None Include="testfiles\php-markdown\Code Spans.text" />
