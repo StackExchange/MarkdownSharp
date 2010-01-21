@@ -794,8 +794,8 @@ namespace MarkdownSharp
             {
                 string url = _urls[linkID];
 
-                url = EscapeBoldItalic(url);
                 url = EncodeProblemUrlChars(url);
+                url = EscapeBoldItalic(url);                
                 result = "<a href=\"" + url + "\"";
 
                 if (_titles.ContainsKey(linkID))
@@ -825,8 +825,8 @@ namespace MarkdownSharp
             {
                 string url = _urls[linkID];
 
-                url = EscapeBoldItalic(url);
                 url = EncodeProblemUrlChars(url);
+                url = EscapeBoldItalic(url);                
                 result = "<a href=\"" + url + "\"";
 
                 if (_titles.ContainsKey(linkID))
@@ -852,10 +852,10 @@ namespace MarkdownSharp
             string title = match.Groups[6].Value;
             string result;
 
+            url = EncodeProblemUrlChars(url);
             url = EscapeBoldItalic(url);
             if (url.StartsWith("<") && url.EndsWith(">"))
-                url = url.Substring(1, url.Length - 2); // remove <>'s surrounding URL, if present
-            url = EncodeProblemUrlChars(url);
+                url = url.Substring(1, url.Length - 2); // remove <>'s surrounding URL, if present            
 
             result = string.Format("<a href=\"{0}\"", url);
 
@@ -940,8 +940,8 @@ namespace MarkdownSharp
             if (_urls.ContainsKey(linkID))
             {
                 string url = _urls[linkID];
-                url = EscapeBoldItalic(url);
                 url = EncodeProblemUrlChars(url);
+                url = EscapeBoldItalic(url);                
                 result = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, altText);
 
                 if (_titles.ContainsKey(linkID))
@@ -972,12 +972,11 @@ namespace MarkdownSharp
 
             alt = alt.Replace("\"", "&quot;");
             title = title.Replace("\"", "&quot;");
-
-            url = EscapeBoldItalic(url);
+            
             if (url.StartsWith("<") && url.EndsWith(">"))
                 url = url.Substring(1, url.Length - 2);    // Remove <>'s surrounding URL, if present
-
             url = EncodeProblemUrlChars(url);
+            url = EscapeBoldItalic(url);
 
             result = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, alt);
 
@@ -1551,31 +1550,33 @@ namespace MarkdownSharp
             return s;
         }
 
+        private static char[] _problemUrlChars = @"""'*()[]$:".ToCharArray();
+
         /// <summary>
-        /// encodes problem characters in URLs, such as * _  ' () []  :
-        /// this is to avoid problems with markup later
+        /// hex-encodes some unusual "problem" chars in URLs to avoid URL detection problems 
         /// </summary>
         private string EncodeProblemUrlChars(string url)
         {
-            if (_encodeProblemUrlCharacters)
+            if (!_encodeProblemUrlCharacters) return url;
+
+            var sb = new StringBuilder(url.Length);
+            bool encode;
+            char c;
+
+            for (int i = 0; i < url.Length; i++)
             {
-                url = url.Replace("\"", "%22");
-                url = url.Replace("*", "%2A");
-                url = url.Replace("_", "%5F");
-                url = url.Replace("'", "%27");
-                url = url.Replace("(", "%28");
-                url = url.Replace(")", "%29");
-                url = url.Replace("[", "%5B");
-                url = url.Replace("]", "%5D");
-                url = url.Replace("$", "%24");
-                if (url.Length > 7 && url.Substring(7).Contains(":"))
-                {
-                    // replace any colons in the body of the URL that are NOT followed by 2 or more numbers
-                    url = url.Substring(0, 7) + Regex.Replace(url.Substring(7), @":(?!\d{2,})", "%3A");
-                }
+                c = url[i];
+                encode = Array.IndexOf(_problemUrlChars, c) != -1;
+                if (encode && c == ':' && i < url.Length - 1)
+                    encode = !(url[i + 1] == '/') && !(url[i + 1] >= '0' && url[i + 1] <= '9');
+
+                if (encode)
+                    sb.Append("%" + String.Format("{0:x}", (byte)c));
+                else
+                    sb.Append(c);                
             }
 
-            return url;
+            return sb.ToString();
         }
 
 

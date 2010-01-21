@@ -78,7 +78,7 @@ namespace MarkdownSharpTests
             Assert.IsFalse(markdown.EncodeProblemUrlCharacters);
             Assert.AreEqual("<p><a href=\"/'*_[]()/\">Foo</a></p>\n", markdown.Transform("[Foo](/'*_[]()/)"));
             markdown.EncodeProblemUrlCharacters = true;
-            Assert.AreEqual("<p><a href=\"/%27*_%5B%5D%28%29/\">Foo</a></p>\n", markdown.Transform("[Foo](/'*_[]()/)"));
+            Assert.AreEqual("<p><a href=\"/%27%2a%5f%5b%5d%28%29/\">Foo</a></p>\n", markdown.Transform("[Foo](/'*_[]()/)"));
         }
 
         [Test]
