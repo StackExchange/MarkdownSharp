@@ -13,7 +13,7 @@
  * http://aspnetresources.com/blog/markdown_announced.aspx
  * 
  * MarkdownSharp
- * Copyright (c) 2009 Jeff Atwood
+ * Copyright (c) 2009-2010 Jeff Atwood
  * http://stackoverflow.com
  * http://www.codinghorror.com/blog/
  * http://code.google.com/p/markdownsharp/
@@ -27,7 +27,7 @@
 
 /*
 
-Copyright (c) 2009 Jeff Atwood
+Copyright (c) 2009 - 2010 Jeff Atwood
 
 http://www.opensource.org/licenses/mit-license.php
   
@@ -92,6 +92,40 @@ using System.Text.RegularExpressions;
 namespace MarkdownSharp
 {
 
+    public class MarkdownOptions
+    {
+        /// <summary>
+        /// when true, (most) bare plain URLs are auto-hyperlinked  
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        public bool AutoHyperlink { get; set; }
+        /// <summary>
+        /// when true, RETURN becomes a literal newline  
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        public bool AutoNewlines { get; set; }
+        /// <summary>
+        /// use ">" for HTML output, or " />" for XHTML output
+        /// </summary>
+        public string EmptyElementSuffix { get; set; }
+        /// <summary>
+        /// when true, problematic URL characters like [, ], (, and so forth will be encoded 
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        public bool EncodeProblemUrlCharacters { get; set; }
+        /// <summary>
+        /// when false, email addresses will never be auto-linked  
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        public bool LinkEmails { get; set; }
+        /// <summary>
+        /// when true, bold and italic require non-word characters on either side  
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        public bool StrictBoldItalic { get; set; }
+    }
+
+
     /// <summary>
     /// Markdown is a text-to-HTML conversion tool for web writers. 
     /// Markdown allows you to write using an easy-to-read, easy-to-write plain text format, 
@@ -99,15 +133,14 @@ namespace MarkdownSharp
     /// </summary>
     public class Markdown
     {
-        private const string _version = "1.12";
+        private const string _version = "1.13";
 
         #region Constructors and Options
 
         /// <summary>
         /// Create a new Markdown instance using default options
         /// </summary>
-        public Markdown()
-            : this(false)
+        public Markdown() : this(false)
         {
         }
 
@@ -121,6 +154,7 @@ namespace MarkdownSharp
         ///     Markdown.AutoNewLines (true/false)
         ///     Markdown.AutoHyperlink (true/false)
         ///     Markdown.EncodeProblemUrlCharacters (true/false) 
+        ///     
         /// </summary>
         public Markdown(bool loadOptionsFromConfigFile)
         {
@@ -151,6 +185,19 @@ namespace MarkdownSharp
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Create a new Markdown instance and set the options from the MarkdownOptions object.
+        /// </summary>
+        public Markdown(MarkdownOptions options)
+        {
+            _autoHyperlink = options.AutoHyperlink;
+            _autoNewlines = options.AutoNewlines;
+            _emptyElementSuffix = options.EmptyElementSuffix;
+            _encodeProblemUrlCharacters = options.EncodeProblemUrlCharacters;
+            _linkEmails = options.LinkEmails;
+            _strictBoldItalic = options.StrictBoldItalic;
         }
 
 
@@ -1195,7 +1242,7 @@ namespace MarkdownSharp
 
 
         private static Regex _codeBlock = new Regex(string.Format(@"
-                    (?:\n\n|\A)
+                    (?:\n\n|\A\n?)
                     (                        # $1 = the code block -- one or more lines, starting with a space
                     (?:
                         (?:[ ]{{{0}}})       # Lines must start with a tab-width of spaces
