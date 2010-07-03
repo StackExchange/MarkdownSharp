@@ -45,9 +45,9 @@ namespace MarkdownSharpTests
             //
             //Test(@"pandoc");
 
-            //Benchmark();
+            Benchmark();
 
-            AdHocTest();
+            //AdHocTest();
             
             Console.ReadKey();
         }
