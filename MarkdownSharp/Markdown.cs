@@ -1166,9 +1166,6 @@ namespace MarkdownSharp
             string listType = Regex.IsMatch(match.Groups[3].Value, _markerUL) ? "ul" : "ol";
             string result;
 
-            // Turn double returns into triple returns, so that we can make a
-            // paragraph for the last item in a list, if necessary:
-            list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
             result = ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL);
 
             result = string.Format("<{0}>\n{1}</{0}>\n", listType, result);
@@ -1208,38 +1205,41 @@ namespace MarkdownSharp
             list = Regex.Replace(list, @"\n{2,}\z", "\n");
 
             string pattern = string.Format(
-              @"(\n)?                      # leading line = $1
-                (^[ ]*)                    # leading whitespace = $2
-                ({0}) [ ]+                 # list marker = $3
-                ((?s:.+?)                  # list item text = $4
-                (\n{{1,2}}))      
-                (?= \n* (\z | \2 ({0}) [ ]+))", marker);
+              @"(^[ ]*)                    # leading whitespace = $1
+                ({0}) [ ]+                 # list marker = $2
+                ((?s:.+?)                  # list item text = $3
+                (\n+))      
+                (?= (\z | \1 ({0}) [ ]+))", marker);
+
+            bool lastItemHadADoubleNewline = false;
+
+            // has to be a closure, so subsequent invocations can share the bool
+            MatchEvaluator ListItemEvaluator = (Match match) =>
+            {
+                string item = match.Groups[3].Value;
+
+                bool endsWithDoubleNewline = item.EndsWith("\n\n");
+                bool containsDoubleNewline = endsWithDoubleNewline || item.Contains("\n\n");
+
+                if (containsDoubleNewline || lastItemHadADoubleNewline)
+                    // we could correct any bad indentation here..
+                    item = RunBlockGamut(Outdent(item) + "\n");
+                else
+                {
+                    // recursion for sub-lists
+                    item = DoLists(Outdent(item));
+                    item = item.TrimEnd('\n');
+                    item = RunSpanGamut(item);
+                }
+                lastItemHadADoubleNewline = endsWithDoubleNewline;
+                return string.Format("<li>{0}</li>\n", item);
+            };
 
             list = Regex.Replace(list, pattern, new MatchEvaluator(ListItemEvaluator),
                                   RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline);
             _listLevel--;
             return list;
         }
-
-        private string ListItemEvaluator(Match match)
-        {
-            string item = match.Groups[4].Value;
-            string leadingLine = match.Groups[1].Value;
-
-            if (!String.IsNullOrEmpty(leadingLine) || Regex.IsMatch(item, @"\n{2,}"))
-                // we could correct any bad indentation here..
-                item = RunBlockGamut(Outdent(item) + "\n");
-            else
-            {
-                // recursion for sub-lists
-                item = DoLists(Outdent(item));
-                item = item.TrimEnd('\n');
-                item = RunSpanGamut(item);
-            }
-
-            return string.Format("<li>{0}</li>\n", item);
-        }
-
 
         private static Regex _codeBlock = new Regex(string.Format(@"
                     (?:\n\n|\A\n?)
