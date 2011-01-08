@@ -13,7 +13,7 @@
  * http://aspnetresources.com/blog/markdown_announced.aspx
  * 
  * MarkdownSharp
- * Copyright (c) 2009-2010 Jeff Atwood
+ * Copyright (c) 2009-2011 Jeff Atwood
  * http://stackoverflow.com
  * http://www.codinghorror.com/blog/
  * http://code.google.com/p/markdownsharp/
