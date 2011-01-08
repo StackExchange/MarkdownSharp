@@ -12,7 +12,7 @@ namespace MarkdownSharpTests
         static void Main(string[] args)
         {
 
-            //UnitTests();
+            UnitTests();
 
             //
             // this is the closest thing to a set of Markdown reference tests I could find
