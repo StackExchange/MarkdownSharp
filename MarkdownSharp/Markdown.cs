@@ -1597,7 +1597,7 @@ namespace MarkdownSharp
             return s;
         }
 
-        private static char[] _problemUrlChars = @"""'*()[]$:".ToCharArray();
+        private static char[] _problemUrlChars = @"""'*()[]$:_".ToCharArray();
 
         /// <summary>
         /// hex-encodes some unusual "problem" chars in URLs to avoid URL detection problems 
