@@ -321,7 +321,7 @@ namespace MarkdownSharp
             foreach (char c in @"\`*_{}[]()>#+-.!")
             {
                 string key = c.ToString();
-                string hash = GetHashKey(key);
+                string hash = GetHashKey(key, isHtmlBlock: false);
                 _escapeTable.Add(key, hash);
                 _invertedEscapeTable.Add(hash, key);
                 _backslashEscapeTable.Add(@"\" + key, hash);
@@ -372,7 +372,7 @@ namespace MarkdownSharp
         /// <summary>
         /// Perform transformations that form block-level tags like paragraphs, headers, and list items.
         /// </summary>
-        private string RunBlockGamut(string text)
+        private string RunBlockGamut(string text, bool unhash = true)
         {
             text = DoHeaders(text);
             text = DoHorizontalRules(text);
@@ -386,7 +386,7 @@ namespace MarkdownSharp
             // <p> tags around block-level tags.
             text = HashHTMLBlocks(text);
 
-            text = FormParagraphs(text);
+            text = FormParagraphs(text, unhash: unhash);
 
             return text;
         }
@@ -420,21 +420,43 @@ namespace MarkdownSharp
         private static Regex _newlinesMultiple = new Regex(@"\n{2,}", RegexOptions.Compiled);
         private static Regex _leadingWhitespace = new Regex(@"^[ ]*", RegexOptions.Compiled);
 
+        private static Regex _htmlBlockHash = new Regex("\x1AH\\d+H", RegexOptions.Compiled);
+
         /// <summary>
         /// splits on two or more newlines, to form "paragraphs";    
-        /// each paragraph is then unhashed (if it is a hash) or wrapped in HTML p tag
+        /// each paragraph is then unhashed (if it is a hash and unhashing isn't turned off) or wrapped in HTML p tag
         /// </summary>
-        private string FormParagraphs(string text)
+        private string FormParagraphs(string text, bool unhash = true)
         {
             // split on two or more newlines
             string[] grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
             
             for (int i = 0; i < grafs.Length; i++)
             {
-                if (grafs[i].StartsWith("\x1A"))
+                if (grafs[i].StartsWith("\x1AH"))
                 {
                     // unhashify HTML blocks
-                    grafs[i] = _htmlBlocks[grafs[i]];
+                    if (unhash)
+                    {
+                        int sanityCheck = 50; // just for safety, guard against an infinite loop
+                        bool keepGoing = true; // as long as replacements where made, keep going
+                        while (keepGoing && sanityCheck > 0)
+                        {
+                            keepGoing = false;
+                            grafs[i] = _htmlBlockHash.Replace(grafs[i], match =>
+                            {
+                                keepGoing = true;
+                                return _htmlBlocks[match.Value];
+                            });
+                            sanityCheck--;
+                        }
+                        /* if (keepGoing)
+                        {
+                            // Logging of an infinite loop goes here.
+                            // If such a thing should happen, please open a new issue on http://code.google.com/p/markdownsharp/
+                            // with the input that caused it.
+                        }*/
+                    }
                 }
                 else
                 {
@@ -710,15 +732,16 @@ namespace MarkdownSharp
         private string HtmlEvaluator(Match match)
         {
             string text = match.Groups[1].Value;
-            string key = GetHashKey(text);
+            string key = GetHashKey(text, isHtmlBlock: true);
             _htmlBlocks[key] = text;
 
             return string.Concat("\n\n", key, "\n\n");
         }
 
-        private static string GetHashKey(string s)
+        private static string GetHashKey(string s, bool isHtmlBlock)
         {
-            return "\x1A" + Math.Abs(s.GetHashCode()).ToString() + "\x1A";
+            var delim = isHtmlBlock ? 'H' : 'E';
+            return "\x1A" + delim +  Math.Abs(s.GetHashCode()).ToString() + delim;
         }
 
         private static Regex _htmlTokens = new Regex(@"
@@ -1223,7 +1246,7 @@ namespace MarkdownSharp
 
                 if (containsDoubleNewline || lastItemHadADoubleNewline)
                     // we could correct any bad indentation here..
-                    item = RunBlockGamut(Outdent(item) + "\n");
+                    item = RunBlockGamut(Outdent(item) + "\n", unhash: false);
                 else
                 {
                     // recursion for sub-lists
@@ -1571,8 +1594,8 @@ namespace MarkdownSharp
         {
             return _backslashEscapeTable[match.Value];
         }
-       
-        private static Regex _unescapes = new Regex("\x1A\\d+\x1A", RegexOptions.Compiled);
+
+        private static Regex _unescapes = new Regex("\x1A" + "E\\d+E", RegexOptions.Compiled);
 
         /// <summary>
         /// swap back in all the special characters we've hidden
