@@ -692,7 +692,7 @@ namespace MarkdownSharp
                   
                       [ ]{0,$less_than_tab}
                       (?s:
-                        <!-- .*? -->
+                        <!--(?:|(?:[^>-]|-[^>])(?:[^-]|-[^-])*)-->
                       )
                       [ ]*
                       (?=\n{2,}|\Z)            # followed by a blank line or end of document
@@ -745,7 +745,7 @@ namespace MarkdownSharp
         }
 
         private static Regex _htmlTokens = new Regex(@"
-            (<!(?:--.*?--\s*)+>)|        # match <!-- foo -->
+            (<!--(?:|(?:[^>-]|-[^>])(?:[^-]|-[^-])*)-->)|        # match <!-- foo -->
             (<\?.*?\?>)|                 # match <?foo?> " +
             RepeatString(@" 
             (<[A-Za-z\/!$](?:[^<>]|", _nestDepth) + RepeatString(@")*>)", _nestDepth) +
