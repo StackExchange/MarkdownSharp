@@ -848,10 +848,15 @@ namespace MarkdownSharp
             return text;
         }
 
+        private string SaveLinkTextFromAutoLinking(string s)
+        {
+            return s.Replace("://", "&#58;//");
+        }
+
         private string AnchorRefEvaluator(Match match)
         {
             string wholeMatch = match.Groups[1].Value;
-            string linkText = match.Groups[2].Value;
+            string linkText = SaveLinkTextFromAutoLinking(match.Groups[2].Value);
             string linkID = match.Groups[3].Value.ToLowerInvariant();
 
             string result;
@@ -886,7 +891,7 @@ namespace MarkdownSharp
         private string AnchorRefShortcutEvaluator(Match match)
         {
             string wholeMatch = match.Groups[1].Value;
-            string linkText = match.Groups[2].Value;
+            string linkText = SaveLinkTextFromAutoLinking(match.Groups[2].Value);
             string linkID = Regex.Replace(linkText.ToLowerInvariant(), @"[ ]*\n[ ]*", " ");  // lower case and remove newlines / extra spaces
 
             string result;
@@ -917,7 +922,7 @@ namespace MarkdownSharp
 
         private string AnchorInlineEvaluator(Match match)
         {
-            string linkText = match.Groups[2].Value;
+            string linkText = SaveLinkTextFromAutoLinking(match.Groups[2].Value);
             string url = match.Groups[3].Value;
             string title = match.Groups[6].Value;
             string result;
