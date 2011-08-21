@@ -304,6 +304,7 @@ namespace MarkdownSharp
         private readonly Dictionary<string, string> _htmlBlocks = new Dictionary<string, string>();
 
         private int _listLevel;
+        private static string AutoLinkPreventionMarker = "\x1AP"; // temporarily replaces "://" where auto-linking shouldn't happen;
 
         /// <summary>
         /// In the static constuctor we'll initialize what stays the same across all transforms.
@@ -408,6 +409,8 @@ namespace MarkdownSharp
             // Must come after DoAnchors(), because you can use < and >
             // delimiters in inline links like [this](<url>).
             text = DoAutoLinks(text);
+
+            text = text.Replace(AutoLinkPreventionMarker, "://");
 
             text = EncodeAmpsAndAngles(text);
             text = DoItalicsAndBold(text);
@@ -850,7 +853,7 @@ namespace MarkdownSharp
 
         private string SaveLinkTextFromAutoLinking(string s)
         {
-            return s.Replace("://", "&#58;//");
+            return s.Replace("://", AutoLinkPreventionMarker);
         }
 
         private string AnchorRefEvaluator(Match match)
