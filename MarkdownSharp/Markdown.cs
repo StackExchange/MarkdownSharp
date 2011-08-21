@@ -1679,6 +1679,10 @@ namespace MarkdownSharp
                 if (token.Type == TokenType.Tag)
                 {
                     value = value.Replace(@"\", _escapeTable[@"\"]);
+                    
+                    if (_autoHyperlink && value.StartsWith("<!")) // escape slashes in comments to prevent autolinking there -- http://meta.stackoverflow.com/questions/95987/html-comment-containing-url-breaks-if-followed-by-another-html-comment
+                        value = value.Replace("/", _escapeTable["/"]);
+                    
                     value = Regex.Replace(value, "(?<=.)</?code>(?=.)", _escapeTable[@"`"]);
                     value = EscapeBoldItalic(value);
                 }
