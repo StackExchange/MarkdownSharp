@@ -1002,6 +1002,16 @@ namespace MarkdownSharp
             return text;
         }
 
+        // This prevents the creation of horribly broken HTML when some syntax ambiguities
+        // collide. It likely still doesn't do what the user meant, but at least we're not
+        // outputting garbage.
+        private string EscapeImageAltText(string s)
+        {
+            s = EscapeBoldItalic(s);
+            s = Regex.Replace(s, @"[\[\]()]", m => _escapeTable[m.ToString()]);
+            return s;
+        }            
+
         private string ImageReferenceEvaluator(Match match)
         {
             string wholeMatch = match.Groups[1].Value;
@@ -1013,7 +1023,7 @@ namespace MarkdownSharp
             if (linkID == "")
                 linkID = altText.ToLowerInvariant();
 
-            altText = altText.Replace("\"", "&quot;");
+            altText = EscapeImageAltText(altText.Replace("\"", "&quot;"));
 
             if (_urls.ContainsKey(linkID))
             {
