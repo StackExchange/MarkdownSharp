@@ -685,7 +685,7 @@ namespace MarkdownSharp
                     # case than to make the other regex more complicated.
                   
                         [ ]{0,$less_than_tab}
-                        <(hr)                 # start tag = $2
+                        <hr
                         $attr                 # attributes
                         /?>                   # the matching end tag
                         [ ]*
@@ -704,9 +704,9 @@ namespace MarkdownSharp
                   
                       [ ]{0,$less_than_tab}
                       (?s:
-                        <([?%])                # $2
+                        <([?%])                # $4
                         .*?
-                        \2>
+                        \4>
                       )
                       [ ]*
                       (?=\n{2,}|\Z)            # followed by a blank line or end of document
