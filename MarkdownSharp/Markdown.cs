@@ -878,8 +878,8 @@ namespace MarkdownSharp
 
                 if (_titles.ContainsKey(linkID))
                 {
-                    string title = _titles[linkID];
-                    title = EscapeBoldItalic(title);
+                    string title = AttributeEncode(_titles[linkID]);
+                    title = AttributeEncode(EscapeBoldItalic(title));
                     result += " title=\"" + title + "\"";
                 }
 
@@ -909,7 +909,7 @@ namespace MarkdownSharp
 
                 if (_titles.ContainsKey(linkID))
                 {
-                    string title = _titles[linkID];
+                    string title = AttributeEncode(_titles[linkID]);
                     title = EscapeBoldItalic(title);
                     result += " title=\"" + title + "\"";
                 }
@@ -939,7 +939,7 @@ namespace MarkdownSharp
 
             if (!String.IsNullOrEmpty(title))
             {
-                title = title.Replace("\"", "&quot;");
+                title = AttributeEncode(title);
                 title = EscapeBoldItalic(title);
                 result += string.Format(" title=\"{0}\"", title);
             }
@@ -1023,7 +1023,7 @@ namespace MarkdownSharp
             if (linkID == "")
                 linkID = altText.ToLowerInvariant();
 
-            altText = EscapeImageAltText(altText.Replace("\"", "&quot;"));
+            altText = EscapeImageAltText(AttributeEncode(altText));
 
             if (_urls.ContainsKey(linkID))
             {
@@ -1058,9 +1058,9 @@ namespace MarkdownSharp
             string title = match.Groups[6].Value;
             string result;
 
-            alt = alt.Replace("\"", "&quot;");
-            title = title.Replace("\"", "&quot;");
-            
+            alt = AttributeEncode(alt);
+            title = AttributeEncode(title);
+
             if (url.StartsWith("<") && url.EndsWith(">"))
                 url = url.Substring(1, url.Length - 2);    // Remove <>'s surrounding URL, if present
             url = EncodeProblemUrlChars(url);
@@ -1641,6 +1641,11 @@ namespace MarkdownSharp
             s = s.Replace("*", _escapeTable["*"]);
             s = s.Replace("_", _escapeTable["_"]);
             return s;
+        }
+
+        private static string AttributeEncode(string s)
+        {
+            return s.Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;");
         }
 
         private static char[] _problemUrlChars = @"""'*()[]$:_".ToCharArray();
