@@ -1435,7 +1435,11 @@ namespace MarkdownSharp
             // These leading spaces screw with <pre> content, so we need to fix that:
             bq = Regex.Replace(bq, @"(\s*<pre>.+?</pre>)", new MatchEvaluator(BlockQuoteEvaluator2), RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline);
 
-            return string.Format("<blockquote>\n{0}\n</blockquote>\n\n", bq);
+            bq = string.Format("<blockquote>\n{0}\n</blockquote>", bq);
+            string key = GetHashKey(bq, isHtmlBlock: true);
+            _htmlBlocks[key] = bq;
+
+            return "\n\n" + key + "\n\n";
         }
 
         private string BlockQuoteEvaluator2(Match match)
