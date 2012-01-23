@@ -127,9 +127,11 @@
     <Content Include="nunit-console\nunit.core.dll" />
     <Content Include="nunit-console\nunit.core.interfaces.dll" />
     <Content Include="nunit-console\nunit.util.dll" />
+    <Content Include="testfiles\mdtest-1.1\HTML_comment_edge_case.html" />
     <Content Include="testfiles\mstest-0.1\code-inside-list.html" />
     <Content Include="testfiles\mstest-0.1\line-endings-cr.html" />
     <Content Include="testfiles\mstest-0.1\line-endings-crlf.html" />
+    <None Include="testfiles\mdtest-1.1\HTML_comment_edge_case.text" />
     <None Include="testfiles\pandoc\unpredictable-sublists.text" />
     <Content Include="testfiles\pandoc\!readme.txt" />
     <Content Include="testfiles\pandoc\failure-to-escape-less-than.html" />

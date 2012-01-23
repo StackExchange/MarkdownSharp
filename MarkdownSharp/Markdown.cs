@@ -654,7 +654,7 @@ namespace MarkdownSharp
             string pattern = @"
             (?>
                   (?>
-                    (?<=\n)     # Starting after a blank line
+                    (?<=\n)     # Starting at the beginning of a line
                     |           # or
                     \A\n?       # the beginning of the doc
                   )
@@ -693,6 +693,7 @@ namespace MarkdownSharp
                   
                   | # Special case for standalone HTML comments:
                   
+                      (?<=\n\n)               # preceded by a blank line
                       [ ]{0,$less_than_tab}
                       (?s:
                         <!--(?:|(?:[^>-]|-[^>])(?:[^-]|-[^-])*)-->
