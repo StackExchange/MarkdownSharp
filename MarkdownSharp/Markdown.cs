@@ -693,7 +693,7 @@ namespace MarkdownSharp
                   
                   | # Special case for standalone HTML comments:
                   
-                      (?<=\n\n)               # preceded by a blank line
+                      (?<=\n\n|\A)            # preceded by a blank line or start of document
                       [ ]{0,$less_than_tab}
                       (?s:
                         <!--(?:|(?:[^>-]|-[^>])(?:[^-]|-[^-])*)-->
