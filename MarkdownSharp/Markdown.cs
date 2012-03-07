@@ -663,7 +663,6 @@ namespace MarkdownSharp
                     # Match from `\n<tag>` to `</tag>\n`, handling nested tags 
                     # in between.
                       
-                        [ ]{0,$less_than_tab}
                         <($block_tags_b_re)   # start tag = $2
                         $attr>                # attributes followed by > and \n
                         $content              # content, support nesting
@@ -673,7 +672,6 @@ namespace MarkdownSharp
 
                   | # Special version for tags of group a.
 
-                        [ ]{0,$less_than_tab}
                         <($block_tags_a_re)   # start tag = $3
                         $attr>[ ]*\n          # attributes followed by >
                         $content2             # content, support nesting
