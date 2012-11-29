@@ -1647,7 +1647,7 @@ namespace MarkdownSharp
             return s.Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;");
         }
 
-        private static char[] _problemUrlChars = @"""'*()[]$:_".ToCharArray();
+        private static char[] _problemUrlChars = @"""'*()[]$:".ToCharArray();
 
         /// <summary>
         /// hex-encodes some unusual "problem" chars in URLs to avoid URL detection problems 
