@@ -319,7 +319,7 @@ namespace MarkdownSharp
 
             string backslashPattern = "";
 
-            foreach (char c in @"\`*_{}[]()>#+-.!")
+            foreach (char c in @"\`*_{}[]()>#+-.!/")
             {
                 string key = c.ToString();
                 string hash = GetHashKey(key, isHtmlBlock: false);
