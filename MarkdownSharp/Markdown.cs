@@ -1034,7 +1034,7 @@ namespace MarkdownSharp
                 if (_titles.ContainsKey(linkID))
                 {
                     string title = _titles[linkID];
-                    title = EscapeBoldItalic(title);
+                    title = AttributeEncode(EscapeBoldItalic(title));
 
                     result += string.Format(" title=\"{0}\"", title);
                 }
