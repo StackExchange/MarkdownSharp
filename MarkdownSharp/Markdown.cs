@@ -1446,8 +1446,37 @@ namespace MarkdownSharp
             return Regex.Replace(match.Groups[1].Value, @"^  ", "", RegexOptions.Multiline);
         }
 
-        private static Regex _autolinkBare = new Regex(@"(^|\s)(https?|ftp)(://[-A-Z0-9+&@#/%?=~_|\[\]\(\)!:,\.;]*[-A-Z0-9+&@#/%=~_|\[\]])($|\W)",
+        private static Regex _autolinkBare = new Regex(@"\b(https?|ftp)(://[-A-Z0-9+&@#/%?=~_|\[\]\(\)!:,\.;]*[-A-Z0-9+&@#/%=~_|\[\])])($|\W)",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static string handleTrailingParens(Match match)
+        {
+            var protocol = match.Groups[1].Value;
+            var link = match.Groups[2].Value;
+            var tail = match.Groups[3].Value;
+            if (!link.EndsWith(")"))
+                return "<" + protocol + link + ">" + tail;
+            var level = 0;
+            foreach (Match c in Regex.Matches(link, "[()]"))
+            {
+                if (c.Value == "(")
+                {
+                    if (level <= 0)
+                        level = 1;
+                    else
+                        level++;
+                }
+                else
+                {
+                    level--;
+                }
+            }
+            if (level < 0)
+            {
+                link = Regex.Replace(link, @"\){1," + (-level) + "}$", m => { tail = m.Value + tail; return ""; });
+            }
+            return "<" + protocol + link + ">" + tail;
+        }
 
         /// <summary>
         /// Turn angle-delimited URLs into HTML anchor tags
@@ -1463,7 +1492,7 @@ namespace MarkdownSharp
                 // fixup arbitrary URLs by adding Markdown < > so they get linked as well
                 // note that at this point, all other URL in the text are already hyperlinked as <a href=""></a>
                 // *except* for the <http://www.foo.com> case
-                text = _autolinkBare.Replace(text, @"$1<$2$3>$4");
+                text = _autolinkBare.Replace(text, handleTrailingParens);
             }
 
             // Hyperlinks: <http://foo.com>
