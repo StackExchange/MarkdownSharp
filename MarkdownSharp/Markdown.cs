@@ -1458,11 +1458,11 @@ namespace MarkdownSharp
             // the google link to not be matched again.
             if (match.Groups[1].Success)
                 return match.Value;
+
             var protocol = match.Groups[2].Value;
             var link = match.Groups[3].Value;
-            var tail = match.Groups[4].Value;
             if (!link.EndsWith(")"))
-                return "<" + protocol + link + ">" + tail;
+                return "<" + protocol + link + ">";
             var level = 0;
             foreach (Match c in Regex.Matches(link, "[()]"))
             {
@@ -1478,9 +1478,10 @@ namespace MarkdownSharp
                     level--;
                 }
             }
+            var tail = "";
             if (level < 0)
             {
-                link = Regex.Replace(link, @"\){1," + (-level) + "}$", m => { tail = m.Value + tail; return ""; });
+                link = Regex.Replace(link, @"\){1," + (-level) + "}$", m => { tail = m.Value; return ""; });
             }
             return "<" + protocol + link + ">" + tail;
         }
