@@ -1446,14 +1446,21 @@ namespace MarkdownSharp
             return Regex.Replace(match.Groups[1].Value, @"^  ", "", RegexOptions.Multiline);
         }
 
-        private static Regex _autolinkBare = new Regex(@"(?<!<|="")\b(https?|ftp)(://[-A-Z0-9+&@#/%?=~_|\[\]\(\)!:,\.;]*[-A-Z0-9+&@#/%=~_|\[\])])($|\W)",
+        private static Regex _autolinkBare = new Regex(@"(<|="")?\b(https?|ftp)(://[-A-Z0-9+&@#/%?=~_|\[\]\(\)!:,\.;]*[-A-Z0-9+&@#/%=~_|\[\])])(?=$|\W)",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static string handleTrailingParens(Match match)
         {
-            var protocol = match.Groups[1].Value;
-            var link = match.Groups[2].Value;
-            var tail = match.Groups[3].Value;
+            // The first group is essentially a negative lookbehind -- if there's a < or a =", we don't touch this.
+            // We're not using a *real* lookbehind, because of links with in links, like <a href="http://web.archive.org/web/20121130000728/http://www.google.com/">
+            // With a real lookbehind, the full link would never be matched, and thus the http://www.google.com *would* be matched.
+            // With the simulated lookbehind, the full link *is* matched (just not handled, because of this early return), causing
+            // the google link to not be matched again.
+            if (match.Groups[1].Success)
+                return match.Value;
+            var protocol = match.Groups[2].Value;
+            var link = match.Groups[3].Value;
+            var tail = match.Groups[4].Value;
             if (!link.EndsWith(")"))
                 return "<" + protocol + link + ">" + tail;
             var level = 0;
