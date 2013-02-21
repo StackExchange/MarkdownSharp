@@ -1016,38 +1016,26 @@ namespace MarkdownSharp
             string wholeMatch = match.Groups[1].Value;
             string altText = match.Groups[2].Value;
             string linkID = match.Groups[3].Value.ToLowerInvariant();
-            string result;
 
             // for shortcut links like ![this][].
             if (linkID == "")
                 linkID = altText.ToLowerInvariant();
 
-            altText = EscapeImageAltText(AttributeEncode(altText));
-
             if (_urls.ContainsKey(linkID))
             {
                 string url = _urls[linkID];
-                url = EncodeProblemUrlChars(url);
-                url = EscapeBoldItalic(url);                
-                result = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, altText);
+                string title = null;
 
                 if (_titles.ContainsKey(linkID))
-                {
-                    string title = _titles[linkID];
-                    title = AttributeEncode(EscapeBoldItalic(title));
+                    title = _titles[linkID];
 
-                    result += string.Format(" title=\"{0}\"", title);
-                }
-
-                result += _emptyElementSuffix;
+                return ImageTag(url, altText, title);
             }
             else
             {
                 // If there's no such link ID, leave intact:
-                result = wholeMatch;
+                return wholeMatch;
             }
-
-            return result;
         }
 
         private string ImageInlineEvaluator(Match match)
@@ -1055,26 +1043,25 @@ namespace MarkdownSharp
             string alt = match.Groups[2].Value;
             string url = match.Groups[3].Value;
             string title = match.Groups[6].Value;
-            string result;
-
-            alt = AttributeEncode(alt);
-            title = AttributeEncode(title);
 
             if (url.StartsWith("<") && url.EndsWith(">"))
                 url = url.Substring(1, url.Length - 2);    // Remove <>'s surrounding URL, if present
+
+            return ImageTag(url, alt, title);
+        }
+
+        private string ImageTag(string url, string altText, string title)
+        {
+            altText = EscapeImageAltText(AttributeEncode(altText));
             url = EncodeProblemUrlChars(url);
             url = EscapeBoldItalic(url);
-
-            result = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, alt);
-
+            var result = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, altText);
             if (!String.IsNullOrEmpty(title))
             {
-                title = EscapeBoldItalic(title);
+                title = AttributeEncode(EscapeBoldItalic(title));
                 result += string.Format(" title=\"{0}\"", title);
             }
-
             result += _emptyElementSuffix;
-
             return result;
         }
 
