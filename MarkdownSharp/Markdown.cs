@@ -1433,7 +1433,7 @@ namespace MarkdownSharp
             return Regex.Replace(match.Groups[1].Value, @"^  ", "", RegexOptions.Multiline);
         }
 
-        private static Regex _autolinkBare = new Regex(@"(<|="")?\b(https?|ftp)(://[-A-Z0-9+&@#/%?=~_|\[\]\(\)!:,\.;]*[-A-Z0-9+&@#/%=~_|\[\])])(?=$|\W)",
+        private static Regex _autolinkBare = new Regex(@"(<|="")?\b(https?|ftp)(://[-A-Z0-9+&@#/%?=~_|\[\]\(\)!:,\.;" + "\x1a]*[-A-Z0-9+&@#/%=~_|\\[\\])])(?=$|\\W)",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static string handleTrailingParens(Match match)
