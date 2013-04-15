@@ -1175,35 +1175,38 @@ namespace MarkdownSharp
         /// <summary>
         /// Turn Markdown lists into HTML ul and ol and li tags
         /// </summary>
-        private string DoLists(string text)
+        private string DoLists(string text, bool isInsideParagraphlessListItem = false)
         {
             // We use a different prefix before nested lists than top-level lists.
             // See extended comment in _ProcessListItems().
             if (_listLevel > 0)
-                text = _listNested.Replace(text, new MatchEvaluator(ListEvaluator));
+                text = _listNested.Replace(text, GetListEvaluator(isInsideParagraphlessListItem));
             else
-                text = _listTopLevel.Replace(text, new MatchEvaluator(ListEvaluator));
+                text = _listTopLevel.Replace(text, GetListEvaluator(false));
 
             return text;
         }
 
-        private string ListEvaluator(Match match)
+        private MatchEvaluator GetListEvaluator(bool isInsideParagraphlessListItem = false)
         {
-            string list = match.Groups[1].Value;
-            string listType = Regex.IsMatch(match.Groups[3].Value, _markerUL) ? "ul" : "ol";
-            string result;
+            return new MatchEvaluator(match =>
+                {
+                    string list = match.Groups[1].Value;
+                    string listType = Regex.IsMatch(match.Groups[3].Value, _markerUL) ? "ul" : "ol";
+                    string result;
 
-            result = ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL);
+                    result = ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL, isInsideParagraphlessListItem);
 
-            result = string.Format("<{0}>\n{1}</{0}>\n", listType, result);
-            return result;
+                    result = string.Format("<{0}>\n{1}</{0}>\n", listType, result);
+                    return result;
+                });
         }
 
         /// <summary>
         /// Process the contents of a single ordered or unordered list, splitting it
         /// into individual list items.
         /// </summary>
-        private string ProcessListItems(string list, string marker)
+        private string ProcessListItems(string list, string marker, bool isInsideParagraphlessListItem = false)
         {
             // The listLevel global keeps track of when we're inside a list.
             // Each time we enter a list, we increment it; when we leave a list,
@@ -1254,9 +1257,10 @@ namespace MarkdownSharp
                 else
                 {
                     // recursion for sub-lists
-                    item = DoLists(Outdent(item));
+                    item = DoLists(Outdent(item), isInsideParagraphlessListItem: true);
                     item = item.TrimEnd('\n');
-                    item = RunSpanGamut(item);
+                    if (!isInsideParagraphlessListItem) // only the outer-most item should run this, otherwise it's run multiple times for the inner ones
+                        item = RunSpanGamut(item);
                 }
                 lastItemHadADoubleNewline = endsWithDoubleNewline;
                 return string.Format("<li>{0}</li>\n", item);
