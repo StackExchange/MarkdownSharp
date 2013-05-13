@@ -1437,8 +1437,13 @@ namespace MarkdownSharp
             return Regex.Replace(match.Groups[1].Value, @"^  ", "", RegexOptions.Multiline);
         }
 
-        private static Regex _autolinkBare = new Regex(@"(<|="")?\b(https?|ftp)(://[-A-Z0-9+&@#/%?=~_|\[\]\(\)!:,\.;" + "\x1a]*[-A-Z0-9+&@#/%=~_|\\[\\])])(?=$|\\W)",
+        private const string _charInsideUrl = @"[-A-Z0-9+&@#/%?=~_|\[\]\(\)!:,\.;" + "\x1a]";
+        private const string _charEndingUrl = "[-A-Z0-9+&@#/%=~_|\\[\\])]";
+
+        private static Regex _autolinkBare = new Regex(@"(<|="")?\b(https?|ftp)(://" + _charInsideUrl + "*" + _charEndingUrl + ")(?=$|\\W)",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static Regex _endCharRegex = new Regex(_charEndingUrl, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static string handleTrailingParens(Match match)
         {
@@ -1473,6 +1478,15 @@ namespace MarkdownSharp
             if (level < 0)
             {
                 link = Regex.Replace(link, @"\){1," + (-level) + "}$", m => { tail = m.Value; return ""; });
+            }
+            if (tail.Length > 0)
+            {
+                var lastChar = link[link.Length - 1];
+                if (!_endCharRegex.IsMatch(lastChar.ToString()))
+                {
+                    tail = lastChar + tail;
+                    link = link.Substring(0, link.Length - 1);
+                }
             }
             return "<" + protocol + link + ">" + tail;
         }
