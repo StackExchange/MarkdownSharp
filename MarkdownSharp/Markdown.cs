@@ -538,7 +538,7 @@ namespace MarkdownSharp
         }
 
         private static Regex _linkDef = new Regex(string.Format(@"
-                        ^[ ]{{0,{0}}}\[(.+)\]:  # id = $1
+                        ^[ ]{{0,{0}}}\[([^\[\]]+)\]:  # id = $1
                           [ ]*
                           \n?                   # maybe *one* newline
                           [ ]*
