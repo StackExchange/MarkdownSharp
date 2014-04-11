@@ -1532,7 +1532,7 @@ namespace MarkdownSharp
         private string HyperlinkEvaluator(Match match)
         {
             string link = match.Groups[1].Value;
-            return string.Format("<a href=\"{0}\">{0}</a>", link);
+            return string.Format("<a href=\"{0}\">{1}</a>", EncodeProblemUrlChars(link), link);
         }
 
         private string EmailEvaluator(Match match)
@@ -1689,7 +1689,7 @@ namespace MarkdownSharp
             return s.Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;");
         }
 
-        private static char[] _problemUrlChars = @"""'*()[]$:".ToCharArray();
+        private static readonly char[] _problemUrlChars = @"""'*()[]$:_".ToCharArray();
 
         /// <summary>
         /// hex-encodes some unusual "problem" chars in URLs to avoid URL detection problems 
