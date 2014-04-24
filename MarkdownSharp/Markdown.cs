@@ -1303,8 +1303,9 @@ namespace MarkdownSharp
         }
 
         private static Regex _codeSpan = new Regex(@"
-                    (?<!\\)   # Character before opening ` can't be a backslash
+                    (?<![\\`])   # Character before opening ` can't be a backslash or backtick
                     (`+)      # $1 = Opening run of `
+                    (?!`)     # and no more backticks -- match the full run
                     (.+?)     # $2 = The code block
                     (?<!`)
                     \1
