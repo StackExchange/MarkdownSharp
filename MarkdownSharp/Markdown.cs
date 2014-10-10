@@ -1170,12 +1170,20 @@ namespace MarkdownSharp
             return new MatchEvaluator(match =>
                 {
                     string list = match.Groups[1].Value;
-                    string listType = Regex.IsMatch(match.Groups[3].Value, _markerUL) ? "ul" : "ol";
+                    string marker = match.Groups[3].Value;
+                    string listType = Regex.IsMatch(marker, _markerUL) ? "ul" : "ol";
                     string result;
+                    string start = "";
+                    if (listType == "ol")
+                    {
+                        var firstNumber = int.Parse(marker.Substring(0, marker.Length - 1));
+                        if (firstNumber != 1 && firstNumber != 0)
+                            start = " start=\"" + firstNumber + "\"";
+                    }
 
                     result = ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL, isInsideParagraphlessListItem);
 
-                    result = string.Format("<{0}>\n{1}</{0}>\n", listType, result);
+                    result = string.Format("<{0}{1}>\n{2}</{0}>\n", listType, start, result);
                     return result;
                 });
         }
