@@ -118,6 +118,12 @@ namespace MarkdownSharp
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
         public bool StrictBoldItalic { get; set; }
+
+        /// <summary>
+        /// when true, asterisks may be used for intraword emphasis
+        /// this does nothing if StrictBoldItalic is false
+        /// </summary>
+        public bool AsteriskIntraWordEmphasis { get; set; }
     }
 
 
@@ -148,6 +154,7 @@ namespace MarkdownSharp
         ///     Markdown.LinkEmails (true/false)
         ///     Markdown.AutoNewLines (true/false)
         ///     Markdown.AutoHyperlink (true/false)
+        ///     Markdown.AsteriskIntraWordEmphasis (true/false)
         ///     
         /// </summary>
         public Markdown(bool loadOptionsFromConfigFile)
@@ -174,6 +181,9 @@ namespace MarkdownSharp
                     case "Markdown.StrictBoldItalic":
                         _strictBoldItalic = Convert.ToBoolean(settings[key]);
                         break;
+                    case "Markdown.AsteriskIntraWordEmphasis":
+                        _asteriskIntraWordEmphasis = Convert.ToBoolean(settings[key]);
+                        break;
                 }
             }
         }
@@ -188,6 +198,7 @@ namespace MarkdownSharp
             _emptyElementSuffix = options.EmptyElementSuffix;
             _linkEmails = options.LinkEmails;
             _strictBoldItalic = options.StrictBoldItalic;
+            _asteriskIntraWordEmphasis = options.AsteriskIntraWordEmphasis;
         }
 
 
@@ -222,6 +233,17 @@ namespace MarkdownSharp
             set { _strictBoldItalic = value; }
         }
         private bool _strictBoldItalic = false;
+
+        /// <summary>
+        /// when true, asterisks may be used for intraword emphasis
+        /// this does nothing if StrictBoldItalic is false
+        /// </summary>
+        public bool AsteriskIntraWordEmphasis
+        {
+            get { return _asteriskIntraWordEmphasis; }
+            set { _asteriskIntraWordEmphasis = value; }
+        }
+        private bool _asteriskIntraWordEmphasis = false;
 
         /// <summary>
         /// when true, RETURN becomes a literal newline  
@@ -276,14 +298,14 @@ namespace MarkdownSharp
 
         private static readonly Dictionary<string, string> _escapeTable;
         private static readonly Dictionary<string, string> _invertedEscapeTable;
-        private static readonly Dictionary<string, string> _backslashEscapeTable;        
+        private static readonly Dictionary<string, string> _backslashEscapeTable;
 
         private readonly Dictionary<string, string> _urls = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _titles = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _htmlBlocks = new Dictionary<string, string>();
 
         private int _listLevel;
-        private static string AutoLinkPreventionMarker = "\x1AP"; // temporarily replaces "://" where auto-linking shouldn't happen;
+        private static string AutoLinkPreventionMarker = "\x1AP"; // temporarily replaces "://" where auto-linking shouldn't happen
 
         /// <summary>
         /// In the static constuctor we'll initialize what stays the same across all transforms.
@@ -1338,14 +1360,17 @@ namespace MarkdownSharp
             return string.Concat("<code>", span, "</code>");
         }
 
-
         private static Regex _bold = new Regex(@"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static Regex _semiStrictBold = new Regex(@"(?=.[*_]|[*_])(^|(?=\W__|(?!\*)[\W_]\*\*|\w\*\*\w).)(\*\*|__)(?!\2)(?=\S)((?:|.*?(?!\2).)(?=\S_|\w|\S\*\*(?:[\W_]|$)).)(?=__(?:\W|$)|\*\*(?:[^*]|$))\2",
+            RegexOptions.Singleline | RegexOptions.Compiled);
         private static Regex _strictBold = new Regex(@"(^|[\W_])(?:(?!\1)|(?=^))(\*|_)\2(?=\S)(.*?\S)\2\2(?!\2)(?=[\W_]|$)",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static Regex _italic = new Regex(@"(\*|_) (?=\S) (.+?) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static Regex _semiStrictItalic = new Regex(@"(?=.[*_]|[*_])(^|(?=\W_|(?!\*)(?:[\W_]\*|\D\*(?=\w)\D)).)(\*|_)(?!\2\2\2)(?=\S)((?:(?!\2).)*?(?=[^\s_]_|(?=\w)\D\*\D|[^\s*]\*(?:[\W_]|$)).)(?=_(?:\W|$)|\*(?:[^*]|$))\2",
+            RegexOptions.Singleline | RegexOptions.Compiled);
         private static Regex _strictItalic = new Regex(@"(^|[\W_])(?:(?!\1)|(?=^))(\*|_)(?=\S)((?:(?!\2).)*?\S)\2(?!\2)(?=[\W_]|$)",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
@@ -1358,8 +1383,18 @@ namespace MarkdownSharp
             // <strong> must go first, then <em>
             if (_strictBoldItalic)
             {
-                text = _strictBold.Replace(text, "$1<strong>$3</strong>");
-                text = _strictItalic.Replace(text, "$1<em>$3</em>");
+                if (_asteriskIntraWordEmphasis)
+                {
+                    text = _semiStrictBold.Replace(text, "$1<strong>$3</strong>");
+                    text = _semiStrictItalic.Replace(text, "$1<em>$3</em>");
+
+                }
+                else
+                {
+                    text = _strictBold.Replace(text, "$1<strong>$3</strong>");
+                    text = _strictItalic.Replace(text, "$1<em>$3</em>");
+
+                }
             }
             else
             {
@@ -1685,7 +1720,6 @@ namespace MarkdownSharp
             return s;
         }
 
-
         /// <summary>
         /// Within tags -- meaning between &lt; and &gt; -- encode [\ ` * _] so they 
         /// don't conflict with their use in Markdown for code, italics and strong. 
@@ -1728,7 +1762,7 @@ namespace MarkdownSharp
         /// removes any blank lines (only spaces) in the text
         /// </summary>
         private string Normalize(string text)
-        {            
+        {
             var output = new StringBuilder(text.Length);
             var line = new StringBuilder();
             bool valid = false;
