@@ -838,6 +838,9 @@ namespace MarkdownSharp
         /// </remarks>
         private string DoAnchors(string text)
         {
+            if (!text.Contains("["))
+                return text;
+
             // First, handle reference-style links: [link text] [id]
             text = _anchorRef.Replace(text, new MatchEvaluator(AnchorRefEvaluator));
 
@@ -992,6 +995,9 @@ namespace MarkdownSharp
         /// </remarks>
         private string DoImages(string text)
         {
+            if (!text.Contains("!["))
+                return text;
+
             // First, handle reference-style labeled images: ![alt text][id]
             text = _imagesRef.Replace(text, new MatchEvaluator(ImageReferenceEvaluator));
 
@@ -1379,7 +1385,8 @@ namespace MarkdownSharp
         /// </summary>
         private string DoItalicsAndBold(string text)
         {
-
+            if (!(text.Contains("*") || text.Contains("_")))
+                return text;
             // <strong> must go first, then <em>
             if (_strictBoldItalic)
             {
