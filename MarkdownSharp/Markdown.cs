@@ -109,11 +109,6 @@ namespace MarkdownSharp
         /// </summary>
         public string EmptyElementSuffix { get; set; }
         /// <summary>
-        /// when true, problematic URL characters like [, ], (, and so forth will be encoded 
-        /// WARNING: this is a significant deviation from the markdown spec
-        /// </summary>
-        public bool EncodeProblemUrlCharacters { get; set; }
-        /// <summary>
         /// when false, email addresses will never be auto-linked  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
@@ -153,7 +148,6 @@ namespace MarkdownSharp
         ///     Markdown.LinkEmails (true/false)
         ///     Markdown.AutoNewLines (true/false)
         ///     Markdown.AutoHyperlink (true/false)
-        ///     Markdown.EncodeProblemUrlCharacters (true/false) 
         ///     
         /// </summary>
         public Markdown(bool loadOptionsFromConfigFile)
@@ -174,9 +168,6 @@ namespace MarkdownSharp
                     case "Markdown.EmptyElementSuffix":
                         _emptyElementSuffix = settings[key];
                         break;
-                    case "Markdown.EncodeProblemUrlCharacters":
-                        _encodeProblemUrlCharacters = Convert.ToBoolean(settings[key]);
-                        break;
                     case "Markdown.LinkEmails":
                         _linkEmails = Convert.ToBoolean(settings[key]);
                         break;
@@ -195,7 +186,6 @@ namespace MarkdownSharp
             _autoHyperlink = options.AutoHyperlink;
             _autoNewlines = options.AutoNewlines;
             _emptyElementSuffix = options.EmptyElementSuffix;
-            _encodeProblemUrlCharacters = options.EncodeProblemUrlCharacters;
             _linkEmails = options.LinkEmails;
             _strictBoldItalic = options.StrictBoldItalic;
         }
@@ -255,17 +245,6 @@ namespace MarkdownSharp
         }
         private bool _autoHyperlink = false;
 
-        /// <summary>
-        /// when true, problematic URL characters like [, ], (, and so forth will be encoded 
-        /// WARNING: this is a significant deviation from the markdown spec
-        /// </summary>
-        public bool EncodeProblemUrlCharacters
-        {
-            get { return _encodeProblemUrlCharacters; }
-            set { _encodeProblemUrlCharacters = value; }
-        }
-        private bool _encodeProblemUrlCharacters = false;
-
         #endregion
 
         private enum TokenType { Text, Tag }
@@ -319,7 +298,7 @@ namespace MarkdownSharp
 
             string backslashPattern = "";
 
-            foreach (char c in @"\`*_{}[]()>#+-.!/")
+            foreach (char c in @"\`*_{}[]()>#+-.!/:")
             {
                 string key = c.ToString();
                 string hash = GetHashKey(key, isHtmlBlock: false);
@@ -358,7 +337,7 @@ namespace MarkdownSharp
             Setup();
 
             text = Normalize(text);
-           
+
             text = HashHTMLBlocks(text);
             text = StripLinkDefinitions(text);
             text = RunBlockGamut(text);
@@ -433,7 +412,7 @@ namespace MarkdownSharp
         {
             // split on two or more newlines
             string[] grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
-            
+
             for (int i = 0; i < grafs.Length; i++)
             {
                 if (grafs[i].StartsWith("\x1AH"))
@@ -871,8 +850,8 @@ namespace MarkdownSharp
             {
                 string url = _urls[linkID];
 
-                url = EncodeProblemUrlChars(url);
-                url = EscapeBoldItalic(url);                
+                url = AttributeSafeUrl(url);
+
                 result = "<a href=\"" + url + "\"";
 
                 if (_titles.ContainsKey(linkID))
@@ -902,8 +881,8 @@ namespace MarkdownSharp
             {
                 string url = _urls[linkID];
 
-                url = EncodeProblemUrlChars(url);
-                url = EscapeBoldItalic(url);                
+                url = AttributeSafeUrl(url);
+
                 result = "<a href=\"" + url + "\"";
 
                 if (_titles.ContainsKey(linkID))
@@ -929,10 +908,10 @@ namespace MarkdownSharp
             string title = match.Groups[6].Value;
             string result;
 
-            url = EncodeProblemUrlChars(url);
-            url = EscapeBoldItalic(url);
             if (url.StartsWith("<") && url.EndsWith(">"))
                 url = url.Substring(1, url.Length - 2); // remove <>'s surrounding URL, if present            
+
+            url = AttributeSafeUrl(url);
 
             result = string.Format("<a href=\"{0}\"", url);
 
@@ -1053,8 +1032,7 @@ namespace MarkdownSharp
         private string ImageTag(string url, string altText, string title)
         {
             altText = EscapeImageAltText(AttributeEncode(altText));
-            url = EncodeProblemUrlChars(url);
-            url = EscapeBoldItalic(url);
+            url = AttributeSafeUrl(url);
             var result = string.Format("<img src=\"{0}\" alt=\"{1}\"", url, altText);
             if (!String.IsNullOrEmpty(title))
             {
@@ -1533,7 +1511,8 @@ namespace MarkdownSharp
         private string HyperlinkEvaluator(Match match)
         {
             string link = match.Groups[1].Value;
-            return string.Format("<a href=\"{0}\">{1}</a>", EscapeBoldItalic(EncodeProblemUrlChars(link)), link);
+            string url = AttributeSafeUrl(link);
+            return string.Format("<a href=\"{0}\">{1}</a>", url, link);
         }
 
         private string EmailEvaluator(Match match)
@@ -1646,7 +1625,7 @@ namespace MarkdownSharp
             return s;
         }
 
-        private static Regex _backslashEscapes; 
+        private static Regex _backslashEscapes;
 
         /// <summary>
         /// Encodes any escaped characters such as \`, \*, \[ etc
@@ -1687,36 +1666,15 @@ namespace MarkdownSharp
 
         private static string AttributeEncode(string s)
         {
-            return s.Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;");
+            return s.Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;").Replace("'", "&#39;");
         }
 
-        private static readonly char[] _problemUrlChars = @"""'*()[]$:".ToCharArray();
-
-        /// <summary>
-        /// hex-encodes some unusual "problem" chars in URLs to avoid URL detection problems 
-        /// </summary>
-        private string EncodeProblemUrlChars(string url)
+        private static string AttributeSafeUrl(string s)
         {
-            if (!_encodeProblemUrlCharacters) return url;
-
-            var sb = new StringBuilder(url.Length);
-            bool encode;
-            char c;
-
-            for (int i = 0; i < url.Length; i++)
-            {
-                c = url[i];
-                encode = Array.IndexOf(_problemUrlChars, c) != -1;
-                if (encode && c == ':' && i < url.Length - 1)
-                    encode = !(url[i + 1] == '/') && !(url[i + 1] >= '0' && url[i + 1] <= '9');
-
-                if (encode)
-                    sb.Append("%" + String.Format("{0:x}", (byte)c));
-                else
-                    sb.Append(c);                
-            }
-
-            return sb.ToString();
+            s = AttributeEncode(s);
+            foreach (var c in "*_:()[]")
+                s = s.Replace(c.ToString(), _escapeTable[c.ToString()]);
+            return s;
         }
 
 
@@ -1742,7 +1700,7 @@ namespace MarkdownSharp
                 {
                     value = value.Replace(@"\", _escapeTable[@"\"]);
                     
-                    if (_autoHyperlink && value.StartsWith("<!")) // escape slashes in comments to prevent autolinking there -- http://meta.stackoverflow.com/questions/95987/html-comment-containing-url-breaks-if-followed-by-another-html-comment
+                    if (_autoHyperlink && value.StartsWith("<!")) // escape slashes in comments to prevent autolinking there -- http://meta.stackexchange.com/questions/95987/html-comment-containing-url-breaks-if-followed-by-another-html-comment
                         value = value.Replace("/", _escapeTable["/"]);
                     
                     value = Regex.Replace(value, "(?<=.)</?code>(?=.)", _escapeTable[@"`"]);
