@@ -437,7 +437,7 @@ namespace MarkdownSharp
 
             for (int i = 0; i < grafs.Length; i++)
             {
-                if (grafs[i].StartsWith("\x1AH"))
+                if (grafs[i].Contains("\x1AH"))
                 {
                     // unhashify HTML blocks
                     if (unhash)
