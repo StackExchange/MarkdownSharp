@@ -374,7 +374,7 @@ namespace MarkdownSharp
         /// <summary>
         /// Perform transformations that form block-level tags like paragraphs, headers, and list items.
         /// </summary>
-        private string RunBlockGamut(string text, bool unhash = true)
+        private string RunBlockGamut(string text, bool unhash = true, bool createParagraphs = true)
         {
             text = DoHeaders(text);
             text = DoHorizontalRules(text);
@@ -388,7 +388,7 @@ namespace MarkdownSharp
             // <p> tags around block-level tags.
             text = HashHTMLBlocks(text);
 
-            text = FormParagraphs(text, unhash: unhash);
+            text = FormParagraphs(text, unhash: unhash, createParagraphs: createParagraphs);
 
             return text;
         }
@@ -430,7 +430,7 @@ namespace MarkdownSharp
         /// splits on two or more newlines, to form "paragraphs";    
         /// each paragraph is then unhashed (if it is a hash and unhashing isn't turned off) or wrapped in HTML p tag
         /// </summary>
-        private string FormParagraphs(string text, bool unhash = true)
+        private string FormParagraphs(string text, bool unhash = true, bool createParagraphs = true)
         {
             // split on two or more newlines
             string[] grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
@@ -465,7 +465,7 @@ namespace MarkdownSharp
                 else
                 {
                     // do span level processing inside the block, then wrap result in <p> tags
-                    grafs[i] = _leadingWhitespace.Replace(RunSpanGamut(grafs[i]), "<p>") + "</p>";
+                    grafs[i] = _leadingWhitespace.Replace(RunSpanGamut(grafs[i]), createParagraphs ? "<p>" : "") + (createParagraphs ? "</p>" : "");
                 }
             }
 
@@ -1181,46 +1181,44 @@ namespace MarkdownSharp
         /// <summary>
         /// Turn Markdown lists into HTML ul and ol and li tags
         /// </summary>
-        private string DoLists(string text, bool isInsideParagraphlessListItem = false)
+        private string DoLists(string text)
         {
             // We use a different prefix before nested lists than top-level lists.
             // See extended comment in _ProcessListItems().
             if (_listLevel > 0)
-                text = _listNested.Replace(text, GetListEvaluator(isInsideParagraphlessListItem));
+                text = _listNested.Replace(text, new MatchEvaluator(ListEvaluator));
             else
-                text = _listTopLevel.Replace(text, GetListEvaluator(false));
+                text = _listTopLevel.Replace(text, new MatchEvaluator(ListEvaluator));
 
             return text;
         }
 
-        private MatchEvaluator GetListEvaluator(bool isInsideParagraphlessListItem = false)
+        private string ListEvaluator(Match match)
         {
-            return new MatchEvaluator(match =>
-                {
-                    string list = match.Groups[1].Value;
-                    string marker = match.Groups[3].Value;
-                    string listType = Regex.IsMatch(marker, _markerUL) ? "ul" : "ol";
-                    string result;
-                    string start = "";
-                    if (listType == "ol")
-                    {
-                        var firstNumber = int.Parse(marker.Substring(0, marker.Length - 1));
-                        if (firstNumber != 1 && firstNumber != 0)
-                            start = " start=\"" + firstNumber + "\"";
-                    }
+            string list = match.Groups[1].Value;
+            string marker = match.Groups[3].Value;
+            string listType = Regex.IsMatch(marker, _markerUL) ? "ul" : "ol";
+            string result;
+            string start = "";
+            if (listType == "ol")
+            {
+                var firstNumber = int.Parse(marker.Substring(0, marker.Length - 1));
+                if (firstNumber != 1 && firstNumber != 0)
+                    start = " start=\"" + firstNumber + "\"";
+            }
 
-                    result = ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL, isInsideParagraphlessListItem);
+            result = ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL);
 
-                    result = string.Format("<{0}{1}>\n{2}</{0}>\n", listType, start, result);
-                    return result;
-                });
+            result = string.Format("<{0}{1}>\n{2}</{0}>\n", listType, start, result);
+            return result;
+
         }
 
         /// <summary>
         /// Process the contents of a single ordered or unordered list, splitting it
         /// into individual list items.
         /// </summary>
-        private string ProcessListItems(string list, string marker, bool isInsideParagraphlessListItem = false)
+        private string ProcessListItems(string list, string marker)
         {
             // The listLevel global keeps track of when we're inside a list.
             // Each time we enter a list, we increment it; when we leave a list,
@@ -1265,17 +1263,10 @@ namespace MarkdownSharp
                 bool endsWithDoubleNewline = item.EndsWith("\n\n");
                 bool containsDoubleNewline = endsWithDoubleNewline || item.Contains("\n\n");
 
-                if (containsDoubleNewline || lastItemHadADoubleNewline)
-                    // we could correct any bad indentation here..
-                    item = RunBlockGamut(Outdent(item) + "\n", unhash: false);
-                else
-                {
-                    // recursion for sub-lists
-                    item = DoLists(Outdent(item), isInsideParagraphlessListItem: true);
-                    item = item.TrimEnd('\n');
-                    if (!isInsideParagraphlessListItem) // only the outer-most item should run this, otherwise it's run multiple times for the inner ones
-                        item = RunSpanGamut(item);
-                }
+                var loose = containsDoubleNewline || lastItemHadADoubleNewline;
+                // we could correct any bad indentation here..
+                item = RunBlockGamut(Outdent(item) + "\n", unhash: false, createParagraphs: loose);
+
                 lastItemHadADoubleNewline = endsWithDoubleNewline;
                 return string.Format("<li>{0}</li>\n", item);
             };
