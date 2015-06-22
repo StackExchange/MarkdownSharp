@@ -800,7 +800,7 @@ namespace MarkdownSharp
                 \[
                     (.*?)                   # id = $3
                 \]
-            )", GetNestedBracketsPattern()), RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+            )", GetNestedBracketsPattern()), RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _anchorInline = new Regex(string.Format(@"
                 (                           # wrap whole match in $1
@@ -819,14 +819,14 @@ namespace MarkdownSharp
                         )?                  # title is optional
                     \)
                 )", GetNestedBracketsPattern(), GetNestedParensPattern()),
-                  RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                  RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _anchorRefShortcut = new Regex(@"
             (                               # wrap whole match in $1
               \[
                  ([^\[\]]+)                 # link text = $2; can't contain [ or ]
               \]
-            )", RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+            )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown link shortcuts into HTML anchor tags
@@ -964,7 +964,7 @@ namespace MarkdownSharp
                         (.*?)       # id = $3
                     \]
 
-                    )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+                    )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _imagesInline = new Regex(String.Format(@"
               (                     # wrap whole match in $1
@@ -984,7 +984,7 @@ namespace MarkdownSharp
                     )?              # title is optional
                 \)
               )", GetNestedParensPattern()),
-                  RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+                  RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown image shortcuts into HTML img tags. 
