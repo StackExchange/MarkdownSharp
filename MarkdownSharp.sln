@@ -1,9 +1,16 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownSharp", "MarkdownSharp\MarkdownSharp.csproj", "{37619116-CCE8-465A-8B1F-081CA53364BB}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28124.53
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarkdownSharp", "src\MarkdownSharp\MarkdownSharp.csproj", "{37619116-CCE8-465A-8B1F-081CA53364BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownSharpTests", "MarkdownSharpTests\MarkdownSharpTests.csproj", "{1F76D227-9B91-475B-9B64-B7A3D0EE7E3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarkdownSharp.Tests", "tests\MarkdownSharp.Tests\MarkdownSharp.Tests.csproj", "{1F76D227-9B91-475B-9B64-B7A3D0EE7E3D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B5D82B87-4F64-4407-86C4-79FF4DFAAB91}"
+	ProjectSection(SolutionItems) = preProject
+		version.json = version.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

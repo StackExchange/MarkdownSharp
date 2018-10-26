@@ -1,0 +1,31 @@
+image:
+- Visual Studio 2017
+- Ubuntu
+
+init:
+  - git config --global core.autocrlf input
+
+skip_branch_with_pr: true
+skip_tags: true
+skip_commits:
+  files:
+    - '**/*.md'
+    - docs/*
+
+environment:
+  Appveyor: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+nuget:
+  disable_publish_on_pr: true
+
+build_script:
+- ps: >-
+    if ($env:OS -eq "Windows_NT") {
+      .\build\dotnet-install.ps1 -Version 2.1.400
+    }
+- ps: .\build.ps1 -PullRequestNumber "$env:APPVEYOR_PULL_REQUEST_NUMBER" -CreatePackages ($env:OS -eq "Windows_NT")
+
+test: off
+artifacts:
+- path: .\.nupkgs\*.nupkg

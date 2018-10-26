@@ -1,0 +1,26 @@
+<Project>
+  <PropertyGroup>
+    <Copyright>2018 Stack Exchange, Inc.</Copyright>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)StackExchange.Redis.snk</AssemblyOriginatorKeyFile>
+    <PackageId>$(AssemblyName)</PackageId>
+    <Authors>Jeff Atwood, Milan Negovan, John Gruber; Nick Craver</Authors>
+    <PackageProjectUrl>https://github.com/StackExchange/MarkdownSharp/</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.github.com/StackExchange/MarkdownSharp/master/LICENSE</PackageLicenseUrl>
+
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/StackExchange/MarkdownSharp/</RepositoryUrl>
+
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>embedded</DebugType>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.2.13" PrivateAssets="all" />
+    <PackageReference Include="SourceLink.Create.GitHub" Version="2.8.3" PrivateAssets="All" />
+    <DotNetCliToolReference Include="dotnet-sourcelink" Version="2.8.3" />
+    <DotNetCliToolReference Include="dotnet-sourcelink-git" Version="2.8.3" />
+  </ItemGroup>
+</Project>

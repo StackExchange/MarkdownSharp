@@ -1,0 +1,19 @@
+{
+  "version": "2.0-alpha",
+  "publicReleaseRefSpec": [
+    "."
+  ],
+  "nugetPackageVersion": {
+    "semVer": 2
+  },
+  "cloudBuild": {
+    "buildNumber": {
+      "enabled": false,
+      "setVersionVariables": false,
+      "includeCommitId": {
+        "when": "nonPublicReleaseOnly",
+        "where": "buildMetadata"
+      }
+    }
+  }
+}
