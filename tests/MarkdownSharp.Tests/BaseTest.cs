@@ -31,7 +31,7 @@ namespace MarkdownSharpTests
             {
                 if (resourceName.StartsWith(namespacePrefix) && resourceName.EndsWith(".html"))
                 {
-                    yield return new[] { Path.ChangeExtension(resourceName, "text"), resourceName };
+                    yield return new[] { Path.ChangeExtension(resourceName, "md"), resourceName };
                 }
             }
         }

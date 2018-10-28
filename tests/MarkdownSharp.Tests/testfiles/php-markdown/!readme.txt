@@ -4,7 +4,7 @@ this is essentially the same as running the unit tests, but with diff-able resul
 
 two files should be present for each test:
 
-test_name.text         -- input (raw markdown)
+test_name.md           -- input (raw markdown)
 test_name.html         -- output (expected cooked html output from reference markdown engine)
 
 this file will be generated if, and ONLY IF, the expected output does not match the actual output:

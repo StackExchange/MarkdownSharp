@@ -18,12 +18,12 @@ namespace MarkdownSharpTests
         /// </summary>
         /// <remarks>TODO: BenchmarkDotNet instead</remarks>
         [Theory]
-        [InlineData("markdown-example-short-1.text", 4000)]
-        [InlineData("markdown-example-medium-1.text", 1000)]
-        [InlineData("markdown-example-long-2.text", 100)]
-        [InlineData("markdown-readme.text", 1)]
-        [InlineData("markdown-readme.8.text", 1)]
-        [InlineData("markdown-readme.32.text", 1)]
+        [InlineData("markdown-example-short-1.md", 4000)]
+        [InlineData("markdown-example-medium-1.md", 1000)]
+        [InlineData("markdown-example-long-2.md", 100)]
+        [InlineData("markdown-readme.md", 1)]
+        [InlineData("markdown-readme.8.md", 1)]
+        [InlineData("markdown-readme.32.md", 1)]
         public void BenchmarkFile(string inputFile, int iterations)
         {
             var text = GetResourceFileContent(_assembly.GetName().Name + ".benchmarks." + inputFile);

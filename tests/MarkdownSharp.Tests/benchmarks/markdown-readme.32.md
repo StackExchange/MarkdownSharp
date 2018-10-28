@@ -151,7 +151,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -493,7 +493,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -835,7 +835,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -1177,7 +1177,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -1519,7 +1519,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -1861,7 +1861,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -2203,7 +2203,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -2545,7 +2545,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -2887,7 +2887,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -3229,7 +3229,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -3571,7 +3571,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -3913,7 +3913,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -4255,7 +4255,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -4597,7 +4597,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -4939,7 +4939,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -5281,7 +5281,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -5623,7 +5623,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -5965,7 +5965,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -6307,7 +6307,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -6649,7 +6649,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -6991,7 +6991,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -7333,7 +7333,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -7675,7 +7675,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -8017,7 +8017,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -8359,7 +8359,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -8701,7 +8701,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -9043,7 +9043,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -9385,7 +9385,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -9727,7 +9727,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -10069,7 +10069,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -10411,7 +10411,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
@@ -10753,7 +10753,7 @@ publish the raw Markdown-formatted text without translation into
 Use the `--html4tags` command-line switch to produce HTML output from a
 Unix-style command line. E.g.:
 
-    % perl Markdown.pl --html4tags foo.text
+    % perl Markdown.pl --html4tags foo.md
 
 Type `perldoc Markdown.pl`, or read the POD documentation within the
 Markdown.pl source code for more information.
