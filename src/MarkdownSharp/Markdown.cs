@@ -198,7 +198,8 @@ namespace MarkdownSharp
         {
             AutoHyperlink = options.AutoHyperlink;
             AutoNewLines = options.AutoNewlines;
-            EmptyElementSuffix = options.EmptyElementSuffix;
+            if (!string.IsNullOrEmpty(options.EmptyElementSuffix))
+                EmptyElementSuffix = options.EmptyElementSuffix;
             LinkEmails = options.LinkEmails;
             StrictBoldItalic = options.StrictBoldItalic;
             AsteriskIntraWordEmphasis = options.AsteriskIntraWordEmphasis;
