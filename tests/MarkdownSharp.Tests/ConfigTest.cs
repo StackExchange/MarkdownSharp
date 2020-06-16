@@ -58,6 +58,19 @@ namespace MarkdownSharpTests
         }
 
         [Fact]
+        public void TestDefaultOptions()
+        {
+            var markdownWithoutOptions = new Markdown();
+            Assert.Equal(" />", markdownWithoutOptions.EmptyElementSuffix);
+
+            var markdownWithOptions = new Markdown(new MarkdownOptions { });
+            Assert.Equal(" />", markdownWithOptions.EmptyElementSuffix);
+
+            var options = new MarkdownOptions { };
+            Assert.Equal(" />", options.EmptyElementSuffix);
+        }
+
+        [Fact]
         public void TestEmptyElementSuffix()
         {
             var markdown = new Markdown();
