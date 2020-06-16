@@ -111,7 +111,7 @@ namespace MarkdownSharp
         /// <summary>
         /// use ">" for HTML output, or " />" for XHTML output
         /// </summary>
-        public string EmptyElementSuffix { get; set; }
+        public string EmptyElementSuffix { get; set; } = " />";
 
         /// <summary>
         /// when false, email addresses will never be auto-linked  
